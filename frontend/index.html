@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salon Booking</title>
+    <link href="css/style.css" rel="stylesheet">
+    <script src="js/app.js" defer></script>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div id="avatar-container">
+                <img id="user-avatar" class="avatar" src="" alt="User Avatar">
+            </div>
+            <h1 id="user-name">Name</h1>
+            <p class="welcome-text">Добро пожаловать!</p>
+        </header>
+
+        <main class="main-content">
+            <div class="info-card">
+                <h2>ПАРИКМАХЕРСКАЯ</h2>
+                <p>📍 Адрес: г. Коммунар, ул. Ленинградское шоссе, д. 20А</p>
+                <p>🕒 График работы: ПН-СБ 10:00-19:00, ВС 10:00-18:00</p>
+            </div>
+
+            <div class="catalog-container">
+                <h2>Наши услуги</h2>
+                <div id="services-container" class="services-grid"></div>
+            </div>
+        </main>
+
+        <footer>
+            <button id="book-btn" class="cta-button">Записаться</button>
+        </footer>
+    </div>
+</body>
+</html>
