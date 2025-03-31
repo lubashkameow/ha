@@ -111,3 +111,39 @@ footer {
   cursor: pointer;
   box-shadow: 0 4px 12px rgba(255, 133, 178, 0.3);
 }
+
+.info-card {
+  text-align: center; /* Центрируем текст */
+  max-width: 600px; /* Ограничиваем ширину */
+  margin: 0 auto 20px; /* Центрируем блок и добавляем отступ снизу */
+}
+
+.loader, .error {
+  text-align: center;
+  padding: 20px;
+  font-size: 18px;
+}
+
+.gender-catalog {
+  animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.service-btn {
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: background 0.3s;
+}
+
+.service-btn:hover {
+  background: #e67399;
+}
