@@ -1,7 +1,7 @@
 const fetch = require('node-fetch');
 
 exports.handler = async () => {
-  const API_URL = 'https://arabia-refurbished-palm-accepting.trycloudflare.com.com/api/services';
+  const API_URL = 'http://arabia-refurbished-palm-accepting.trycloudflare.com.com/api/services';
   
   try {
     console.log('Отправка запроса к:', API_URL);
