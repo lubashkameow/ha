@@ -6,7 +6,6 @@ exports.handler = async () => {
   try {
     console.log('Отправка запроса к:', API_URL);
     const response = await fetch(API_URL, {
-      timeout: 5000 // 5 секунд таймаут
     });
 
     console.log('Получен ответ, статус:', response.status);
