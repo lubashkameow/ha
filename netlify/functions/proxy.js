@@ -11,7 +11,7 @@ exports.handler = async (event) => {
   }
 
   try {
-    const apiUrl = `https://cheque-mature-wealth-habitat.trycloudflare.com/api/appointments?user_id=${user_id}`;
+    const apiUrl = `https://removal-essentially-jd-fu.trycloudflare.com/api/appointments?user_id=${user_id}`;
     const response = await fetch(apiUrl);
     
     if (!response.ok) {
