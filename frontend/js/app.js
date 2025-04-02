@@ -5,6 +5,19 @@ document.addEventListener('DOMContentLoaded', () => {
     tg.expand();
     tg.BackButton.show();
     tg.BackButton.onClick(() => tg.close());
+
+    // Запрет масштабирования
+    disableZoom();
+
+    // Функция для запрета масштабирования
+    function disableZoom() {
+    const viewport = document.querySelector('meta[name="viewport"]');
+    viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+    
+    document.addEventListener('touchmove', function(e) {
+        if (e.scale !== 1) e.preventDefault();
+    }, { passive: false });
+}
     
     // Загрузка данных пользователя
     const user = tg.initDataUnsafe.user;
@@ -30,102 +43,106 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+// Загрузка услуг с сервера
 async function loadServices() {
     const container = document.getElementById('services-container');
+    if (!container) return;
+    
     container.innerHTML = '<div class="loader">Загрузка услуг...</div>';
     
     try {
         const response = await fetch('/.netlify/functions/getservices');
-        const services = await response.json();
+        if (!response.ok) throw new Error('Network response was not ok');
         
-        // Группировка по полу и категориям
-        const catalogData = {
-            female: {},
-            male: {}
-        };
-        
-        services.forEach(service => {
-            const gender = service.gender === 'female' ? 'female' : 'male';
-            if (!catalogData[gender][service.name_category]) {
-                catalogData[gender][service.name_category] = [];
-            }
-            catalogData[gender][service.name_category].push(service);
-        });
-        
-        // Создание HTML
-        renderCatalog(catalogData);
-        
-        // Инициализация кнопок переключения
-        initGenderButtons();
+        const data = await response.json();
+        renderServices(data);
         
     } catch (error) {
-        console.error('Ошибка:', error);
-        container.innerHTML = '<p class="error">Не удалось загрузить услуги</p>';
+        console.error('Ошибка загрузки услуг:', error);
+        container.innerHTML = '<p class="error">Не удалось загрузить услуги. Пожалуйста, попробуйте позже.</p>';
     }
 }
 
-function renderCatalog(data) {
+// Рендер услуг
+function renderServices(data) {
     const container = document.getElementById('services-container');
+    if (!container || !data.catalog) return;
     
-    // Основной HTML
-    container.innerHTML = `
-        <div class="gender-buttons">
-            <button class="gender-btn active" data-gender="female">Женский каталог</button>
-            <button class="gender-btn" data-gender="male">Мужской каталог</button>
-        </div>
-        
-        <div id="female-catalog" class="gender-catalog">
-            ${renderGenderCatalog(data.female)}
-        </div>
-        
-        <div id="male-catalog" class="gender-catalog" style="display:none">
-            ${renderGenderCatalog(data.male)}
+    // Создаем кнопки для переключения категорий
+    let html = `
+        <div class="gender-switcher">
+            ${data.categories.map(cat => `
+                <button class="gender-btn" data-category="${cat.id}">${cat.name}</button>
+            `).join('')}
         </div>
     `;
-}
-
-function renderGenderCatalog(genderData) {
-    return Object.entries(genderData).map(([category, services]) => `
-        <div class="category-section">
-            <h3 class="category-title">${category}</h3>
-            <div class="services-grid">
-                ${services.map(service => `
-                    <div class="service-card">
-                        <h4>${service.name_service}</h4>
-                        <p class="service-price">${service.price} ₽</p>
-                        <button class="service-btn" data-service-id="${service.id_service}">
-                            Выбрать
-                        </button>
-                    </div>
-                `).join('')}
-            </div>
-        </div>
-    `).join('');
-}
-
-function initGenderButtons() {
+    
+    // Добавляем контейнер для каталогов
+    html += '<div id="gender-catalogs"></div>';
+    
+    container.innerHTML = html;
+    
+    // Рендерим первый каталог по умолчанию
+    if (data.categories.length > 0) {
+        renderCatalog(data.categories[0].id, data.catalog);
+    }
+    
+    // Добавляем обработчики для кнопок
     document.querySelectorAll('.gender-btn').forEach(btn => {
         btn.addEventListener('click', () => {
-            // Переключение активной кнопки
-            document.querySelectorAll('.gender-btn').forEach(b => 
-                b.classList.remove('active')
-            );
-            btn.classList.add('active');
+            const categoryId = btn.getAttribute('data-category');
+            renderCatalog(categoryId, data.catalog);
             
-            // Переключение каталогов
-            document.querySelectorAll('.gender-catalog').forEach(catalog => 
-                catalog.style.display = 'none'
-            );
-            document.getElementById(`${btn.dataset.gender}-catalog`).style.display = 'block';
+            // Обновляем активную кнопку
+            document.querySelectorAll('.gender-btn').forEach(b => {
+                b.classList.remove('active');
+            });
+            btn.classList.add('active');
         });
     });
     
-    // Обработчики для кнопок выбора услуги
-    document.querySelectorAll('.service-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const serviceId = btn.dataset.serviceId;
-            // Здесь можно добавить логику записи
-            window.Telegram.WebApp.showAlert(`Выбрана услуга #${serviceId}`);
-        });
-    });
+    // Активируем первую кнопку
+    if (document.querySelector('.gender-btn')) {
+        document.querySelector('.gender-btn').classList.add('active');
+    }
+}
+
+// Рендер конкретного каталога
+function renderCatalog(categoryId, catalog) {
+    const container = document.getElementById('gender-catalogs');
+    if (!container) return;
+    
+    // Находим название категории по ID
+    let categoryName = '';
+    if (categoryId == 1) categoryName = 'Женский каталог';
+    else if (categoryId == 2) categoryName = 'Мужской каталог';
+    
+    let html = `<div class="gender-catalog" data-category="${categoryId}">`;
+    html += `<h2 class="gender-title">${categoryName}</h2>`;
+    
+    // Находим соответствующие услуги
+    const services = catalog[categoryName];
+    if (services) {
+        for (const [length, items] of Object.entries(services)) {
+            html += `<div class="category-title">${length}</div>`;
+            html += '<div class="services-list">';
+            
+            items.forEach(item => {
+                html += `
+                    <div class="service-item">
+                        <span class="service-bullet">✦</span>
+                        <span class="service-name">${item.name}</span>
+                        <span class="service-price">${item.price}</span>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+        }
+    } else {
+        html += '<p>Услуги для этой категории не найдены</p>';
+    }
+    
+    html += '</div>';
+    container.innerHTML = html;
 }
