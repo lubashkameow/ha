@@ -2,7 +2,7 @@ const fetch = require('node-fetch');
 
 exports.handler = async (event) => {
   try {
-    const response = await fetch('https://cheque-mature-wealth-habitat.trycloudflare.com/api/services');
+    const response = await fetch('https://removal-essentially-jd-fu.trycloudflare.com/api/services');
     const data = await response.json();
     
     return {
