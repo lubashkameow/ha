@@ -11,7 +11,7 @@ exports.handler = async (event) => {
   }
 
   try {
-    const apiUrl = `https://kilometers-consult-massive-ix.trycloudflare.com/api/appointments?user_id=${user_id}`;
+    const apiUrl = `https://arabia-refurbished-palm-accepting.trycloudflare.com/api/appointments?user_id=${user_id}`;
     const response = await fetch(apiUrl);
     
     if (!response.ok) {
