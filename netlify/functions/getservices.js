@@ -1,9 +1,8 @@
 const fetch = require('node-fetch');
-const cheerio = require('cheerio'); // Добавьте в package.json: "cheerio": "^1.0.0-rc.12"
 
 exports.handler = async () => {
   try {
-    const response = await fetch('https://removal-essentially-jd-fu.trycloudflare.com/api/services');
+    const response = await fetch('https://lab-review-nurses-shape.trycloudflare.com/api/services');
     
     if (!response.ok) throw new Error('API request failed');
     
