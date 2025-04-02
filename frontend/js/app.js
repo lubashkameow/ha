@@ -65,14 +65,16 @@ async function loadServices() {
     
     try {
         const response = await fetch('/.netlify/functions/getservices');
-        if (!response.ok) throw new Error('Network response was not ok');
+        if (!response.ok) throw new Error(`Ошибка HTTP: ${response.status}`);
         
         const data = await response.json();
         renderServices(data);
-        
     } catch (error) {
         console.error('Ошибка загрузки услуг:', error);
-        container.innerHTML = '<p class="error">Не удалось загрузить услуги. Пожалуйста, попробуйте позже.</p>';
+        container.innerHTML = `
+            <p class="error">Не удалось загрузить услуги. Пожалуйста, попробуйте позже.</p>
+            <p>Техническая информация: ${error.message}</p>
+        `;
     }
 }
 
