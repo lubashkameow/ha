@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initUserData();
     
     // Загрузка услуг (только для просмотра)
-    loadServicesForView();
+    loadServices();
     
     // Обработчик кнопки записи
     document.getElementById('book-btn').addEventListener('click', () => {
