@@ -159,3 +159,292 @@ function renderCatalog(categoryId, catalog) {
     html += '</div>';
     container.innerHTML = html;
 }
+
+
+
+
+// Показать форму записи
+function showBookingForm() {
+    const formContainer = document.getElementById('booking-form');
+    
+    if (!formContainer) {
+        // Создаем форму записи если её нет
+        const formHtml = `
+        <div id="booking-form" class="booking-form">
+            <h3>Форма записи</h3>
+            
+            <div class="form-group">
+                <label>Выберите услугу:</label>
+                <select id="service-select" class="form-control">
+                    <option value="">-- Выберите услугу --</option>
+                </select>
+            </div>
+            
+            <div class="form-group" id="date-group" style="display:none;">
+                <label>Выберите дату:</label>
+                <div id="calendar-container"></div>
+            </div>
+            
+            <div class="form-group" id="time-group" style="display:none;">
+                <label>Выберите время:</label>
+                <div id="time-slots-container"></div>
+            </div>
+            
+            <div class="form-group" id="master-group" style="display:none;">
+                <label>Мастер:</label>
+                <div id="masters-container"></div>
+            </div>
+            
+            <div class="form-group" id="comment-group" style="display:none;">
+                <label>Комментарий:</label>
+                <textarea id="booking-comment" class="form-control"></textarea>
+            </div>
+            
+            <button id="confirm-booking" class="btn-primary" disabled>Подтвердить запись</button>
+        </div>
+        `;
+        
+        document.querySelector('.main-content').insertAdjacentHTML('beforeend', formHtml);
+        
+        // Заполняем список услуг
+        fillServiceSelect();
+        
+        // Назначаем обработчики
+        document.getElementById('service-select').addEventListener('change', onServiceSelect);
+        document.getElementById('confirm-booking').addEventListener('click', confirmBooking);
+    }
+    
+    // Показываем/скрываем форму
+    formContainer.style.display = formContainer.style.display === 'none' ? 'block' : 'none';
+}
+
+// Заполнение выпадающего списка услуг
+function fillServiceSelect() {
+    const select = document.getElementById('service-select');
+    if (!select) return;
+    
+    // Очищаем и добавляем только первый option
+    select.innerHTML = '<option value="">-- Выберите услугу --</option>';
+    
+    // Получаем все услуги из каталога
+    const serviceItems = document.querySelectorAll('.service-item');
+    serviceItems.forEach(item => {
+        const serviceName = item.querySelector('.service-name').textContent;
+        const servicePrice = item.querySelector('.service-price').textContent;
+        
+        const option = document.createElement('option');
+        option.value = JSON.stringify({
+            name: serviceName,
+            price: servicePrice,
+            duration: 60 // Укажите правильное значение для ваших услуг
+        });
+        option.textContent = `${serviceName} (${servicePrice})`;
+        select.appendChild(option);
+    });
+}
+
+// Обработчик выбора услуги
+function onServiceSelect(event) {
+    const selectedOption = event.target.value;
+    
+    if (selectedOption) {
+        const service = JSON.parse(selectedOption);
+        document.getElementById('date-group').style.display = 'block';
+        loadAvailableDates(service);
+    } else {
+        document.getElementById('date-group').style.display = 'none';
+        document.getElementById('time-group').style.display = 'none';
+        document.getElementById('master-group').style.display = 'none';
+        document.getElementById('comment-group').style.display = 'none';
+        document.getElementById('confirm-booking').disabled = true;
+    }
+}
+
+// Загрузка доступных дат
+async function loadAvailableDates(service) {
+    const container = document.getElementById('calendar-container');
+    if (!container) return;
+    
+    container.innerHTML = '<div class="loader">Загрузка доступных дат...</div>';
+    
+    try {
+        const response = await fetch(`/.netlify/functions/getcalendar?duration=${service.duration}`);
+        const data = await response.json();
+        renderCalendar(data.dates);
+    } catch (error) {
+        container.innerHTML = '<p class="error">Ошибка загрузки дат</p>';
+    }
+}
+
+// Рендер календаря
+function renderCalendar(dates) {
+    const container = document.getElementById('calendar-container');
+    if (!container) return;
+    
+    let html = '<div class="calendar-grid">';
+    
+    dates.forEach(date => {
+        const dateObj = new Date(date.date);
+        const day = dateObj.getDate();
+        const isPast = dateObj < new Date();
+        const isAvailable = date.has_available_slots;
+        const isFull = !isAvailable && !isPast;
+        
+        html += `
+            <div class="date-cell 
+                ${isPast ? 'past' : ''} 
+                ${isFull ? 'full' : ''}
+                ${isAvailable ? 'available' : ''}"
+                data-date="${date.date}">
+                ${day}
+            </div>
+        `;
+    });
+    
+    html += '</div>';
+    container.innerHTML = html;
+    
+    // Добавляем обработчики клика на даты
+    document.querySelectorAll('.date-cell.available').forEach(cell => {
+        cell.addEventListener('click', () => {
+            const date = cell.getAttribute('data-date');
+            loadTimeSlots(date);
+        });
+    });
+}
+
+// Загрузка временных слотов
+async function loadTimeSlots(date) {
+    const serviceSelect = document.getElementById('service-select');
+    if (!serviceSelect || !serviceSelect.value) return;
+    
+    const service = JSON.parse(serviceSelect.value);
+    const container = document.getElementById('time-slots-container');
+    
+    container.innerHTML = '<div class="loader">Загрузка доступного времени...</div>';
+    document.getElementById('time-group').style.display = 'block';
+    
+    try {
+        const response = await fetch(`/.netlify/functions/gettimeslots?date=${date}&duration=${service.duration}`);
+        const data = await response.json();
+        renderTimeSlots(data.slots);
+    } catch (error) {
+        container.innerHTML = '<p class="error">Ошибка загрузки времени</p>';
+    }
+}
+
+// Рендер временных слотов
+function renderTimeSlots(slots) {
+    const container = document.getElementById('time-slots-container');
+    if (!container) return;
+    
+    let html = '<div class="time-slots-grid">';
+    
+    slots.forEach(slot => {
+        html += `
+            <button class="time-slot" data-slot-id="${slot.id_slot}" data-master-id="${slot.id_master}">
+                ${slot.start_time}
+            </button>
+        `;
+    });
+    
+    html += '</div>';
+    container.innerHTML = html;
+    
+    // Добавляем обработчики клика на слоты времени
+    document.querySelectorAll('.time-slot').forEach(button => {
+        button.addEventListener('click', () => {
+            document.getElementById('master-group').style.display = 'block';
+            document.getElementById('comment-group').style.display = 'block';
+            document.getElementById('confirm-booking').disabled = false;
+            
+            // Здесь можно загрузить информацию о мастере
+            const masterId = button.getAttribute('data-master-id');
+            loadMasterInfo(masterId);
+        });
+    });
+}
+
+// Загрузка информации о мастере
+async function loadMasterInfo(masterId) {
+    const container = document.getElementById('masters-container');
+    container.innerHTML = '<div class="loader">Загрузка информации о мастере...</div>';
+    
+    try {
+        const response = await fetch(`/.netlify/functions/getmaster?id=${masterId}`);
+        const data = await response.json();
+        
+        container.innerHTML = `
+            <div class="master-info">
+                <p><strong>Мастер:</strong> ${data.name_master}</p>
+                <p><strong>Телефон:</strong> ${data.phone_master}</p>
+            </div>
+        `;
+    } catch (error) {
+        container.innerHTML = '<p class="error">Ошибка загрузки информации</p>';
+    }
+}
+
+// Подтверждение записи
+async function confirmBooking() {
+    const tg = window.Telegram.WebApp;
+    const serviceSelect = document.getElementById('service-select');
+    const timeSlot = document.querySelector('.time-slot.selected');
+    const comment = document.getElementById('booking-comment').value;
+    
+    if (!serviceSelect.value || !timeSlot) {
+        alert('Пожалуйста, заполните все поля');
+        return;
+    }
+    
+    const service = JSON.parse(serviceSelect.value);
+    const slotId = timeSlot.getAttribute('data-slot-id');
+    
+    try {
+        const response = await fetch('/.netlify/functions/createbooking', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                user_id: tg.initDataUnsafe.user.id,
+                service_id: service.id || 1, // Замените на реальный ID
+                service_name: service.name,
+                service_price: service.price,
+                slot_id: slotId,
+                comment: comment
+            })
+        });
+        
+        if (response.ok) {
+            const result = await response.json();
+            showBookingConfirmation(result);
+        } else {
+            throw new Error('Ошибка при создании записи');
+        }
+    } catch (error) {
+        alert(error.message);
+    }
+}
+
+// Показать подтверждение записи
+function showBookingConfirmation(booking) {
+    const formContainer = document.getElementById('booking-form');
+    if (!formContainer) return;
+    
+    formContainer.innerHTML = `
+        <div class="confirmation">
+            <h3>Запись подтверждена!</h3>
+            <p><strong>Услуга:</strong> ${booking.service_name}</p>
+            <p><strong>Дата:</strong> ${booking.date}</p>
+            <p><strong>Время:</strong> ${booking.time}</p>
+            <p><strong>Мастер:</strong> ${booking.master}</p>
+            <p><strong>Комментарий:</strong> ${booking.comment || 'нет'}</p>
+            <button id="close-booking" class="btn-primary">Закрыть</button>
+        </div>
+    `;
+    
+    document.getElementById('close-booking').addEventListener('click', () => {
+        formContainer.style.display = 'none';
+        // Можно обновить страницу или сбросить форму
+        location.reload();
+    });
+}
