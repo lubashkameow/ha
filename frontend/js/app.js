@@ -155,7 +155,12 @@ function renderCatalog(categoryId, catalog) {
 // Показать форму записи
 function showBookingForm() {
     const formContainer = document.getElementById('booking-form-container');
-    
+
+    // Если форма уже отображается - скрываем её
+    if (container && container.style.display === 'block') {
+        container.style.display = 'none';
+        return;
+    }
     if (!formContainer) {
         // Создаем форму записи если её нет
         const formHtml = `
