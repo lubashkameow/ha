@@ -349,3 +349,39 @@ footer {
   margin: 10px 0;
   text-align: left;
 }
+
+#booking-form-container {
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    margin-top: 20px;
+}
+
+.form-section {
+    margin-bottom: 15px;
+}
+
+.form-select, .form-textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-top: 5px;
+}
+
+.form-button {
+    width: 100%;
+    padding: 12px;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.form-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
