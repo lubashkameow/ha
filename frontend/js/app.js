@@ -375,7 +375,7 @@ function initBookingForm() {
         container.innerHTML = '<div class="loader">Загрузка дат...</div>';
         
         try {
-            const response = await fetch(`/.netlify/functions/getcalendar?duration=${service.duration}`);
+            const response = await fetch(`/.netlify/functions/getcalendar?id_service=${service.id}`);
             const data = await response.json();
             renderCalendar(data.dates);
         } catch (error) {
