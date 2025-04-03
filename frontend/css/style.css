@@ -385,3 +385,38 @@ footer {
     opacity: 0.5;
     cursor: not-allowed;
 }
+
+/* Стили для формы записи */
+.booking-form {
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    margin-top: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.form-control:focus {
+    border-color: var(--primary-color);
+    outline: none;
+}
+
+optgroup {
+    font-weight: bold;
+    font-style: normal;
+}
+
+option {
+    padding: 5px;
+}
