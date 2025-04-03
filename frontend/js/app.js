@@ -170,7 +170,16 @@ function showBookingForm() {
             <h3>Форма записи</h3>
             
             <div class="form-group">
-                <label>Выберите услугу:</label>
+                <label>Каталог:</label>
+                <select id="catalog-select" class="form-control">
+                    <option value="">-- Выберите каталог --</option>
+                    <option value="1">Женский каталог</option>
+                    <option value="2">Мужской каталог</option>
+                </select>
+            </div>
+            
+            <div class="form-group" id="service-group" style="display:none;">
+                <label>Услуга:</label>
                 <select id="service-select" class="form-control">
                     <option value="">-- Выберите услугу --</option>
                 </select>
