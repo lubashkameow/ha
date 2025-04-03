@@ -162,7 +162,7 @@ function showBookingForm() {
     const formContainer = document.getElementById('booking-form-container');
     
     if (formContainer) {
-        formContainer.style.display = 'block';
+        formContainer.style.display = formContainer.style.display === 'none' ? 'block' : 'none';
         return;
     }
     
