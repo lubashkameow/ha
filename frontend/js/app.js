@@ -13,8 +13,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Загрузка данных пользователя
     initUserData();
     
-    // Загрузка услуг
-    loadServices();
+    // Загрузка услуг (только для просмотра)
+    loadServicesForView();
     
     // Обработчик кнопки записи
     document.getElementById('book-btn').addEventListener('click', () => {
@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-// Функция для запрета масштабирования
+// Блокировка масштабирования
 function disableZoom() {
     const viewport = document.querySelector('meta[name="viewport"]');
     viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
@@ -52,8 +52,8 @@ function initUserData() {
     }
 }
 
-// Загрузка услуг с сервера
-async function loadServices() {
+// Загрузка услуг для просмотра
+async function loadServicesForView() {
     const container = document.getElementById('services-container');
     if (!container) return;
     
@@ -64,7 +64,7 @@ async function loadServices() {
         if (!response.ok) throw new Error('Network response was not ok');
         
         const data = await response.json();
-        renderServices(data);
+        renderServicesForView(data);
         
     } catch (error) {
         console.error('Ошибка загрузки услуг:', error);
@@ -72,163 +72,107 @@ async function loadServices() {
     }
 }
 
-// Рендер услуг
-function renderServices(data) {
+// Отображение каталога услуг
+function renderServicesForView(data) {
     const container = document.getElementById('services-container');
     if (!container || !data.catalog) return;
     
-    // Создаем кнопки для переключения категорий
-    let html = `
-        <div class="gender-switcher">
-            ${data.categories.map(cat => `
-                <button class="gender-btn" data-category="${cat.id}">${cat.name}</button>
-            `).join('')}
-        </div>
-    `;
+    let html = '<div class="services-view">';
     
-    // Добавляем контейнер для каталогов
-    html += '<div id="gender-catalogs"></div>';
-    
-    container.innerHTML = html;
-    
-    // Рендерим первый каталог по умолчанию
-    if (data.categories.length > 0) {
-        renderCatalog(data.categories[0].id, data.catalog);
-    }
-    
-    // Добавляем обработчики для кнопок
-    document.querySelectorAll('.gender-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const categoryId = btn.getAttribute('data-category');
-            renderCatalog(categoryId, data.catalog);
-            
-            // Обновляем активную кнопку
-            document.querySelectorAll('.gender-btn').forEach(b => {
-                b.classList.remove('active');
-            });
-            btn.classList.add('active');
-        });
-    });
-    
-    // Активируем первую кнопку
-    if (document.querySelector('.gender-btn')) {
-        document.querySelector('.gender-btn').classList.add('active');
-    }
-}
-
-// Рендер конкретного каталога
-function renderCatalog(categoryId, catalog) {
-    const container = document.getElementById('gender-catalogs');
-    if (!container) return;
-    
-    // Находим название категории по ID
-    let categoryName = '';
-    if (categoryId == 1) categoryName = 'Женский каталог';
-    else if (categoryId == 2) categoryName = 'Мужской каталог';
-    
-    let html = `<div class="gender-catalog" data-category="${categoryId}">`;
-    html += `<h2 class="gender-title">${categoryName}</h2>`;
-    
-    // Находим соответствующие услуги
-    const services = catalog[categoryName];
-    if (services) {
-        for (const [length, items] of Object.entries(services)) {
-            html += `<div class="category-title">${length}</div>`;
-            html += '<div class="services-list">';
+    // Отображаем оба каталога
+    for (const [category, services] of Object.entries(data.catalog)) {
+        html += `<h2 class="catalog-title">${category}</h2>`;
+        
+        for (const [subcategory, items] of Object.entries(services)) {
+            html += `<h3 class="subcategory-title">${subcategory}</h3>`;
+            html += '<ul class="services-list">';
             
             items.forEach(item => {
                 html += `
-                    <div class="service-item">
-                        <span class="service-bullet">✦</span>
+                    <li class="service-item">
                         <span class="service-name">${item.name}</span>
                         <span class="service-price">${item.price}</span>
-                    </div>
+                    </li>
                 `;
             });
             
-            html += '</div>';
+            html += '</ul>';
         }
-    } else {
-        html += '<p>Услуги для этой категории не найдены</p>';
     }
     
     html += '</div>';
     container.innerHTML = html;
 }
 
-
-
-
 // Показать форму записи
 function showBookingForm() {
-    const formContainer = document.getElementById('booking-form');
+    const formContainer = document.getElementById('booking-form-container');
     
-    if (!formContainer) {
-        // Создаем форму записи если её нет
-        const formHtml = `
-        <div id="booking-form" class="booking-form">
-            <h3>Форма записи</h3>
-            
-            <div class="form-group">
-                <label>Каталог:</label>
-                <select id="catalog-select" class="form-control">
-                    <option value="">-- Выберите каталог --</option>
-                    <option value="1">Женский каталог</option>
-                    <option value="2">Мужской каталог</option>
-                </select>
-            </div>
-            
-            <div class="form-group" id="service-group" style="display:none;">
-                <label>Услуга:</label>
-                <select id="service-select" class="form-control">
-                    <option value="">-- Выберите услугу --</option>
-                </select>
-            </div>
-            
-            <div class="form-group" id="date-group" style="display:none;">
-                <label>Выберите дату:</label>
-                <div id="calendar-container"></div>
-            </div>
-            
-            <div class="form-group" id="time-group" style="display:none;">
-                <label>Выберите время:</label>
-                <div id="time-slots-container"></div>
-            </div>
-            
-            <div class="form-group" id="master-group" style="display:none;">
-                <label>Мастер:</label>
-                <div id="masters-container"></div>
-            </div>
-            
-            <div class="form-group" id="comment-group" style="display:none;">
-                <label>Комментарий:</label>
-                <textarea id="booking-comment" class="form-control"></textarea>
-            </div>
-            
-            <button id="confirm-booking" class="btn-primary" disabled>Подтвердить запись</button>
-        </div>
-        `;
-        
-        document.querySelector('.main-content').insertAdjacentHTML('beforeend', formHtml);
-        
-        // Заполняем список услуг
-        initBookingFormHandlers();
-        
-
+    if (formContainer) {
+        formContainer.style.display = 'block';
+        return;
     }
     
-    // Показываем/скрываем форму
-    formContainer.style.display = formContainer.style.display === 'none' ? 'block' : 'none';
+    // Создаем форму записи
+    const formHtml = `
+    <div id="booking-form-container" class="booking-form-container">
+        <h3>Запись на услугу</h3>
+        
+        <div class="form-step active" id="step-catalog">
+            <label>Выберите каталог:</label>
+            <select id="catalog-select" class="form-control">
+                <option value="">-- Выберите каталог --</option>
+                <option value="1">Женский каталог</option>
+                <option value="2">Мужской каталог</option>
+            </select>
+        </div>
+        
+        <div class="form-step" id="step-service" style="display:none;">
+            <label>Выберите услугу:</label>
+            <select id="service-select" class="form-control" disabled>
+                <option value="">-- Сначала выберите каталог --</option>
+            </select>
+        </div>
+        
+        <div class="form-step" id="step-date" style="display:none;">
+            <label>Выберите дату:</label>
+            <div id="calendar-container"></div>
+        </div>
+        
+        <div class="form-step" id="step-time" style="display:none;">
+            <label>Выберите время:</label>
+            <div id="time-slots-container"></div>
+        </div>
+        
+        <div class="form-step" id="step-comment" style="display:none;">
+            <label>Комментарий (необязательно):</label>
+            <textarea id="booking-comment" class="form-control" placeholder="Ваши пожелания..."></textarea>
+        </div>
+        
+        <div class="form-navigation">
+            <button id="prev-btn" class="nav-btn" disabled>Назад</button>
+            <button id="next-btn" class="nav-btn">Далее</button>
+        </div>
+    </div>
+    `;
+    
+    document.querySelector('.main-content').insertAdjacentHTML('beforeend', formHtml);
+    
+    // Инициализация обработчиков формы
+    initBookingForm();
 }
-// Инициализация обработчиков формы записи
-function initBookingFormHandlers() {
+
+// Инициализация формы записи
+function initBookingForm() {
     const catalogSelect = document.getElementById('catalog-select');
     const serviceSelect = document.getElementById('service-select');
     const prevBtn = document.getElementById('prev-btn');
     const nextBtn = document.getElementById('next-btn');
     
     let currentStep = 1;
-    const totalSteps = 5; // Каталог -> Услуга -> Дата -> Время -> Комментарий
+    const totalSteps = 5;
+    let selectedService = null;
+    let selectedSlot = null;
     
     // Обработчик выбора каталога
     catalogSelect.addEventListener('change', async function() {
@@ -238,7 +182,6 @@ function initBookingFormHandlers() {
             return;
         }
         
-        // Загружаем услуги для выбранного каталога
         serviceSelect.innerHTML = '<option value="">Загрузка услуг...</option>';
         serviceSelect.disabled = true;
         
@@ -273,30 +216,32 @@ function initBookingFormHandlers() {
             serviceSelect.disabled = false;
         } catch (error) {
             console.error('Ошибка загрузки услуг:', error);
-            serviceSelect.innerHTML = '<option value="">Ошибка загрузки услуг</option>';
+            serviceSelect.innerHTML = '<option value="">Ошибка загрузки</option>';
         }
     });
     
     // Обработчик кнопки "Далее"
     nextBtn.addEventListener('click', async function() {
         if (currentStep >= totalSteps) {
-            confirmBooking();
+            await confirmBooking();
             return;
         }
         
-        // Валидация текущего шага
-        if (!validateStep(currentStep)) {
+        if (!validateCurrentStep()) {
             return;
         }
         
-        // Переход к следующему шагу
+        // Подготовка данных для следующего шага
+        if (currentStep === 2) { // После выбора услуги
+            selectedService = JSON.parse(serviceSelect.value);
+        }
+        
         currentStep++;
-        updateFormSteps();
+        updateFormView();
         
-        // Загрузка данных для нового шага
+        // Загрузка данных для шага
         if (currentStep === 3) { // Шаг выбора даты
-            const service = JSON.parse(serviceSelect.value);
-            loadAvailableDates(service);
+            loadAvailableDates(selectedService);
         }
     });
     
@@ -305,22 +250,12 @@ function initBookingFormHandlers() {
         if (currentStep <= 1) return;
         
         currentStep--;
-        updateFormSteps();
+        updateFormView();
     });
     
-    // Обновление видимости шагов
-    function updateFormSteps() {
-        document.querySelectorAll('.form-step').forEach((step, index) => {
-            step.style.display = index + 1 === currentStep ? 'block' : 'none';
-        });
-        
-        prevBtn.disabled = currentStep === 1;
-        nextBtn.textContent = currentStep === totalSteps ? 'Подтвердить' : 'Далее';
-    }
-    
-    // Валидация шага
-    function validateStep(step) {
-        switch(step) {
+    // Валидация текущего шага
+    function validateCurrentStep() {
+        switch(currentStep) {
             case 1: // Каталог
                 if (!catalogSelect.value) {
                     alert('Пожалуйста, выберите каталог');
@@ -335,198 +270,208 @@ function initBookingFormHandlers() {
                 }
                 return true;
                 
-            // Другие шаги...
+            case 3: // Дата
+                if (!document.querySelector('.date-cell.selected')) {
+                    alert('Пожалуйста, выберите дату');
+                    return false;
+                }
+                return true;
+                
+            case 4: // Время
+                if (!document.querySelector('.time-slot.selected')) {
+                    alert('Пожалуйста, выберите время');
+                    return false;
+                }
+                return true;
+                
             default:
                 return true;
         }
     }
-}
-
-// Загрузка доступных дат
-async function loadAvailableDates(service) {
-    const container = document.getElementById('calendar-container');
-    if (!container) return;
     
-    container.innerHTML = '<div class="loader">Загрузка доступных дат...</div>';
-    
-    try {
-        const response = await fetch(`/.netlify/functions/getcalendar?duration=${service.duration}`);
-        const data = await response.json();
-        renderCalendar(data.dates);
-    } catch (error) {
-        container.innerHTML = '<p class="error">Ошибка загрузки дат</p>';
-    }
-}
-
-// Рендер календаря
-function renderCalendar(dates) {
-    const container = document.getElementById('calendar-container');
-    if (!container) return;
-    
-    let html = '<div class="calendar-grid">';
-    
-    dates.forEach(date => {
-        const dateObj = new Date(date.date);
-        const day = dateObj.getDate();
-        const isPast = dateObj < new Date();
-        const isAvailable = date.has_available_slots;
-        const isFull = !isAvailable && !isPast;
-        
-        html += `
-            <div class="date-cell 
-                ${isPast ? 'past' : ''} 
-                ${isFull ? 'full' : ''}
-                ${isAvailable ? 'available' : ''}"
-                data-date="${date.date}">
-                ${day}
-            </div>
-        `;
-    });
-    
-    html += '</div>';
-    container.innerHTML = html;
-    
-    // Добавляем обработчики клика на даты
-    document.querySelectorAll('.date-cell.available').forEach(cell => {
-        cell.addEventListener('click', () => {
-            const date = cell.getAttribute('data-date');
-            loadTimeSlots(date);
-        });
-    });
-}
-
-// Загрузка временных слотов
-async function loadTimeSlots(date) {
-    const serviceSelect = document.getElementById('service-select');
-    if (!serviceSelect || !serviceSelect.value) return;
-    
-    const service = JSON.parse(serviceSelect.value);
-    const container = document.getElementById('time-slots-container');
-    
-    container.innerHTML = '<div class="loader">Загрузка доступного времени...</div>';
-    document.getElementById('time-group').style.display = 'block';
-    
-    try {
-        const response = await fetch(`/.netlify/functions/gettimeslots?date=${date}&duration=${service.duration}`);
-        const data = await response.json();
-        renderTimeSlots(data.slots);
-    } catch (error) {
-        container.innerHTML = '<p class="error">Ошибка загрузки времени</p>';
-    }
-}
-
-// Рендер временных слотов
-function renderTimeSlots(slots) {
-    const container = document.getElementById('time-slots-container');
-    if (!container) return;
-    
-    let html = '<div class="time-slots-grid">';
-    
-    slots.forEach(slot => {
-        html += `
-            <button class="time-slot" data-slot-id="${slot.id_slot}" data-master-id="${slot.id_master}">
-                ${slot.start_time}
-            </button>
-        `;
-    });
-    
-    html += '</div>';
-    container.innerHTML = html;
-    
-    // Добавляем обработчики клика на слоты времени
-    document.querySelectorAll('.time-slot').forEach(button => {
-        button.addEventListener('click', () => {
-            document.getElementById('master-group').style.display = 'block';
-            document.getElementById('comment-group').style.display = 'block';
-            document.getElementById('confirm-booking').disabled = false;
-            
-            // Здесь можно загрузить информацию о мастере
-            const masterId = button.getAttribute('data-master-id');
-            loadMasterInfo(masterId);
-        });
-    });
-}
-
-// Загрузка информации о мастере
-async function loadMasterInfo(masterId) {
-    const container = document.getElementById('masters-container');
-    container.innerHTML = '<div class="loader">Загрузка информации о мастере...</div>';
-    
-    try {
-        const response = await fetch(`/.netlify/functions/getmaster?id=${masterId}`);
-        const data = await response.json();
-        
-        container.innerHTML = `
-            <div class="master-info">
-                <p><strong>Мастер:</strong> ${data.name_master}</p>
-                <p><strong>Телефон:</strong> ${data.phone_master}</p>
-            </div>
-        `;
-    } catch (error) {
-        container.innerHTML = '<p class="error">Ошибка загрузки информации</p>';
-    }
-}
-
-// Подтверждение записи
-async function confirmBooking() {
-    const tg = window.Telegram.WebApp;
-    const serviceSelect = document.getElementById('service-select');
-    const timeSlot = document.querySelector('.time-slot.selected');
-    const comment = document.getElementById('booking-comment').value;
-    
-    if (!serviceSelect.value || !timeSlot) {
-        alert('Пожалуйста, заполните все поля');
-        return;
-    }
-    
-    const service = JSON.parse(serviceSelect.value);
-    const slotId = timeSlot.getAttribute('data-slot-id');
-    
-    try {
-        const response = await fetch('/.netlify/functions/createbooking', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                user_id: tg.initDataUnsafe.user.id,
-                service_id: service.id || 1, // Замените на реальный ID
-                service_name: service.name,
-                service_price: service.price,
-                slot_id: slotId,
-                comment: comment
-            })
+    // Обновление отображения формы
+    function updateFormView() {
+        // Скрываем все шаги
+        document.querySelectorAll('.form-step').forEach(step => {
+            step.style.display = 'none';
         });
         
-        if (response.ok) {
-            const result = await response.json();
-            showBookingConfirmation(result);
-        } else {
-            throw new Error('Ошибка при создании записи');
+        // Показываем текущий шаг
+        document.getElementById(`step-${getStepName(currentStep)}`).style.display = 'block';
+        
+        // Обновляем кнопки навигации
+        prevBtn.disabled = currentStep === 1;
+        nextBtn.textContent = currentStep === totalSteps ? 'Подтвердить' : 'Далее';
+    }
+    
+    // Получение имени шага
+    function getStepName(step) {
+        switch(step) {
+            case 1: return 'catalog';
+            case 2: return 'service';
+            case 3: return 'date';
+            case 4: return 'time';
+            case 5: return 'comment';
+            default: return '';
         }
-    } catch (error) {
-        alert(error.message);
     }
-}
-
-// Показать подтверждение записи
-function showBookingConfirmation(booking) {
-    const formContainer = document.getElementById('booking-form');
-    if (!formContainer) return;
     
-    formContainer.innerHTML = `
-        <div class="confirmation">
-            <h3>Запись подтверждена!</h3>
-            <p><strong>Услуга:</strong> ${booking.service_name}</p>
-            <p><strong>Дата:</strong> ${booking.date}</p>
-            <p><strong>Время:</strong> ${booking.time}</p>
-            <p><strong>Мастер:</strong> ${booking.master}</p>
-            <p><strong>Комментарий:</strong> ${booking.comment || 'нет'}</p>
-            <button id="close-booking" class="btn-primary">Закрыть</button>
-        </div>
-    `;
+    // Загрузка доступных дат
+    async function loadAvailableDates(service) {
+        const container = document.getElementById('calendar-container');
+        container.innerHTML = '<div class="loader">Загрузка дат...</div>';
+        
+        try {
+            const response = await fetch(`/.netlify/functions/getcalendar?duration=${service.duration}`);
+            const data = await response.json();
+            renderCalendar(data.dates);
+        } catch (error) {
+            container.innerHTML = '<p class="error">Ошибка загрузки дат</p>';
+        }
+    }
     
-    document.getElementById('close-booking').addEventListener('click', () => {
-        formContainer.style.display = 'none';
-        // Можно обновить страницу или сбросить форму
-        location.reload();
-    });
+    // Отрисовка календаря
+    function renderCalendar(dates) {
+        const container = document.getElementById('calendar-container');
+        let html = '<div class="calendar-grid">';
+        
+        dates.forEach(date => {
+            const dateObj = new Date(date.date);
+            const day = dateObj.getDate();
+            const isPast = dateObj < new Date();
+            const isAvailable = date.has_available_slots;
+            const isFull = !isAvailable && !isPast;
+            
+            html += `
+                <div class="date-cell 
+                    ${isPast ? 'past' : ''} 
+                    ${isFull ? 'full' : ''}
+                    ${isAvailable ? 'available' : ''}"
+                    data-date="${date.date}">
+                    ${day}
+                </div>
+            `;
+        });
+        
+        html += '</div>';
+        container.innerHTML = html;
+        
+        // Обработчики выбора даты
+        document.querySelectorAll('.date-cell.available').forEach(cell => {
+            cell.addEventListener('click', function() {
+                document.querySelectorAll('.date-cell').forEach(c => {
+                    c.classList.remove('selected');
+                });
+                this.classList.add('selected');
+                
+                const date = this.getAttribute('data-date');
+                loadTimeSlots(date, selectedService.duration);
+            });
+        });
+    }
+    
+    // Загрузка временных слотов
+    async function loadTimeSlots(date, duration) {
+        const container = document.getElementById('time-slots-container');
+        container.innerHTML = '<div class="loader">Загрузка времени...</div>';
+        
+        try {
+            const response = await fetch(`/.netlify/functions/gettimeslots?date=${date}&duration=${duration}`);
+            const data = await response.json();
+            renderTimeSlots(data.slots);
+        } catch (error) {
+            container.innerHTML = '<p class="error">Ошибка загрузки времени</p>';
+        }
+    }
+    
+    // Отрисовка временных слотов
+    function renderTimeSlots(slots) {
+        const container = document.getElementById('time-slots-container');
+        let html = '<div class="time-slots-grid">';
+        
+        slots.forEach(slot => {
+            html += `
+                <button class="time-slot" 
+                        data-slot-id="${slot.id_slot}"
+                        data-master-id="${slot.id_master}"
+                        data-master-name="${slot.name_master}">
+                    ${slot.start_time}
+                </button>
+            `;
+        });
+        
+        html += '</div>';
+        container.innerHTML = html;
+        
+        // Обработчики выбора времени
+        document.querySelectorAll('.time-slot').forEach(button => {
+            button.addEventListener('click', function() {
+                document.querySelectorAll('.time-slot').forEach(b => {
+                    b.classList.remove('selected');
+                });
+                this.classList.add('selected');
+                selectedSlot = this.getAttribute('data-slot-id');
+            });
+        });
+    }
+    
+    // Подтверждение записи
+    async function confirmBooking() {
+        const tg = window.Telegram.WebApp;
+        const comment = document.getElementById('booking-comment').value;
+        const timeSlot = document.querySelector('.time-slot.selected');
+        
+        if (!selectedService || !selectedSlot) {
+            alert('Пожалуйста, заполните все обязательные поля');
+            return;
+        }
+        
+        try {
+            const response = await fetch('/.netlify/functions/createbooking', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    user_id: tg.initDataUnsafe.user.id,
+                    service_id: selectedService.id,
+                    service_name: selectedService.name,
+                    service_price: selectedService.price,
+                    slot_id: selectedSlot,
+                    master_id: timeSlot.getAttribute('data-master-id'),
+                    master_name: timeSlot.getAttribute('data-master-name'),
+                    date: document.querySelector('.date-cell.selected').getAttribute('data-date'),
+                    time: timeSlot.textContent,
+                    comment: comment
+                })
+            });
+            
+            if (response.ok) {
+                const result = await response.json();
+                showConfirmation(result);
+            } else {
+                throw new Error('Ошибка при создании записи');
+            }
+        } catch (error) {
+            alert(error.message);
+        }
+    }
+    
+    // Показать подтверждение записи
+    function showConfirmation(booking) {
+        const formContainer = document.getElementById('booking-form-container');
+        formContainer.innerHTML = `
+            <div class="confirmation">
+                <h3>Запись подтверждена!</h3>
+                <p><strong>Услуга:</strong> ${booking.service_name} (${booking.service_price})</p>
+                <p><strong>Дата:</strong> ${booking.date}</p>
+                <p><strong>Время:</strong> ${booking.time}</p>
+                <p><strong>Мастер:</strong> ${booking.master_name}</p>
+                ${booking.comment ? `<p><strong>Комментарий:</strong> ${booking.comment}</p>` : ''}
+                <button id="close-booking" class="btn-primary">Закрыть</button>
+            </div>
+        `;
+        
+        document.getElementById('close-booking').addEventListener('click', () => {
+            formContainer.style.display = 'none';
+        });
+    }
 }
