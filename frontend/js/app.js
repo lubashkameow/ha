@@ -18,11 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Обработчик кнопки записи
     document.getElementById('book-btn').addEventListener('click', () => {
-        tg.showPopup({
-            title: 'Запись',
-            message: 'Для записи воспользуйтесь кнопкой "Открыть запись"',
-            buttons: [{ type: 'ok' }]
-        });
+        showBookingForm();
     });
 });
 
