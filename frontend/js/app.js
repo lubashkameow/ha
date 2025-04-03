@@ -212,56 +212,133 @@ function showBookingForm() {
         document.querySelector('.main-content').insertAdjacentHTML('beforeend', formHtml);
         
         // Заполняем список услуг
-        fillServiceSelect();
+        initBookingFormHandlers();
         
-        // Назначаем обработчики
-        document.getElementById('service-select').addEventListener('change', onServiceSelect);
-        document.getElementById('confirm-booking').addEventListener('click', confirmBooking);
+
     }
     
     // Показываем/скрываем форму
     formContainer.style.display = formContainer.style.display === 'none' ? 'block' : 'none';
 }
-
-// Заполнение выпадающего списка услуг
-function fillServiceSelect() {
-    const select = document.getElementById('service-select');
-    if (!select) return;
+// Инициализация обработчиков формы записи
+function initBookingFormHandlers() {
+    const catalogSelect = document.getElementById('catalog-select');
+    const serviceSelect = document.getElementById('service-select');
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
     
-    // Очищаем и добавляем только первый option
-    select.innerHTML = '<option value="">-- Выберите услугу --</option>';
+    let currentStep = 1;
+    const totalSteps = 5; // Каталог -> Услуга -> Дата -> Время -> Комментарий
     
-    // Получаем все услуги из каталога
-    const serviceItems = document.querySelectorAll('.service-item');
-    serviceItems.forEach(item => {
-        const serviceName = item.querySelector('.service-name').textContent;
-        const servicePrice = item.querySelector('.service-price').textContent;
+    // Обработчик выбора каталога
+    catalogSelect.addEventListener('change', async function() {
+        if (!this.value) {
+            serviceSelect.innerHTML = '<option value="">-- Сначала выберите каталог --</option>';
+            serviceSelect.disabled = true;
+            return;
+        }
         
-        const option = document.createElement('option');
-        option.value = JSON.stringify({
-            name: serviceName,
-            price: servicePrice,
-            duration: 60 // Укажите правильное значение для ваших услуг
-        });
-        option.textContent = `${serviceName} (${servicePrice})`;
-        select.appendChild(option);
+        // Загружаем услуги для выбранного каталога
+        serviceSelect.innerHTML = '<option value="">Загрузка услуг...</option>';
+        serviceSelect.disabled = true;
+        
+        try {
+            const response = await fetch(`/.netlify/functions/getservices?category_id=${this.value}`);
+            const data = await response.json();
+            
+            serviceSelect.innerHTML = '<option value="">-- Выберите услугу --</option>';
+            
+            const catalogName = this.value === '1' ? 'Женский каталог' : 'Мужской каталог';
+            const services = data.catalog[catalogName];
+            
+            for (const [subcategory, items] of Object.entries(services)) {
+                const optgroup = document.createElement('optgroup');
+                optgroup.label = subcategory;
+                
+                items.forEach(item => {
+                    const option = document.createElement('option');
+                    option.value = JSON.stringify({
+                        id: item.id_service,
+                        name: item.name,
+                        price: item.price,
+                        duration: item.duration_minutes || 60
+                    });
+                    option.textContent = `${item.name} (${item.price})`;
+                    optgroup.appendChild(option);
+                });
+                
+                serviceSelect.appendChild(optgroup);
+            }
+            
+            serviceSelect.disabled = false;
+        } catch (error) {
+            console.error('Ошибка загрузки услуг:', error);
+            serviceSelect.innerHTML = '<option value="">Ошибка загрузки услуг</option>';
+        }
     });
-}
-
-// Обработчик выбора услуги
-function onServiceSelect(event) {
-    const selectedOption = event.target.value;
     
-    if (selectedOption) {
-        const service = JSON.parse(selectedOption);
-        document.getElementById('date-group').style.display = 'block';
-        loadAvailableDates(service);
-    } else {
-        document.getElementById('date-group').style.display = 'none';
-        document.getElementById('time-group').style.display = 'none';
-        document.getElementById('master-group').style.display = 'none';
-        document.getElementById('comment-group').style.display = 'none';
-        document.getElementById('confirm-booking').disabled = true;
+    // Обработчик кнопки "Далее"
+    nextBtn.addEventListener('click', async function() {
+        if (currentStep >= totalSteps) {
+            confirmBooking();
+            return;
+        }
+        
+        // Валидация текущего шага
+        if (!validateStep(currentStep)) {
+            return;
+        }
+        
+        // Переход к следующему шагу
+        currentStep++;
+        updateFormSteps();
+        
+        // Загрузка данных для нового шага
+        if (currentStep === 3) { // Шаг выбора даты
+            const service = JSON.parse(serviceSelect.value);
+            loadAvailableDates(service);
+        }
+    });
+    
+    // Обработчик кнопки "Назад"
+    prevBtn.addEventListener('click', function() {
+        if (currentStep <= 1) return;
+        
+        currentStep--;
+        updateFormSteps();
+    });
+    
+    // Обновление видимости шагов
+    function updateFormSteps() {
+        document.querySelectorAll('.form-step').forEach((step, index) => {
+            step.style.display = index + 1 === currentStep ? 'block' : 'none';
+        });
+        
+        prevBtn.disabled = currentStep === 1;
+        nextBtn.textContent = currentStep === totalSteps ? 'Подтвердить' : 'Далее';
+    }
+    
+    // Валидация шага
+    function validateStep(step) {
+        switch(step) {
+            case 1: // Каталог
+                if (!catalogSelect.value) {
+                    alert('Пожалуйста, выберите каталог');
+                    return false;
+                }
+                return true;
+                
+            case 2: // Услуга
+                if (!serviceSelect.value) {
+                    alert('Пожалуйста, выберите услугу');
+                    return false;
+                }
+                return true;
+                
+            // Другие шаги...
+            default:
+                return true;
+        }
     }
 }
 
