@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initUserData();
     
     // Загрузка услуг (только для просмотра)
-    loadServices();
+    loadServicesForView();
     
     // Обработчик кнопки записи
     document.getElementById('book-btn').addEventListener('click', () => {
@@ -52,8 +52,8 @@ function initUserData() {
     }
 }
 
-// Загрузка услуг с сервера
-async function loadServices() {
+// Загрузка услуг для просмотра
+async function loadServicesForView() {
     const container = document.getElementById('services-container');
     if (!container) return;
     
@@ -64,7 +64,7 @@ async function loadServices() {
         if (!response.ok) throw new Error('Network response was not ok');
         
         const data = await response.json();
-        renderServices(data);
+        renderServicesForView(data);
         
     } catch (error) {
         console.error('Ошибка загрузки услуг:', error);
@@ -72,102 +72,49 @@ async function loadServices() {
     }
 }
 
-// Рендер услуг
-function renderServices(data) {
+// Отображение каталога услуг
+function renderServicesForView(data) {
     const container = document.getElementById('services-container');
     if (!container || !data.catalog) return;
     
-    // Создаем кнопки для переключения категорий
-    let html = `
-        <div class="gender-switcher">
-            ${data.categories.map(cat => `
-                <button class="gender-btn" data-category="${cat.id}">${cat.name}</button>
-            `).join('')}
-        </div>
-    `;
+    let html = '<div class="services-view">';
     
-    // Добавляем контейнер для каталогов
-    html += '<div id="gender-catalogs"></div>';
-    
-    container.innerHTML = html;
-    
-    // Рендерим первый каталог по умолчанию
-    if (data.categories.length > 0) {
-        renderCatalog(data.categories[0].id, data.catalog);
-    }
-    
-    // Добавляем обработчики для кнопок
-    document.querySelectorAll('.gender-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const categoryId = btn.getAttribute('data-category');
-            renderCatalog(categoryId, data.catalog);
-            
-            // Обновляем активную кнопку
-            document.querySelectorAll('.gender-btn').forEach(b => {
-                b.classList.remove('active');
-            });
-            btn.classList.add('active');
-        });
-    });
-    // Активируем первую кнопку
-    if (document.querySelector('.gender-btn')) {
-        document.querySelector('.gender-btn').classList.add('active');
-    }
-}
-
-// Рендер конкретного каталога
-function renderCatalog(categoryId, catalog) {
-    const container = document.getElementById('gender-catalogs');
-    if (!container) return;
-    
-    // Находим название категории по ID
-    let categoryName = '';
-    if (categoryId == 1) categoryName = 'Женский каталог';
-    else if (categoryId == 2) categoryName = 'Мужской каталог';
-    
-    let html = `<div class="gender-catalog" data-category="${categoryId}">`;
-    html += `<h2 class="gender-title">${categoryName}</h2>`;
-    
-    // Находим соответствующие услуги
-    const services = catalog[categoryName];
-    if (services) {
-        for (const [length, items] of Object.entries(services)) {
-            html += `<div class="category-title">${length}</div>`;
-            html += '<div class="services-list">';
+    // Отображаем оба каталога
+    for (const [category, services] of Object.entries(data.catalog)) {
+        html += `<h2 class="catalog-title">${category}</h2>`;
+        
+        for (const [subcategory, items] of Object.entries(services)) {
+            html += `<h3 class="subcategory-title">${subcategory}</h3>`;
+            html += '<ul class="services-list">';
             
             items.forEach(item => {
                 html += `
-                    <div class="service-item">
-                        <span class="service-bullet">✦</span>
+                    <li class="service-item">
                         <span class="service-name">${item.name}</span>
                         <span class="service-price">${item.price}</span>
-                    </div>
+                    </li>
                 `;
             });
             
-            html += '</div>';
+            html += '</ul>';
         }
-    } else {
-        html += '<p>Услуги для этой категории не найдены</p>';
     }
     
     html += '</div>';
     container.innerHTML = html;
 }
 
-
 // Показать форму записи
 function showBookingForm() {
     const formContainer = document.getElementById('booking-form-container');
-
-    // Если форма уже отображается - скрываем её
-    if (container && container.style.display === 'block') {
-        container.style.display = 'none';
+    
+    if (formContainer) {
+        formContainer.style.display = 'block';
         return;
     }
-    if (!formContainer) {
-        // Создаем форму записи если её нет
-        const formHtml = `
+    
+    // Создаем форму записи
+    const formHtml = `
     <div id="booking-form-container" class="booking-form-container">
         <h3>Запись на услугу</h3>
         
