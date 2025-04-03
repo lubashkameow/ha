@@ -11,35 +11,28 @@ exports.handler = async (event) => {
       };
     }
 
-    // Получаем информацию о услуге, включая duration_minutes
-    const serviceResponse = await fetch(`https://translations-raleigh-seekers-lo.trycloudflare.com/api/service?id=${id_service}`);
+    // Запрашиваем календарь с основного сервера
+    const calendarResponse = await fetch(
+      `https://translations-raleigh-seekers-lo.trycloudflare.com/api/calendar?id_service=${id_service}`
+    );
     
-    if (!serviceResponse.ok) throw new Error('Failed to fetch service details');
-    
-    const serviceData = await serviceResponse.json();
-    const duration = serviceData.duration_minutes || 60;
-
-    // Получаем календарь с учетом длительности услуги
-    const calendarResponse = await fetch(`https://translations-raleigh-seekers-lo.trycloudflare.com/api/calendar?duration=${duration}`);
-    
-    if (!calendarResponse.ok) throw new Error('Failed to fetch calendar data');
+    if (!calendarResponse.ok) {
+      throw new Error(`Failed to fetch calendar data: ${calendarResponse.statusText}`);
+    }
     
     const calendarData = await calendarResponse.json();
     
     return {
       statusCode: 200,
-      body: JSON.stringify({
-        dates: calendarData.dates,
-        service: {
-          id: id_service,
-          duration: duration
-        }
-      }),
+      body: JSON.stringify(calendarData), // Просто передаем данные как есть
     };
   } catch (error) {
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: error.message }),
+      body: JSON.stringify({ 
+        error: error.message,
+        stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+      }),
     };
   }
 };
