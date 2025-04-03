@@ -109,6 +109,10 @@ function renderServices(data) {
             btn.classList.add('active');
         });
     });
+    // Активируем первую кнопку
+    if (document.querySelector('.gender-btn')) {
+        document.querySelector('.gender-btn').classList.add('active');
+    }
 }
 
 // Рендер конкретного каталога
