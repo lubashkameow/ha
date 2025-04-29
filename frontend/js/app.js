@@ -374,42 +374,36 @@ function initBookingForm() {
     async function loadAvailableDates(service) {
         const container = document.getElementById('calendar-container');
         container.innerHTML = '<div class="loader">Загрузка дат...</div>';
-        const testData = {
-        dates: [
-            {date: "2025-04-29", has_available_slots: 1},
-            {date: "2025-04-30", has_available_slots: 1},
-            {date: "2025-05-01", has_available_slots: 1}
-        ],
-        service: {id_service: "10", duration_minutes: 180}
-    };
+        try {
+        console.log('Loading calendar for service ID:', service.id); // Добавьте этот лог
+        
+        const response = await fetch(`/.netlify/functions/getcalendar?id_service=${service.id}`);
+        
+        console.log('Calendar response status:', response.status); // Лог статуса
+        
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Error response:', errorText);
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
     
-    setTimeout(() => {
-        renderCalendar(testData.dates);
-    }, 500);
-       // try {
-        //    const response = await fetch(`/.netlify/functions/getcalendar?id_service=${service.id}`);
-        //    if (!response.ok) {
-        //    throw new Error(`HTTP error! status: ${response.status}`);
-        //    }
-       // 
-         //   const data = await response.json();
+        const data = await response.json();
+        console.log('Calendar data:', data); // Лог полученных данных
+    
+        if (!data.dates || !Array.isArray(data.dates)) {
+            throw new Error('Invalid data format: dates array not found');
+        }
+    
+        if (data.service && data.service.duration_minutes) {
+            service.duration = data.service.duration_minutes;
+        }
         
-            // Добавим логирование для отладки
-         //   console.log('Calendar data received:', data);
-        
-         //   if (!data.dates) {
-         //   throw new Error('Invalid data format: dates not found');
-         //   }
-        
-            // Обновляем длительность услуги, если она пришла
-         //   if (data.service && data.service.duration_minutes) {
-         //       service.duration = data.service.duration_minutes;
-         //   }
-      //      renderCalendar(data.dates);
-  //      } catch (error) {
-         //   container.innerHTML = '<p class="error">Ошибка загрузки дат</p>';
-    //    }
-//    }
+        renderCalendar(data.dates);
+    } catch (error) {
+        console.error('Error loading calendar:', error);
+        container.innerHTML = `<p class="error">Ошибка загрузки дат: ${error.message}</p>`;
+    }
+}
     
     // Отрисовка календаря
     function renderCalendar(dates) {
