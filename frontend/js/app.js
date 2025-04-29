@@ -54,7 +54,7 @@ function initUserData() {
 
 // Показать форму записи
 function showBookingForm() {
-    const formContainer = document.getElementById('booking-form-container');
+    const formContainer = document.getElementById('booking-page');
     
     if (formContainer) {
         formContainer.style.display = formContainer.style.display === 'none' ? 'block' : 'none';
