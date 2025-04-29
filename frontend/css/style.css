@@ -1,5 +1,5 @@
 :root {
-  --primary-color: #b19576;
+  --primary-color: #a56d5a;
   --bg-color: #fff5f9;
   --text-color: #5a3d5c;
   --white: #ffffff;
@@ -16,6 +16,18 @@ body {
   touch-action: pan-y;
 }
 
+h1, h2, h3 {
+  font-family: cursive, serif;
+  font-weight: normal;
+  margin: 5px 0;
+        }
+
+.welcome-text {
+  font-family: cursive, serif;
+  margin: 5px 0 15px;
+  font-size: 1.1em;
+        }
+
 .container {
   max-width: 100%;
   padding: 20px;
@@ -27,7 +39,7 @@ body {
 
 header {
   text-align: center;
-  padding: 20px 0;
+  padding: 10px 0;
 }
 
 .avatar {
@@ -35,7 +47,7 @@ header {
   height: 80px;
   border-radius: 50%;
   object-fit: cover;
-  margin-bottom: 10px;
+  margin-bottom: 5px;
   border: 3px solid var(--primary-color);
 }
 
@@ -47,10 +59,11 @@ header {
 
 .info-card {
   background-color: var(--white);
-  border-radius: 16px;
-  padding: 20px;
-  margin-bottom: 20px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border-radius: 12px;
+  padding: 15px;
+  margin-bottom: 15px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  max-width: 90%;
 }
 
 .catalog-container {
