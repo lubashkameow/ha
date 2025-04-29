@@ -7,9 +7,45 @@
     <link href="css/style.css" rel="stylesheet">
     <script src="js/app.js" defer></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        /* Добавляем стили для нижней панели */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            background: #fff;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            z-index: 100;
+        }
+        
+        .nav-item {
+            flex: 1;
+            text-align: center;
+            padding: 12px 0;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .nav-item.active {
+            color: #0088cc;
+            font-weight: bold;
+        }
+        
+        .nav-item i {
+            display: block;
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+        
+        .page-container {
+            padding-bottom: 60px; /* Чтобы контент не перекрывался панелью */
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
+    <div class="container page-container">
         <header>
             <div id="avatar-container">
                 <img id="user-avatar" class="avatar" src="" alt="User Avatar">
@@ -19,23 +55,42 @@
         </header>
 
         <main class="main-content">
-            <div class="info-card">
-                <h2>ПАРИКМАХЕРСКАЯ</h2>
-                <p>📍 Адрес: г. Коммунар, ул. Ленинградское шоссе, д. 25АЕ</p>
-                <p>🕒 График работы:</p>
-                <p>ПН-СБ 10:00-19:00,</p>
-                <p>ВС 10:00-18:00</p>
-            </div>
+            <div id="page-services" class="page active">
+                <div class="info-card">
+                    <h2>ПАРИКМАХЕРСКАЯ</h2>
+                    <p>📍 Адрес: г. Коммунар, ул. Ленинградское шоссе, д. 25АЕ</p>
+                    <p>🕒 График работы:</p>
+                    <p>ПН-СБ 10:00-19:00,</p>
+                    <p>ВС 10:00-18:00</p>
+                </div>
             
             <div id="services-container" class="catalog-container"></div>
-        </main>
 
         <footer>
             <button id="book-btn" class="cta-button">Открыть форму записи</button>
         </footer>
         <p></p>
         <p></p>
+            </div>
+
+            <!-- Страница 2: Мои записи -->
+            <div id="page-bookings" class="page">
+                <h2>Мои записи</h2>
+                <div id="bookings-list" class="bookings-container">
+                    <!-- Сюда будут загружаться записи -->
+                </div>
+            </div>
+            
+            <!-- Страница 3: Мастера и работы -->
+            <div id="page-masters" class="page">
+                <h2>Наши мастера</h2>
+                <div id="masters-list" class="masters-container">
+                    <!-- Сюда будут загружаться мастера -->
+                </div>
+            </div>
+        </main>
     </div>
+    
     <script>
         // Дополнительная защита от масштабирования
         document.addEventListener('gesturestart', function(e) {
@@ -68,5 +123,20 @@
             e.preventDefault();
         });
     </script>
+    <!-- Нижняя панель навигации -->
+    <div class="bottom-nav">
+        <div class="nav-item active" data-page="services">
+            <i>💇</i>
+            <span>Услуги</span>
+        </div>
+        <div class="nav-item" data-page="bookings">
+            <i>📅</i>
+            <span>Мои записи</span>
+        </div>
+        <div class="nav-item" data-page="masters">
+            <i>👩‍🎨</i>
+            <span>Мастера</span>
+        </div>
+    </div>
 </body>
 </html>
