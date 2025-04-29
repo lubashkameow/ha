@@ -273,31 +273,48 @@ function initBookingForm() {
             serviceSelect.innerHTML = '<option value="">Ошибка загрузки</option>';
         }
     });
-    
+    serviceSelect.addEventListener('change', function() {
+    try {
+        if (this.value) {
+            selectedService = JSON.parse(this.value);
+            console.log('Selected service:', selectedService); // Добавьте этот лог
+        }
+    } catch (e) {
+        console.error('Error parsing service data:', e);
+    }
+});
     // Обработчик кнопки "Далее"
     nextBtn.addEventListener('click', async function() {
-        if (currentStep >= totalSteps) {
-            await confirmBooking();
+    if (!validateCurrentStep()) return;
+
+    // Перед переходом на следующий шаг
+    if (currentStep === 2) { // При переходе от выбора услуги к выбору даты
+        if (!serviceSelect.value) {
+            alert('Пожалуйста, выберите услугу');
             return;
         }
         
-        if (!validateCurrentStep()) {
-            return;
-        }
-        
-        // Подготовка данных для следующего шага
-        if (currentStep === 2) { // После выбора услуги
+        try {
             selectedService = JSON.parse(serviceSelect.value);
+            console.log('Service selected for calendar:', selectedService);
+            
+            if (!selectedService || !selectedService.id) {
+                throw new Error('Не удалось получить данные услуги');
+            }
+        } catch (e) {
+            console.error('Error parsing service:', e);
+            alert('Ошибка при выборе услуги');
+            return;
         }
-        
-        currentStep++;
-        updateFormView();
-        
-        // Загрузка данных для шага
-        if (currentStep === 3) { // Шаг выбора даты
-            loadAvailableDates(selectedService);
-        }
-    });
+    }
+
+    currentStep++;
+    updateFormView();
+
+    if (currentStep === 3) {
+        loadAvailableDates(selectedService);
+    }
+});
     
     // Обработчик кнопки "Назад"
     prevBtn.addEventListener('click', function() {
