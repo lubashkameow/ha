@@ -209,7 +209,9 @@ function showBookingForm() {
     </div>
     `;
     
-    document.querySelector('.main-content').insertAdjacentHTML('beforeend', formHtml);
+    // Вставляем форму в подготовленный контейнер
+    formContainer.innerHTML = formHtml;
+    formContainer.style.display = 'block';
     
     // Инициализация обработчиков формы
     initBookingForm();
