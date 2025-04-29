@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Salon Booking</title>
     <link href="css/style.css" rel="stylesheet">
     <script src="js/app.js" defer></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -42,6 +41,14 @@
         .page-container {
             padding-bottom: 60px; /* Чтобы контент не перекрывался панелью */
         }
+        #booking-page {
+            display: none;
+            margin-top: 20px;
+            background: #fff;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
     </style>
 </head>
 <body>
@@ -66,24 +73,19 @@
             <footer>
             <button id="book-btn" class="cta-button">Записаться</button>
         </footer>
-                <div class="container" id="booking-page" style="display:none;">
-
-
-        <main class="main-content" id="booking-steps">
-            <!-- Здесь будет динамически меняться контент -->
-        </main>
-
-        <footer>
-            <button id="prev-step" class="nav-button" disabled>Назад</button>
-            <button id="next-step" class="cta-button" disabled>Далее</button>
-        </footer>
-    </div>
+        <!-- Форма записи (будет показываться после нажатия кнопки) -->
+                <div id="booking-page">
+                    <main class="main-content" id="booking-steps">
+                        <!-- Здесь будет динамически меняться контент -->
+                    </main>
+                    <footer class="booking-footer">
+                        <button id="prev-step" class="nav-button" disabled>Назад</button>
+                        <button id="next-step" class="cta-button" disabled>Далее</button>
+                    </footer>
+                </div>
                 
             <div id="services-container" class="catalog-container"></div>
 
-        
-        <p></p>
-        <p></p>
             </div>
 
             <!-- Страница 2: Мои записи -->
