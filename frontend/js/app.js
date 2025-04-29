@@ -544,3 +544,135 @@ function initBookingForm() {
         });
     }
 }
+
+// Обработка навигации
+document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', function() {
+        const pageId = this.getAttribute('data-page');
+        
+        // Убираем активный класс у всех
+        document.querySelectorAll('.nav-item').forEach(i => {
+            i.classList.remove('active');
+        });
+        document.querySelectorAll('.page').forEach(p => {
+            p.classList.remove('active');
+        });
+        
+        // Добавляем активный класс текущему
+        this.classList.add('active');
+        document.getElementById(`page-${pageId}`).classList.add('active');
+        
+        // Загружаем данные при необходимости
+        if (pageId === 'bookings') {
+            loadUserBookings();
+        } else if (pageId === 'masters') {
+            loadMasters();
+        }
+    });
+});
+
+// Загрузка записей пользователя
+async function loadUserBookings() {
+    const container = document.getElementById('bookings-list');
+    container.innerHTML = '<div class="loader">Загрузка записей...</div>';
+    
+    try {
+        const tg = window.Telegram.WebApp;
+        const response = await fetch(`/.netlify/functions/getbookings?user_id=${tg.initDataUnsafe.user.id}`);
+        const data = await response.json();
+        
+        if (data.bookings && data.bookings.length > 0) {
+            let html = '';
+            data.bookings.forEach(booking => {
+                html += `
+                    <div class="booking-item">
+                        <div class="booking-service">${booking.service_name}</div>
+                        <div class="booking-date">${booking.date} в ${booking.time}</div>
+                        <div class="booking-master">Мастер: ${booking.master_name}</div>
+                        <button class="cancel-btn" data-booking-id="${booking.id_app}">Отменить</button>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+            
+            // Добавляем обработчики отмены
+            document.querySelectorAll('.cancel-btn').forEach(btn => {
+                btn.addEventListener('click', async function() {
+                    const bookingId = this.getAttribute('data-booking-id');
+                    if (confirm('Вы уверены, что хотите отменить запись?')) {
+                        await cancelBooking(bookingId);
+                        loadUserBookings(); // Обновляем список
+                    }
+                });
+            });
+        } else {
+            container.innerHTML = '<p>У вас нет активных записей</p>';
+        }
+    } catch (error) {
+        container.innerHTML = '<p class="error">Ошибка загрузки записей</p>';
+    }
+}
+
+// Загрузка информации о мастерах
+async function loadMasters() {
+    const container = document.getElementById('masters-list');
+    container.innerHTML = '<div class="loader">Загрузка мастеров...</div>';
+    
+    try {
+        const response = await fetch('/.netlify/functions/getmasters');
+        const data = await response.json();
+        
+        if (data.masters && data.masters.length > 0) {
+            let html = '<div class="masters-grid">';
+            data.masters.forEach(master => {
+                html += `
+                    <div class="master-card">
+                        <img src="${master.photo || 'img/default-master.jpg'}" alt="${master.name_master}">
+                        <h3>${master.name_master}</h3>
+                        <p>${master.description || 'Опытный мастер'}</p>
+                        <button class="view-portfolio" data-master-id="${master.id_master}">Портфолио</button>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            container.innerHTML = html;
+            
+            // Обработчики просмотра портфолио
+            document.querySelectorAll('.view-portfolio').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const masterId = this.getAttribute('data-master-id');
+                    showPortfolio(masterId);
+                });
+            });
+        } else {
+            container.innerHTML = '<p>Информация о мастерах временно недоступна</p>';
+        }
+    } catch (error) {
+        container.innerHTML = '<p class="error">Ошибка загрузки мастеров</p>';
+    }
+}
+
+// Функция отмены записи
+async function cancelBooking(bookingId) {
+    try {
+        const response = await fetch('/.netlify/functions/cancelbooking', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ booking_id: bookingId })
+        });
+        
+        if (!response.ok) {
+            throw new Error('Ошибка отмены записи');
+        }
+        
+        alert('Запись успешно отменена');
+    } catch (error) {
+        alert(error.message);
+    }
+}
+
+// Функция показа портфолио
+function showPortfolio(masterId) {
+    // Здесь можно реализовать модальное окно с работами мастера
+    alert(`Портфолио мастера ID: ${masterId} будет показано здесь`);
+}
