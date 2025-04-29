@@ -258,7 +258,7 @@ function initBookingForm() {
                         id: item.id_service,
                         name: item.name,
                         price: item.price,
-                        duration: item.duration_minutes || 60
+                        duration: item.duration_minutes
                     });
                     option.textContent = `${item.name} (${item.price})`;
                     optgroup.appendChild(option);
