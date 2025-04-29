@@ -13,7 +13,7 @@ exports.handler = async (event) => {
 
     // Запрашиваем календарь с основного сервера
     const calendarResponse = await fetch(
-      `https://translations-raleigh-seekers-lo.trycloudflare.com/api/calendar?id_service=${id_service}`
+      `https://def-ws-quantity-lets.trycloudflare.com/api/calendar?id_service=${id_service}`
     );
     
     if (!calendarResponse.ok) {
