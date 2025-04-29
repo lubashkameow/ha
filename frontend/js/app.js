@@ -386,30 +386,30 @@ function initBookingForm() {
     setTimeout(() => {
         renderCalendar(testData.dates);
     }, 500);
-        try {
-            const response = await fetch(`/.netlify/functions/getcalendar?id_service=${service.id}`);
-            if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-            }
-        
-            const data = await response.json();
+       // try {
+        //    const response = await fetch(`/.netlify/functions/getcalendar?id_service=${service.id}`);
+        //    if (!response.ok) {
+        //    throw new Error(`HTTP error! status: ${response.status}`);
+        //    }
+       // 
+         //   const data = await response.json();
         
             // Добавим логирование для отладки
-            console.log('Calendar data received:', data);
+         //   console.log('Calendar data received:', data);
         
-            if (!data.dates) {
-            throw new Error('Invalid data format: dates not found');
-            }
+         //   if (!data.dates) {
+         //   throw new Error('Invalid data format: dates not found');
+         //   }
         
             // Обновляем длительность услуги, если она пришла
-            if (data.service && data.service.duration_minutes) {
-                service.duration = data.service.duration_minutes;
-            }
-            renderCalendar(data.dates);
-        } catch (error) {
-            container.innerHTML = '<p class="error">Ошибка загрузки дат</p>';
-        }
-    }
+         //   if (data.service && data.service.duration_minutes) {
+         //       service.duration = data.service.duration_minutes;
+         //   }
+      //      renderCalendar(data.dates);
+  //      } catch (error) {
+         //   container.innerHTML = '<p class="error">Ошибка загрузки дат</p>';
+    //    }
+//    }
     
     // Отрисовка календаря
     function renderCalendar(dates) {
