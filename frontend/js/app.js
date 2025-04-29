@@ -105,7 +105,7 @@ function showBookingForm() {
     `;
     
     document.querySelector('.main-content').insertAdjacentHTML('beforeend', formHtml);
-    
+    document.getElementById('booking-steps').innerHTML = formHtml;
     // Инициализация обработчиков формы
     initBookingForm();
 }
