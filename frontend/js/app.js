@@ -275,12 +275,22 @@ function initBookingForm() {
     });
     serviceSelect.addEventListener('change', function() {
     try {
-        if (this.value) {
+        if (this.value && this.value !== '""') { // Проверка на пустое значение
             selectedService = JSON.parse(this.value);
-            console.log('Selected service:', selectedService); // Добавьте этот лог
+            console.log('Parsed service:', selectedService);
+            
+            // Добавим проверку структуры
+            if (!selectedService.id || !selectedService.name) {
+                console.error('Invalid service structure:', selectedService);
+                selectedService = null;
+            }
+        } else {
+            selectedService = null;
         }
     } catch (e) {
-        console.error('Error parsing service data:', e);
+        console.error('JSON parse error:', e);
+        console.error('Failed to parse:', this.value);
+        selectedService = null;
     }
 });
     // Обработчик кнопки "Далее"
