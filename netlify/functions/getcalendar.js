@@ -2,36 +2,61 @@ const fetch = require('node-fetch');
 
 exports.handler = async (event) => {
   try {
+    // Логируем входящие параметры
+    console.log('Query parameters:', event.queryStringParameters);
+    
     const { id_service } = event.queryStringParameters;
     
     if (!id_service) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: 'id_service parameter is required' }),
+        body: JSON.stringify({ error: 'Параметр id_service обязателен' }),
       };
     }
 
-    // Запрашиваем календарь с основного сервера
-    const calendarResponse = await fetch(
-      `https://def-ws-quantity-lets.trycloudflare.com/api/calendar?id_service=${id_service}`
-    );
+    // Добавляем проверку ID
+    if (isNaN(id_service)) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: 'Некорректный ID услуги' }),
+      };
+    }
+
+    const apiUrl = `https://def-ws-quantity-lets.trycloudflare.com/api/calendar?id_service=${id_service}`;
+    console.log('Requesting:', apiUrl);
     
-    if (!calendarResponse.ok) {
-      throw new Error(`Failed to fetch calendar data: ${calendarResponse.statusText}`);
+    const response = await fetch(apiUrl);
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('API error:', errorText);
+      return {
+        statusCode: 502,
+        body: JSON.stringify({ error: 'Ошибка при запросе к API' }),
+      };
     }
     
-    const calendarData = await calendarResponse.json();
+    const data = await response.json();
+    
+    // Проверяем структуру ответа
+    if (!data.dates || !Array.isArray(data.dates)) {
+      return {
+        statusCode: 502,
+        body: JSON.stringify({ error: 'Некорректный формат данных от API' }),
+      };
+    }
     
     return {
       statusCode: 200,
-      body: JSON.stringify(calendarData), // Просто передаем данные как есть
+      body: JSON.stringify(data),
     };
   } catch (error) {
+    console.error('Internal error:', error);
     return {
       statusCode: 500,
       body: JSON.stringify({ 
-        error: error.message,
-        stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+        error: 'Внутренняя ошибка сервера',
+        details: error.message 
       }),
     };
   }
