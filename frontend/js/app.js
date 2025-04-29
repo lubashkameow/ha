@@ -374,7 +374,18 @@ function initBookingForm() {
     async function loadAvailableDates(service) {
         const container = document.getElementById('calendar-container');
         container.innerHTML = '<div class="loader">Загрузка дат...</div>';
-        
+        const testData = {
+        dates: [
+            {date: "2025-04-29", has_available_slots: 1},
+            {date: "2025-04-30", has_available_slots: 1},
+            {date: "2025-05-01", has_available_slots: 1}
+        ],
+        service: {id_service: "10", duration_minutes: 180}
+    };
+    
+    setTimeout(() => {
+        renderCalendar(testData.dates);
+    }, 500);
         try {
             const response = await fetch(`/.netlify/functions/getcalendar?id_service=${service.id}`);
             if (!response.ok) {
