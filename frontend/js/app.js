@@ -372,36 +372,38 @@ function initBookingForm() {
     
     // Загрузка доступных дат
     async function loadAvailableDates(service) {
-        const container = document.getElementById('calendar-container');
-        container.innerHTML = '<div class="loader">Загрузка дат...</div>';
-        try {
-        console.log('Loading calendar for service ID:', service.id); // Добавьте этот лог
+    const container = document.getElementById('calendar-container');
+    container.innerHTML = '<div class="loader">Загрузка дат...</div>';
+    
+    try {
+        console.log('Service ID:', service.id); // Логируем ID услуги
         
+        // Добавляем проверку ID
+        if (!service.id) {
+            throw new Error('Service ID is missing');
+        }
+
         const response = await fetch(`/.netlify/functions/getcalendar?id_service=${service.id}`);
         
-        console.log('Calendar response status:', response.status); // Лог статуса
+        console.log('Response status:', response.status);
         
         if (!response.ok) {
-            const errorText = await response.text();
-            console.error('Error response:', errorText);
-            throw new Error(`HTTP error! status: ${response.status}`);
+            const errorDetails = await response.text();
+            console.error('Error details:', errorDetails);
+            throw new Error(`Ошибка сервера: ${response.status}`);
         }
-    
+        
         const data = await response.json();
-        console.log('Calendar data:', data); // Лог полученных данных
-    
-        if (!data.dates || !Array.isArray(data.dates)) {
-            throw new Error('Invalid data format: dates array not found');
-        }
-    
-        if (data.service && data.service.duration_minutes) {
-            service.duration = data.service.duration_minutes;
+        console.log('Received data:', data);
+        
+        if (!data.dates) {
+            throw new Error('Неверный формат данных календаря');
         }
         
         renderCalendar(data.dates);
     } catch (error) {
-        console.error('Error loading calendar:', error);
-        container.innerHTML = `<p class="error">Ошибка загрузки дат: ${error.message}</p>`;
+        console.error('Ошибка загрузки календаря:', error);
+        container.innerHTML = `<p class="error">${error.message}</p>`;
     }
 }
     
