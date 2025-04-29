@@ -253,10 +253,6 @@ function initBookingForm() {
                 optgroup.label = subcategory;
                 
                 items.forEach(item => {
-                    if (!item.id_service || !item.name || !item.price) {
-                        console.error('Invalid service item:', item);
-                        return;
-                    }
                     const option = document.createElement('option');
                     option.value = JSON.stringify({
                         id: item.id_service,
@@ -264,9 +260,7 @@ function initBookingForm() {
                         price: item.price,
                         duration: item.duration_minutes || 60
                     });
-                    option.value = JSON.stringify(serviceData);
                     option.textContent = `${item.name} (${item.price})`;
-                    option.dataset.serviceId = item.id_service;
                     optgroup.appendChild(option);
                 });
                 
@@ -281,52 +275,61 @@ function initBookingForm() {
     });
     serviceSelect.addEventListener('change', function() {
     try {
-            if (!this.value || this.value === '""') {
+        if (this.value && this.value !== '""') { // Проверка на пустое значение
+            selectedService = JSON.parse(this.value);
+            console.log('Parsed service:', selectedService);
+            
+            // Добавим проверку структуры
+            if (!selectedService.id || !selectedService.name) {
+                console.error('Invalid service structure:', selectedService);
                 selectedService = null;
-                return;
             }
+        } else {
+            selectedService = null;
+        }
+    } catch (e) {
+        console.error('JSON parse error:', e);
+        console.error('Failed to parse:', this.value);
+        selectedService = null;
+    }
+});
+    // Обработчик кнопки "Далее"
+    nextBtn.addEventListener('click', async function() {
+    if (!validateCurrentStep()) return;
+
+    // Перед переходом на следующий шаг
+    if (currentStep === 2) { // При переходе от выбора услуги к выбору даты
+        if (!serviceSelect.value) {
+            alert('Пожалуйста, выберите услугу');
+            return;
+        }
+        
+        try {
+            selectedService = JSON.parse(serviceSelect.value);
+            console.log('Service selected for calendar:', selectedService);
             
-            let valueToParse = this.value;
-            if (valueToParse.startsWith('"') && valueToParse.endsWith('"')) {
-                valueToParse = valueToParse.slice(1, -1);
-            }
-            
-            selectedService = JSON.parse(valueToParse);
-            console.log('Selected service:', selectedService);
-            
-            if (!selectedService?.id || !selectedService?.name) {
-                console.error('Invalid service data:', selectedService);
-                selectedService = null;
+            if (!selectedService || !selectedService.id) {
+                throw new Error('Не удалось получить данные услуги');
             }
         } catch (e) {
             console.error('Error parsing service:', e);
-            console.error('Failed value:', this.value);
-            selectedService = null;
+            alert('Ошибка при выборе услуги');
+            return;
         }
-    });
-    // Обработчик кнопки "Далее"
-    nextBtn.addEventListener('click', async function() {
-        if (currentStep === 2) {
-            if (!selectedService?.id) {
-                alert('Пожалуйста, выберите услугу из списка');
-                return;
-            }
-            
-            console.log('Proceeding with service:', selectedService);
-        }
-        
-        if (!validateCurrentStep()) return;
-        
-        currentStep++;
-        updateFormView();
-        
-        if (currentStep === 3) {
-            loadAvailableDates(selectedService);
-        }
-    });
+    }
+
+    currentStep++;
+    updateFormView();
+
+    if (currentStep === 3) {
+        loadAvailableDates(selectedService);
+    }
+});
     
+    // Обработчик кнопки "Назад"
     prevBtn.addEventListener('click', function() {
         if (currentStep <= 1) return;
+        
         currentStep--;
         updateFormView();
     });
@@ -396,31 +399,40 @@ function initBookingForm() {
     
     // Загрузка доступных дат
     async function loadAvailableDates(service) {
-        const container = document.getElementById('calendar-container');
-        container.innerHTML = '<div class="loader">Загрузка дат...</div>';
+    const container = document.getElementById('calendar-container');
+    container.innerHTML = '<div class="loader">Загрузка дат...</div>';
+    
+    try {
+        console.log('Service ID:', service.id); // Логируем ID услуги
         
-        try {
-            console.log('Loading dates for service:', service.id);
-            const response = await fetch(`/.netlify/functions/getcalendar?id_service=${service.id}`);
-            
-            if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(`HTTP error ${response.status}: ${errorText}`);
-            }
-            
-            const data = await response.json();
-            console.log('Calendar data:', data);
-            
-            if (!data.dates) {
-                throw new Error('Invalid calendar data format');
-            }
-            
-            renderCalendar(data.dates);
-        } catch (error) {
-            console.error('Error loading dates:', error);
-            container.innerHTML = `<p class="error">Ошибка загрузки дат: ${error.message}</p>`;
+        // Добавляем проверку ID
+        if (!service.id) {
+            throw new Error('Service ID is missing');
         }
+
+        const response = await fetch(`/.netlify/functions/getcalendar?id_service=${service.id}`);
+        
+        console.log('Response status:', response.status);
+        
+        if (!response.ok) {
+            const errorDetails = await response.text();
+            console.error('Error details:', errorDetails);
+            throw new Error(`Ошибка сервера: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        console.log('Received data:', data);
+        
+        if (!data.dates) {
+            throw new Error('Неверный формат данных календаря');
+        }
+        
+        renderCalendar(data.dates);
+    } catch (error) {
+        console.error('Ошибка загрузки календаря:', error);
+        container.innerHTML = `<p class="error">${error.message}</p>`;
     }
+}
     
     // Отрисовка календаря
     function renderCalendar(dates) {
