@@ -188,14 +188,19 @@ function showBookingForm() {
         </div>
         
         <div class="form-step" id="step-date" style="display:none;">
-            <label>Выберите дату:</label>
-            <div id="calendar-container"></div>
-        </div>
-        
-        <div class="form-step" id="step-time" style="display:none;">
-            <label>Выберите время:</label>
-            <div id="time-slots-container"></div>
-        </div>
+    <label>Выберите дату:</label>
+    <div class="calendar-header">
+        <button id="prev-week">&lt;</button>
+        <div id="current-week-range"></div>
+        <button id="next-week">&gt;</button>
+    </div>
+    <div class="week-days" id="week-days-container"></div>
+</div>
+
+<div class="form-step" id="step-masters" style="display:none;">
+    <label>Доступные мастера:</label>
+    <div id="masters-slots-container"></div>
+</div>
         
         <div class="form-step" id="step-comment" style="display:none;">
             <label>Комментарий (необязательно):</label>
@@ -218,6 +223,8 @@ function showBookingForm() {
 
 // Инициализация формы записи
 function initBookingForm() {
+    let currentWeekStart = new Date();
+    currentWeekStart.setHours(0, 0, 0, 0);
     const catalogSelect = document.getElementById('catalog-select');
     const serviceSelect = document.getElementById('service-select');
     const prevBtn = document.getElementById('prev-btn');
@@ -435,82 +442,103 @@ function initBookingForm() {
 }
     
     // Отрисовка календаря
-    function renderCalendar(dates) {
-        const container = document.getElementById('calendar-container');
-        let html = '<div class="calendar-grid">';
+    function renderWeekDays(startDate) {
+    const container = document.getElementById('week-days-container');
+    const weekDays = ['ВС', 'ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ'];
+    
+    let html = '';
+    for (let i = 0; i < 7; i++) {
+        const date = new Date(startDate);
+        date.setDate(startDate.getDate() + i);
         
-        dates.forEach(date => {
-            const dateObj = new Date(date.date);
-            const day = dateObj.getDate();
-            const isPast = dateObj < new Date();
-            const isAvailable = date.has_available_slots;
-            const isFull = !isAvailable && !isPast;
+        const day = date.getDate();
+        const weekDay = weekDays[date.getDay()];
+        const dateStr = date.toISOString().split('T')[0];
+        const isToday = date.toDateString() === new Date().toDateString();
+        
+        html += `
+            <div class="day-cell ${isToday ? 'today' : ''}" data-date="${dateStr}">
+                <div class="week-day">${weekDay}</div>
+                <div class="day-number">${day}</div>
+            </div>
+        `;
+    }
+    
+    container.innerHTML = html;
+    updateWeekRangeText(startDate);
+    
+    // Обработчики клика по дням
+    document.querySelectorAll('.day-cell').forEach(cell => {
+        cell.addEventListener('click', function() {
+            document.querySelectorAll('.day-cell').forEach(c => {
+                c.classList.remove('selected');
+            });
+            this.classList.add('selected');
             
-            html += `
-                <div class="date-cell 
-                    ${isPast ? 'past' : ''} 
-                    ${isFull ? 'full' : ''}
-                    ${isAvailable ? 'available' : ''}"
-                    data-date="${date.date}">
-                    ${day}
-                </div>
-            `;
+            const date = this.getAttribute('data-date');
+            loadMastersSlots(date, selectedService.duration);
         });
-        
-        html += '</div>';
-        container.innerHTML = html;
-        
-        // Обработчики выбора даты
-        document.querySelectorAll('.date-cell.available').forEach(cell => {
-    cell.addEventListener('click', function() {
-        // Удаляем выделение у всех ячеек
-        document.querySelectorAll('.date-cell').forEach(c => {
-            c.classList.remove('selected');
-        });
-        
-        // Добавляем выделение текущей
-        this.classList.add('selected');
-        
-        // Получаем дату и загружаем слоты
-        const date = this.getAttribute('data-date');
-        console.log('Selected date:', date); // Добавьте лог
-        loadTimeSlots(date, selectedService.duration);
     });
+}
+
+function updateWeekRangeText(startDate) {
+    const endDate = new Date(startDate);
+    endDate.setDate(startDate.getDate() + 6);
+    
+    const rangeElement = document.getElementById('current-week-range');
+    rangeElement.textContent = `
+        ${startDate.toLocaleDateString()} - ${endDate.toLocaleDateString()}
+    `;
+}
+
+// Добавьте обработчики для кнопок недели
+document.getElementById('prev-week').addEventListener('click', () => {
+    currentWeekStart.setDate(currentWeekStart.getDate() - 7);
+    renderWeekDays(currentWeekStart);
 });
-    }
+
+document.getElementById('next-week').addEventListener('click', () => {
+    currentWeekStart.setDate(currentWeekStart.getDate() + 7);
+    renderWeekDays(currentWeekStart);
+});
+
+// Новая функция для загрузки мастеров и слотов
+async function loadMastersSlots(date, duration) {
+    const container = document.getElementById('masters-slots-container');
+    container.innerHTML = '<div class="loader">Загрузка мастеров...</div>';
     
-    // Загрузка временных слотов
-    async function loadTimeSlots(date, duration) {
-        const container = document.getElementById('time-slots-container');
-        container.innerHTML = '<div class="loader">Загрузка времени...</div>';
+    try {
+        // 1. Сначала получаем мастеров, работающих в эту дату
+        const mastersResponse = await fetch(`/.netlify/functions/getmasters?date=${date}`);
+        const mastersData = await mastersResponse.json();
         
-        try {
-            const response = await fetch(`/.netlify/functions/gettimeslots?date=${date}&duration=${duration}`);
-            const data = await response.json();
-            renderTimeSlots(data.slots);
-        } catch (error) {
-            container.innerHTML = '<p class="error">Ошибка загрузки времени</p>';
+        // 2. Для каждого мастера получаем свободные слоты
+        let html = '';
+        for (const master of mastersData.masters) {
+            const slotsResponse = await fetch(
+                `/.netlify/functions/gettimeslots?date=${date}&master_id=${master.id_master}&duration=${duration}`
+            );
+            const slotsData = await slotsResponse.json();
+            
+            if (slotsData.slots.length > 0) {
+                html += `
+                    <div class="master-slots">
+                        <h3>${master.name_master}</h3>
+                        <div class="master-slots-grid">
+                            ${slotsData.slots.map(slot => `
+                                <button class="time-slot" 
+                                    data-slot-id="${slot.id_slot}"
+                                    data-master-id="${master.id_master}">
+                                    ${slot.start_time}
+                                </button>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
         }
-    }
-    
-    // Отрисовка временных слотов
-    function renderTimeSlots(slots) {
-        const container = document.getElementById('time-slots-container');
-        let html = '<div class="time-slots-grid">';
         
-        slots.forEach(slot => {
-            html += `
-                <button class="time-slot" 
-                        data-slot-id="${slot.id_slot}"
-                        data-master-id="${slot.id_master}"
-                        data-master-name="${slot.name_master}">
-                    ${slot.start_time}
-                </button>
-            `;
-        });
-        
-        html += '</div>';
-        container.innerHTML = html;
+        container.innerHTML = html || '<p>Нет доступных мастеров на эту дату</p>';
         
         // Обработчики выбора времени
         document.querySelectorAll('.time-slot').forEach(button => {
@@ -522,7 +550,15 @@ function initBookingForm() {
                 selectedSlot = this.getAttribute('data-slot-id');
             });
         });
+        
+        // Показываем блок с мастерами
+        document.getElementById('step-masters').style.display = 'block';
+        
+    } catch (error) {
+        console.error('Ошибка загрузки мастеров:', error);
+        container.innerHTML = '<p class="error">Ошибка загрузки данных</p>';
     }
+}
     
     // Подтверждение записи
     async function confirmBooking() {
