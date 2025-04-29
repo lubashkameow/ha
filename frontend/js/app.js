@@ -462,16 +462,21 @@ function initBookingForm() {
         
         // Обработчики выбора даты
         document.querySelectorAll('.date-cell.available').forEach(cell => {
-            cell.addEventListener('click', function() {
-                document.querySelectorAll('.date-cell').forEach(c => {
-                    c.classList.remove('selected');
-                });
-                this.classList.add('selected');
-                
-                const date = this.getAttribute('data-date');
-                loadTimeSlots(date, selectedService.duration);
-            });
+    cell.addEventListener('click', function() {
+        // Удаляем выделение у всех ячеек
+        document.querySelectorAll('.date-cell').forEach(c => {
+            c.classList.remove('selected');
         });
+        
+        // Добавляем выделение текущей
+        this.classList.add('selected');
+        
+        // Получаем дату и загружаем слоты
+        const date = this.getAttribute('data-date');
+        console.log('Selected date:', date); // Добавьте лог
+        loadTimeSlots(date, selectedService.duration);
+    });
+});
     }
     
     // Загрузка временных слотов
