@@ -1,7 +1,15 @@
 const fetch = require('node-fetch');
 
 exports.handler = async (event) => {
-    const id = event.queryStringParameters.id;
+    const { date } = event.queryStringParameters; // Исправлено: извлекаем date
+    
+    if (!date) {
+        return {
+            statusCode: 400,
+            body: JSON.stringify({ error: 'date parameter is required' })
+        };
+    }
+    
     const url = `https://buildings-cb-visited-thorough.trycloudflare.com/api/master?date=${date}`;
     
     try {
