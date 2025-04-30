@@ -2,7 +2,7 @@ const fetch = require('node-fetch');
 
 exports.handler = async (event) => {
     const { date, duration } = event.queryStringParameters;
-    const url = `https://def-ws-quantity-lets.trycloudflare.com/api/timeslots?date=${date}&duration=${duration}`;
+    const url = `https://reaches-cardiac-nevada-complimentary.trycloudflare.com/api/timeslots?date=${date}&duration=${duration}`;
     
     try {
         const response = await fetch(url);
