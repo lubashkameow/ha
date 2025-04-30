@@ -406,35 +406,33 @@ function initBookingForm() {
     
     // Загрузка доступных дат
     async function loadAvailableDates(service) {
-    const container = document.getElementById('calendar-container');
+    const container = document.getElementById('week-days-container'); // Изменили здесь
     container.innerHTML = '<div class="loader">Загрузка дат...</div>';
     
     try {
-        console.log('Service ID:', service.id); // Логируем ID услуги
+        console.log('Service ID:', service.id);
         
-        // Добавляем проверку ID
         if (!service.id) {
             throw new Error('Service ID is missing');
         }
 
         const response = await fetch(`/.netlify/functions/getcalendar?id_service=${service.id}`);
         
-        console.log('Response status:', response.status);
-        
         if (!response.ok) {
-            const errorDetails = await response.text();
-            console.error('Error details:', errorDetails);
             throw new Error(`Ошибка сервера: ${response.status}`);
         }
         
         const data = await response.json();
-        console.log('Received data:', data);
         
         if (!data.dates) {
             throw new Error('Неверный формат данных календаря');
         }
         
-        renderCalendar(data.dates);
+        // Инициализируем текущую неделю
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        renderWeekDays(today);
+        
     } catch (error) {
         console.error('Ошибка загрузки календаря:', error);
         container.innerHTML = `<p class="error">${error.message}</p>`;
