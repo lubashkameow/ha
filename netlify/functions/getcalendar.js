@@ -22,7 +22,7 @@ exports.handler = async (event) => {
       };
     }
 
-    const apiUrl = `https://moses-checkout-wells-choosing.trycloudflare.com/api/calendar?id_service=${id_service}`;
+    const apiUrl = `https://buildings-cb-visited-thorough.trycloudflare.com/api/calendar?id_service=${id_service}`;
     console.log('Requesting:', apiUrl);
     
     const response = await fetch(apiUrl);
