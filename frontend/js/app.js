@@ -234,6 +234,16 @@ function initBookingForm() {
     const totalSteps = 5;
     let selectedService = null;
     let selectedSlot = null;
+
+    document.getElementById('prev-week')?.addEventListener('click', () => {
+    currentWeekStart.setDate(currentWeekStart.getDate() - 7);
+    renderWeekDays(currentWeekStart);
+});
+
+document.getElementById('next-week')?.addEventListener('click', () => {
+    currentWeekStart.setDate(currentWeekStart.getDate() + 7);
+    renderWeekDays(currentWeekStart);
+});
     
     // Обработчик выбора каталога
     catalogSelect.addEventListener('change', async function() {
@@ -406,7 +416,7 @@ function initBookingForm() {
     
     // Загрузка доступных дат
     async function loadAvailableDates(service) {
-    const container = document.getElementById('calendar-container');
+    const container = document.getElementById('week-days-container');
     container.innerHTML = '<div class="loader">Загрузка дат...</div>';
     
     try {
@@ -445,16 +455,21 @@ function initBookingForm() {
     function renderWeekDays(startDate) {
     const container = document.getElementById('week-days-container');
     const weekDays = ['ВС', 'ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ'];
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
     
     let html = '';
     for (let i = 0; i < 7; i++) {
         const date = new Date(startDate);
         date.setDate(startDate.getDate() + i);
         
+        // Пропускаем прошедшие даты
+        if (date < today) continue;
+        
         const day = date.getDate();
         const weekDay = weekDays[date.getDay()];
         const dateStr = date.toISOString().split('T')[0];
-        const isToday = date.toDateString() === new Date().toDateString();
+        const isToday = date.toDateString() === today.toDateString();
         
         html += `
             <div class="day-cell ${isToday ? 'today' : ''}" data-date="${dateStr}">
@@ -463,6 +478,23 @@ function initBookingForm() {
             </div>
         `;
     }
+    
+    container.innerHTML = html || '<p>Нет доступных дат</p>';
+    updateWeekRangeText(startDate);
+    
+    // Обработчики клика
+    document.querySelectorAll('.day-cell').forEach(cell => {
+        cell.addEventListener('click', function() {
+            document.querySelectorAll('.day-cell').forEach(c => {
+                c.classList.remove('selected');
+            });
+            this.classList.add('selected');
+            
+            const date = this.getAttribute('data-date');
+            loadMastersSlots(date, selectedService.duration);
+        });
+    });
+}
     
     container.innerHTML = html;
     updateWeekRangeText(startDate);
