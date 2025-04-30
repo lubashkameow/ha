@@ -443,11 +443,16 @@ function initBookingForm() {
     function renderWeekDays(startDate) {
     const container = document.getElementById('week-days-container');
     const weekDays = ['ВС', 'ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ'];
-    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+        
     let html = '';
     for (let i = 0; i < 7; i++) {
         const date = new Date(startDate);
         date.setDate(startDate.getDate() + i);
+
+        // Пропускаем прошедшие даты
+        if (date < today) continue;
         
         const day = date.getDate();
         const weekDay = weekDays[date.getDay()];
@@ -462,7 +467,7 @@ function initBookingForm() {
         `;
     }
     
-    container.innerHTML = html;
+    container.innerHTML = html || '<p>Нет доступных дат</p>';
     updateWeekRangeText(startDate);
     
     // Обработчики клика по дням
