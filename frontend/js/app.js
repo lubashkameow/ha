@@ -512,7 +512,7 @@ async function loadMastersSlots(date, duration) {
     
     try {
         // 1. Сначала получаем мастеров, работающих в эту дату
-        const mastersResponse = await fetch(`/.netlify/functions/getmasters?date=${date}`);
+        const mastersResponse = await fetch(`/.netlify/functions/getmaster?date=${date}`);
         const mastersData = await mastersResponse.json();
         
         // 2. Для каждого мастера получаем свободные слоты
