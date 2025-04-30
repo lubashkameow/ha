@@ -305,28 +305,32 @@ function initBookingForm() {
     nextBtn.addEventListener('click', async function() {
     if (!validateCurrentStep()) return;
 
-    // Специальная обработка перехода от даты к мастерам
-    if (currentStep === 3) {
-        if (!selectedDate) {
-            alert('Пожалуйста, выберите дату');
+    // Перед переходом на следующий шаг
+    if (currentStep === 2) { // При переходе от выбора услуги к выбору даты
+        if (!serviceSelect.value) {
+            alert('Пожалуйста, выберите услугу');
             return;
         }
         
-        // Показываем мастеров сразу после выбора даты
-        document.getElementById('step-masters').style.display = 'block';
+        try {
+            selectedService = JSON.parse(serviceSelect.value);
+            console.log('Service selected for calendar:', selectedService);
+            
+            if (!selectedService || !selectedService.id) {
+                throw new Error('Не удалось получить данные услуги');
+            }
+        } catch (e) {
+            console.error('Error parsing service:', e);
+            alert('Ошибка при выборе услуги');
+            return;
+        }
     }
 
     currentStep++;
     updateFormView();
 
-    // Если перешли на шаг мастеров, но они уже загружены - ничего не делаем
-    if (currentStep === 4 && document.getElementById('masters-slots-container').children.length > 0) {
-        return;
-    }
-    
-    // Если перешли на шаг мастеров и дата выбрана - загружаем мастеров
-    if (currentStep === 4 && selectedDate && selectedService) {
-        loadMastersSlots(selectedDate, selectedService.duration);
+    if (currentStep === 3) {
+        loadAvailableDates(selectedService);
     }
 });
     
@@ -377,26 +381,18 @@ function initBookingForm() {
     
     // Обновление отображения формы
     function updateFormView() {
-    // Скрываем все шаги
-    document.querySelectorAll('.form-step').forEach(step => {
-        step.style.display = 'none';
-    });
-    
-    // Показываем текущий шаг
-    const currentStepElement = document.getElementById(`step-${getStepName(currentStep)}`);
-    if (currentStepElement) {
-        currentStepElement.style.display = 'block';
+        // Скрываем все шаги
+        document.querySelectorAll('.form-step').forEach(step => {
+            step.style.display = 'none';
+        });
+        
+        // Показываем текущий шаг
+        document.getElementById(`step-${getStepName(currentStep)}`).style.display = 'block';
+        
+        // Обновляем кнопки навигации
+        prevBtn.disabled = currentStep === 1;
+        nextBtn.textContent = currentStep === totalSteps ? 'Подтвердить' : 'Далее';
     }
-    
-    // Специальная логика для шага мастеров
-    if (currentStep === 4 && selectedDate) {
-        document.getElementById('step-masters').style.display = 'block';
-    }
-    
-    // Обновляем кнопки навигации
-    prevBtn.disabled = currentStep === 1;
-    nextBtn.textContent = currentStep === totalSteps ? 'Подтвердить' : 'Далее';
-}
     
     // Получение имени шага
     function getStepName(step) {
