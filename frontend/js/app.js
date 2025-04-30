@@ -232,6 +232,7 @@ function initBookingForm() {
     
     let currentStep = 1;
     const totalSteps = 5;
+    let selectedDate = null;
     let selectedService = null;
     let selectedSlot = null;
     
@@ -359,23 +360,24 @@ function initBookingForm() {
                 return true;
                 
             case 3: // Дата
-                if (!document.querySelector('.date-cell.selected')) {
-                    alert('Пожалуйста, выберите дату');
-                    return false;
-                }
-                return true;
-                
+            // Изменили проверку - теперь смотрим на глобальную переменную selectedDate
+            if (!selectedDate) {
+                alert('Пожалуйста, выберите дату');
+                return false;
+            }
+            return true;
+            
             case 4: // Время
-                if (!document.querySelector('.time-slot.selected')) {
-                    alert('Пожалуйста, выберите время');
-                    return false;
-                }
-                return true;
-                
-            default:
-                return true;
-        }
+            if (!selectedSlot) {
+                alert('Пожалуйста, выберите время');
+                return false;
+            }
+            return true;
+            
+        default:
+            return true;
     }
+}
     
     // Обновление отображения формы
     function updateFormView() {
@@ -472,16 +474,19 @@ function initBookingForm() {
     
     // Обработчики клика по дням
     document.querySelectorAll('.day-cell').forEach(cell => {
-        cell.addEventListener('click', function() {
-            document.querySelectorAll('.day-cell').forEach(c => {
-                c.classList.remove('selected');
-            });
-            this.classList.add('selected');
-            
-            const date = this.getAttribute('data-date');
-            loadMastersSlots(date, selectedService.duration);
+    cell.addEventListener('click', function() {
+        document.querySelectorAll('.day-cell').forEach(c => {
+            c.classList.remove('selected');
         });
+        this.classList.add('selected');
+        
+        selectedDate = this.getAttribute('data-date'); // Сохраняем выбранную дату
+        loadMastersSlots(selectedDate, selectedService.duration);
+        
+        // Показываем следующий шаг автоматически
+        document.getElementById('step-masters').style.display = 'block';
     });
+});
 }
 
 function updateWeekRangeText(startDate) {
