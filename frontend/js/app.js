@@ -778,7 +778,7 @@ async function loadMasters() {
     container.innerHTML = '<div class="loader">Загрузка мастеров...</div>';
     
     try {
-        const response = await fetch('/.netlify/functions/getmasters');
+        const response = await fetch('/.netlify/functions/getmaster');
         const data = await response.json();
         
         if (data.masters && data.masters.length > 0) {
