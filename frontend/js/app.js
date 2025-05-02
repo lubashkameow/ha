@@ -414,7 +414,7 @@ function initBookingForm() {
         case 1: return 'catalog';
         case 2: return 'service';
         case 3: return 'date';
-        case 4: return 'masters';
+        case 4: return 'comment';
         case 5: return 'confirmation';
         default: return '';
     }
@@ -676,23 +676,25 @@ function formatDate(dateStr) {
     
     // Показать подтверждение записи
     function showConfirmation(booking) {
-        const formContainer = document.getElementById('booking-form-container');
-        formContainer.innerHTML = `
-            <div class="confirmation">
-                <h3>Запись подтверждена!</h3>
-                <p><strong>Услуга:</strong> ${booking.service_name} (${booking.service_price})</p>
-                <p><strong>Дата:</strong> ${booking.date}</p>
-                <p><strong>Время:</strong> ${booking.time}</p>
-                <p><strong>Мастер:</strong> ${booking.master_name}</p>
-                ${booking.comment ? `<p><strong>Комментарий:</strong> ${booking.comment}</p>` : ''}
-                <button id="close-booking" class="btn-primary">Закрыть</button>
+    const formContainer = document.getElementById('booking-form-container');
+    formContainer.innerHTML = `
+        <div class="confirmation success-message">
+            <h2>🎉 Ура! Вы успешно записались!</h2>
+            <div class="confirmation-details">
+                <p><strong>💇 Услуга:</strong> ${booking.service_name} (${booking.service_price} ₽)</p>
+                <p><strong>📅 Дата:</strong> ${booking.date}</p>
+                <p><strong>⏰ Время:</strong> ${booking.time}</p>
+                <p><strong>👩‍🎨 Мастер:</strong> ${booking.master_name}</p>
+                <p><strong>📝 Комментарий:</strong> ${booking.comment || 'нет'}</p>
             </div>
-        `;
-        
-        document.getElementById('close-booking').addEventListener('click', () => {
-            formContainer.style.display = 'none';
-        });
-    }
+            <button id="close-booking" class="btn-primary">Закрыть</button>
+        </div>
+    `;
+
+    document.getElementById('close-booking').addEventListener('click', () => {
+        formContainer.style.display = 'none';
+    });
+}
 }
 
 // Обработка навигации
