@@ -572,9 +572,9 @@ async function loadMastersSlots(date, duration) {
         this.classList.add('selected');
         selectedSlot = this.getAttribute('data-slot-id');
         selectedMaster = {
-            id: this.getAttribute('data-master-id'),
-            name: this.getAttribute('data-master-name')
-        };
+        id: this.getAttribute('data-master-id'),
+        name: this.getAttribute('data-master-name') || this.closest('.master-slots')?.querySelector('h3')?.textContent || 'Неизвестно'
+    };
     });
 });
         
@@ -610,7 +610,7 @@ async function loadMastersSlots(date, duration) {
             </div>
             <div class="summary-item">
                 <span class="summary-label">Мастер:</span>
-                <span class="summary-value">${selectedMaster.name}</span>
+                <span class="summary-value">${selectedMaster.name || 'не выбран'}</span>
             </div>
             <div class="summary-item">
                 <span class="summary-label">Комментарий:</span>
