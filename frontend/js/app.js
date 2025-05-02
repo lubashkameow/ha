@@ -550,7 +550,8 @@ async function loadMastersSlots(date, duration) {
                             ${slotsData.slots.map(slot => `
                                 <button class="time-slot" 
                                     data-slot-id="${slot.id_slot}"
-                                    data-master-id="${master.id_master}">
+                                    data-master-id="${master.id_master}"
+                                    data-master-name="${master.name_master}">
                                     ${slot.start_time}
                                 </button>
                             `).join('')}
