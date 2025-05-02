@@ -22,6 +22,11 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+let selectedDate = null;
+let selectedService = null;
+let selectedSlot = null;
+let selectedMaster = null;
+
 // Блокировка масштабирования
 function disableZoom() {
     const viewport = document.querySelector('meta[name="viewport"]');
@@ -159,60 +164,56 @@ function renderCatalog(categoryId, catalog) {
 
 // Показать форму записи
 function showBookingForm() {
-    const formContainer = document.getElementById('booking-form-container');
-    
-    if (formContainer) {
-        formContainer.style.display = formContainer.style.display === 'none' ? 'block' : 'none';
-        return;
-    }
-    
-    // Создаем форму записи
     const formHtml = `
-    <div id="booking-form-container" class="booking-form-container">
-        <h3>Запись на услугу</h3>
-        
-        <div class="form-step active" id="step-catalog">
-            <label>Выберите каталог:</label>
-            <select id="catalog-select" class="form-control">
-                <option value="">-- Выберите каталог --</option>
-                <option value="1">Женский каталог</option>
-                <option value="2">Мужской каталог</option>
-            </select>
-        </div>
-        
-        <div class="form-step" id="step-service" style="display:none;">
-            <label>Выберите услугу:</label>
-            <select id="service-select" class="form-control" disabled>
-                <option value="">-- Сначала выберите каталог --</option>
-            </select>
-        </div>
-        
-        <div class="form-step" id="step-date" style="display:none;">
-    <label>Выберите дату:</label>
-    <div class="calendar-header">
-        <button id="prev-week">&lt;</button>
-        <div id="current-week-range"></div>
-        <button id="next-week">&gt;</button>
+<div id="booking-form-container" class="booking-form-container">
+    <h3>Запись на услугу</h3>
+    
+    <div class="form-step active" id="step-catalog">
+        <label>Выберите каталог:</label>
+        <select id="catalog-select" class="form-control">
+            <option value="">-- Выберите каталог --</option>
+            <option value="1">Женский каталог</option>
+            <option value="2">Мужской каталог</option>
+        </select>
     </div>
-    <div class="week-days" id="week-days-container"></div>
-</div>
+    
+    <div class="form-step" id="step-service" style="display:none;">
+        <label>Выберите услугу:</label>
+        <select id="service-select" class="form-control" disabled>
+            <option value="">-- Сначала выберите каталог --</option>
+        </select>
+    </div>
+    
+    <div class="form-step" id="step-date" style="display:none;">
+        <label>Выберите дату:</label>
+        <div class="calendar-header">
+            <button id="prev-week">&lt;</button>
+            <div id="current-week-range"></div>
+            <button id="next-week">&gt;</button>
+        </div>
+        <div class="week-days" id="week-days-container"></div>
+    </div>
 
-<div class="form-step" id="step-masters" style="display:none;">
-    <label>Доступные мастера:</label>
-    <div id="masters-slots-container"></div>
-</div>
-        
-        <div class="form-step" id="step-comment" style="display:none;">
-            <label>Комментарий (необязательно):</label>
-            <textarea id="booking-comment" class="form-control" placeholder="Ваши пожелания..."></textarea>
-        </div>
-        
-        <div class="form-navigation">
-            <button id="prev-btn" class="nav-btn" disabled>Назад</button>
-            <button id="next-btn" class="nav-btn">Далее</button>
-        </div>
+    <div class="form-step" id="step-masters" style="display:none;">
+        <label>Доступные мастера:</label>
+        <div id="masters-slots-container"></div>
     </div>
-    `;
+    
+    <div class="form-step" id="step-comment" style="display:none;">
+        <label>Комментарий (необязательно):</label>
+        <textarea id="booking-comment" class="form-control" placeholder="Ваши пожелания..."></textarea>
+    </div>
+    
+    <div class="form-step" id="step-confirmation" style="display:none;">
+        <!-- Здесь будет сводка -->
+    </div>
+    
+    <div class="form-navigation">
+        <button id="prev-btn" class="nav-btn" disabled>Назад</button>
+        <button id="next-btn" class="nav-btn">Далее</button>
+    </div>
+</div>
+`;
     
     // Вставляем форму в подготовленный контейнер
     document.querySelector('.main-content').insertAdjacentHTML('beforeend', formHtml);
@@ -232,9 +233,6 @@ function initBookingForm() {
     
     let currentStep = 1;
     const totalSteps = 5;
-    let selectedDate = null;
-    let selectedService = null;
-    let selectedSlot = null;
     
     // Обработчик выбора каталога
     catalogSelect.addEventListener('change', async function() {
@@ -303,6 +301,10 @@ function initBookingForm() {
 });
     // Обработчик кнопки "Далее"
     nextBtn.addEventListener('click', async function() {
+    if (currentStep === totalSteps) {
+            await confirmBooking();
+            return;
+        }
     if (!validateCurrentStep()) return;
 
     // Перед переходом на следующий шаг
@@ -325,7 +327,14 @@ function initBookingForm() {
             return;
         }
     }
-
+    // Специальная обработка перехода от даты к мастерам
+    if (currentStep === 3) {
+         if (!selectedDate) {
+             alert('Пожалуйста, выберите дату');
+             return;
+            }
+        }
+        
     currentStep++;
     updateFormView();
 
@@ -367,9 +376,9 @@ function initBookingForm() {
             }
             return true;
             
-            case 4: // Время
-            if (!selectedSlot) {
-                alert('Пожалуйста, выберите время');
+            case 4: // Время и мастер
+            if (!selectedSlot || !selectedMaster) {
+                alert('Пожалуйста, выберите время и мастера');
                 return false;
             }
             return true;
@@ -392,19 +401,24 @@ function initBookingForm() {
         // Обновляем кнопки навигации
         prevBtn.disabled = currentStep === 1;
         nextBtn.textContent = currentStep === totalSteps ? 'Подтвердить' : 'Далее';
+
+        // Если это шаг подтверждения (5), показываем сводку
+    if (currentStep === 5) {
+        showConfirmationSummary();
     }
+}
     
     // Получение имени шага
     function getStepName(step) {
-        switch(step) {
-            case 1: return 'catalog';
-            case 2: return 'service';
-            case 3: return 'date';
-            case 4: return 'time';
-            case 5: return 'comment';
-            default: return '';
-        }
+    switch(step) {
+        case 1: return 'catalog';
+        case 2: return 'service';
+        case 3: return 'date';
+        case 4: return 'masters';
+        case 5: return 'confirmation';
+        default: return '';
     }
+}
     
     // Загрузка доступных дат
     async function loadAvailableDates(service) {
@@ -550,14 +564,18 @@ async function loadMastersSlots(date, duration) {
         
         // Обработчики выбора времени
         document.querySelectorAll('.time-slot').forEach(button => {
-            button.addEventListener('click', function() {
-                document.querySelectorAll('.time-slot').forEach(b => {
-                    b.classList.remove('selected');
-                });
-                this.classList.add('selected');
-                selectedSlot = this.getAttribute('data-slot-id');
-            });
+    button.addEventListener('click', function() {
+        document.querySelectorAll('.time-slot').forEach(b => {
+            b.classList.remove('selected');
         });
+        this.classList.add('selected');
+        selectedSlot = this.getAttribute('data-slot-id');
+        selectedMaster = {
+            id: this.getAttribute('data-master-id'),
+            name: this.getAttribute('data-master-name')
+        };
+    });
+});
         
         // Показываем блок с мастерами
         document.getElementById('step-masters').style.display = 'block';
@@ -567,7 +585,47 @@ async function loadMastersSlots(date, duration) {
         container.innerHTML = '<p class="error">Ошибка загрузки данных</p>';
     }
 }
+    // функция для показа сводки
+    function showConfirmationSummary() {
+    const summaryContainer = document.getElementById('step-confirmation');
+    if (!summaryContainer) return;
     
+    const timeSlot = document.querySelector('.time-slot.selected');
+    
+    summaryContainer.innerHTML = `
+        <div class="confirmation-summary">
+            <h3>Подтверждение записи</h3>
+            <div class="summary-item">
+                <span class="summary-label">Услуга:</span>
+                <span class="summary-value">${selectedService.name} (${selectedService.price})</span>
+            </div>
+            <div class="summary-item">
+                <span class="summary-label">Дата:</span>
+                <span class="summary-value">${formatDate(selectedDate)}</span>
+            </div>
+            <div class="summary-item">
+                <span class="summary-label">Время:</span>
+                <span class="summary-value">${timeSlot.textContent}</span>
+            </div>
+            <div class="summary-item">
+                <span class="summary-label">Мастер:</span>
+                <span class="summary-value">${selectedMaster.name}</span>
+            </div>
+            <div class="summary-item">
+                <span class="summary-label">Комментарий:</span>
+                <span class="summary-value">${document.getElementById('booking-comment').value || 'нет'}</span>
+            </div>
+        </div>
+    `;
+}
+
+// Добавьте функцию форматирования даты
+function formatDate(dateStr) {
+    const date = new Date(dateStr);
+    const options = { day: 'numeric', month: 'long', weekday: 'short' };
+    return date.toLocaleDateString('ru-RU', options);
+}
+
     // Подтверждение записи
     async function confirmBooking() {
         const tg = window.Telegram.WebApp;
