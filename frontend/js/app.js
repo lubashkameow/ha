@@ -648,7 +648,6 @@ function formatDate(dateStr) {
                     service_name: selectedService.name,
                     service_price: selectedService.price,
                     slot_id: selectedSlot,
-                    master_id: timeSlot.getAttribute('data-master-id'),
                     master_name: timeSlot.getAttribute('data-master-name'),
                     date: document.querySelector('.date-cell.selected').getAttribute('data-date'),
                     time: timeSlot.textContent,
