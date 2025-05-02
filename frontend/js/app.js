@@ -737,7 +737,7 @@ async function loadUserBookings() {
     
     try {
         const tg = window.Telegram.WebApp;
-        const response = await fetch(`/.netlify/functions/getbookings?user_id=${tg.initDataUnsafe.user.id}`);
+        const response = await fetch(`/.netlify/functions/appointments?user_id=${tg.initDataUnsafe.user.id}`);
         const data = await response.json();
         
         if (data.bookings && data.bookings.length > 0) {
