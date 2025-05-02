@@ -11,7 +11,7 @@ exports.handler = async (event) => {
     }
 
     const response = await fetch(
-      `https://powers-mug-highlights-populations.trycloudflare.com/api/portfolio?master_id=${masterId}`
+      `https://plastic-reproduction-resorts-barbara.trycloudflare.com/api/portfolio?master_id=${masterId}`
     );
 
     if (!response.ok) throw new Error('API request failed');
