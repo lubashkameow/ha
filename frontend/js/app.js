@@ -629,42 +629,50 @@ function formatDate(dateStr) {
 
     // Подтверждение записи
     async function confirmBooking() {
-        const tg = window.Telegram.WebApp;
-        const comment = document.getElementById('booking-comment').value;
-        const timeSlot = document.querySelector('.time-slot.selected');
-        
-        if (!selectedService || !selectedSlot) {
-            alert('Пожалуйста, заполните все обязательные поля');
-            return;
-        }
-        
-        try {
-            const response = await fetch('/.netlify/functions/createbooking', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    user_id: tg.initDataUnsafe.user.id,
-                    service_id: selectedService.id,
-                    service_name: selectedService.name,
-                    service_price: selectedService.price,
-                    slot_id: selectedSlot,
-                    master_name: timeSlot.getAttribute('data-master-name'),
-                    date: document.querySelector('.date-cell.selected').getAttribute('data-date'),
-                    time: timeSlot.textContent,
-                    comment: comment
-                })
-            });
-            
-            if (response.ok) {
-                const result = await response.json();
-                showConfirmation(result);
-            } else {
-                throw new Error('Ошибка при создании записи');
-            }
-        } catch (error) {
-            alert(error.message);
-        }
+    const tg = window.Telegram.WebApp;
+    const comment = document.getElementById('booking-comment').value;
+    const timeSlot = document.querySelector('.time-slot.selected');
+
+    if (!selectedService || !selectedSlot || !selectedMaster || !selectedMaster.id) {
+        console.error('❌ Отсутствуют обязательные данные:', {
+            selectedService,
+            selectedSlot,
+            selectedMaster
+        });
+        alert('Пожалуйста, выберите услугу, мастера и время');
+        return;
     }
+
+    try {
+        const response = await fetch('/.netlify/functions/createbooking', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                user_id: tg.initDataUnsafe.user.id,
+                service_id: selectedService.id,
+                service_name: selectedService.name,
+                service_price: selectedService.price,
+                slot_id: selectedSlot,
+                master_id: selectedMaster.id,
+                master_name: selectedMaster.name,
+                date: selectedDate,
+                time: timeSlot.textContent,
+                comment: comment
+            })
+        });
+
+        if (response.ok) {
+            const result = await response.json();
+            showConfirmation(result);
+        } else {
+            throw new Error('Ошибка при создании записи');
+        }
+    } catch (error) {
+        console.error('❌ Ошибка запроса:', error);
+        alert(error.message);
+    }
+}
+
     
     // Показать подтверждение записи
     function showConfirmation(booking) {
