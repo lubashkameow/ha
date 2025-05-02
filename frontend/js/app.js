@@ -528,25 +528,27 @@ document.getElementById('next-week').addEventListener('click', () => {
 async function loadMastersSlots(date, duration) {
     const container = document.getElementById('masters-slots-container');
     container.innerHTML = '<div class="loader">Загрузка мастеров...</div>';
-
+    
     try {
+        // 1. Сначала получаем мастеров, работающих в эту дату
         const mastersResponse = await fetch(`/.netlify/functions/getmaster?date=${date}`);
         const mastersData = await mastersResponse.json();
-
+        
+        // 2. Для каждого мастера получаем свободные слоты
         let html = '';
         for (const master of mastersData.masters) {
             const slotsResponse = await fetch(
                 `/.netlify/functions/gettimeslots?date=${date}&master_id=${master.id_master}&duration=${duration}`
             );
             const slotsData = await slotsResponse.json();
-
+            
             if (slotsData.slots.length > 0) {
                 html += `
                     <div class="master-slots">
                         <h3>${master.name_master}</h3>
                         <div class="master-slots-grid">
                             ${slotsData.slots.map(slot => `
-                                <button class="time-slot"
+                                <button class="time-slot" 
                                     data-slot-id="${slot.id_slot}"
                                     data-master-id="${master.id_master}"
                                     data-master-name="${master.name_master}">
@@ -558,34 +560,23 @@ async function loadMastersSlots(date, duration) {
                 `;
             }
         }
-
+        
         container.innerHTML = html || '<p>Нет доступных мастеров на эту дату</p>';
-
+        
         // Обработчики выбора времени
         document.querySelectorAll('.time-slot').forEach(button => {
-            button.addEventListener('click', function () {
-                document.querySelectorAll('.time-slot').forEach(b => b.classList.remove('selected'));
-                this.classList.add('selected');
-
-                selectedSlot = this.getAttribute('data-slot-id');
-
-                selectedMaster = {
-                    id: this.getAttribute('data-master-id'),
-                    name: this.getAttribute('data-master-name')
-                };
-
-                console.log('✅ Slot selected:', selectedSlot);
-                console.log('✅ Master selected:', selectedMaster);
-            });
+    button.addEventListener('click', function() {
+        document.querySelectorAll('.time-slot').forEach(b => {
+            b.classList.remove('selected');
         });
-
-        document.getElementById('step-masters').style.display = 'block';
-    } catch (error) {
-        console.error('Ошибка загрузки мастеров:', error);
-        container.innerHTML = '<p class="error">Ошибка загрузки данных</p>';
-    }
-}
-
+        this.classList.add('selected');
+        selectedSlot = this.getAttribute('data-slot-id');
+        selectedMaster = {
+        id: this.getAttribute('data-master-id'),
+        name: this.getAttribute('data-master-name') || this.closest('.master-slots')?.querySelector('h3')?.textContent || 'Неизвестно'
+    };
+    });
+});
         
         // Показываем блок с мастерами
         document.getElementById('step-masters').style.display = 'block';
@@ -657,7 +648,6 @@ function formatDate(dateStr) {
                     service_name: selectedService.name,
                     service_price: selectedService.price,
                     slot_id: selectedSlot,
-                    master_id: timeSlot.getAttribute('data-master-id'),
                     master_name: timeSlot.getAttribute('data-master-name'),
                     date: document.querySelector('.date-cell.selected').getAttribute('data-date'),
                     time: timeSlot.textContent,
