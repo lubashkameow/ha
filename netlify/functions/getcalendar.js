@@ -22,7 +22,7 @@ exports.handler = async (event) => {
       };
     }
 
-    const apiUrl = `https://powers-mug-highlights-populations.trycloudflare.com/api/calendar?id_service=${id_service}`;
+    const apiUrl = `https://plastic-reproduction-resorts-barbara.trycloudflare.com/api/calendar?id_service=${id_service}`;
     console.log('Requesting:', apiUrl);
     
     const response = await fetch(apiUrl);
