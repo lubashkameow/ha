@@ -164,6 +164,13 @@ function renderCatalog(categoryId, catalog) {
 
 // Показать форму записи
 function showBookingForm() {
+    const formContainer = document.getElementById('booking-form-container');
+    
+    if (formContainer) {
+        formContainer.style.display = formContainer.style.display === 'none' ? 'block' : 'none';
+        return;
+    }
+    
     const formHtml = `
 <div id="booking-form-container" class="booking-form-container">
     <h3>Запись на услугу</h3>
@@ -681,10 +688,10 @@ function formatDate(dateStr) {
         <div class="confirmation success-message">
             <h2>🎉 Ура! Вы успешно записались!</h2>
             <div class="confirmation-details">
-                <p><strong>💇 Услуга:</strong> ${booking.service_name} (${booking.service_price} ₽)</p>
+                <p><strong>💇 Услуга:</strong> ${booking.name_service} (${booking.price} ₽)</p>
                 <p><strong>📅 Дата:</strong> ${booking.date}</p>
                 <p><strong>⏰ Время:</strong> ${booking.time}</p>
-                <p><strong>👩‍🎨 Мастер:</strong> ${booking.master_name}</p>
+                <p><strong>👩‍🎨 Мастер:</strong> ${booking.name_master}</p>
                 <p><strong>📝 Комментарий:</strong> ${booking.comment || 'нет'}</p>
             </div>
             <button id="close-booking" class="btn-primary">Закрыть</button>
