@@ -834,29 +834,64 @@ async function cancelBooking(bookingId) {
     }
 }
 
-// Функция показа портфолио
-function showPortfolioModal(master, portfolio) {
-    const modal = document.createElement('div');
-    modal.classList.add('portfolio-modal');
-    modal.innerHTML = `
-        <div class="portfolio-content">
-            <button class="close-modal">&times;</button>
-            <h2>${master.name_master}</h2>
-            <p>${master.description}</p>
-            <div class="portfolio-grid">
-                ${portfolio.map(item => `
-                    <div class="portfolio-item">
-                        <img src="${item.image}" alt="Работа">
-                        <p>${item.description || ''}</p>
-                    </div>
-                `).join('')}
-            </div>
-        </div>
-    `;
-    document.body.appendChild(modal);
+function showPortfolioModal(photos) {
+    // Проверка на корректный массив
+    if (!Array.isArray(photos)) {
+        alert("Портфолио недоступно или пусто");
+        return;
+    }
 
-    document.querySelector('.close-modal').addEventListener('click', () => {
-        modal.remove();
+    // Создание модального окна
+    let modal = document.getElementById('portfolio-modal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'portfolio-modal';
+        modal.style.position = 'fixed';
+        modal.style.top = 0;
+        modal.style.left = 0;
+        modal.style.width = '100%';
+        modal.style.height = '100%';
+        modal.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+        modal.style.display = 'flex';
+        modal.style.alignItems = 'center';
+        modal.style.justifyContent = 'center';
+        modal.style.flexDirection = 'column';
+        modal.style.zIndex = '9999';
+
+        const closeBtn = document.createElement('button');
+        closeBtn.textContent = 'Закрыть';
+        closeBtn.style.marginBottom = '15px';
+        closeBtn.style.padding = '8px 16px';
+        closeBtn.style.background = '#fff';
+        closeBtn.style.border = 'none';
+        closeBtn.style.cursor = 'pointer';
+        closeBtn.onclick = () => document.body.removeChild(modal);
+
+        const grid = document.createElement('div');
+        grid.style.display = 'grid';
+        grid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(150px, 1fr))';
+        grid.style.gap = '10px';
+        grid.style.maxWidth = '90%';
+        grid.style.maxHeight = '80%';
+        grid.style.overflowY = 'auto';
+
+        modal.appendChild(closeBtn);
+        modal.appendChild(grid);
+        document.body.appendChild(modal);
+    }
+
+    // Очистка предыдущих фото
+    const grid = modal.querySelector('div');
+    grid.innerHTML = '';
+
+    // Добавление фото
+    photos.forEach(photo => {
+        const img = document.createElement('img');
+        img.src = photo;
+        img.style.width = '100%';
+        img.style.borderRadius = '10px';
+        grid.appendChild(img);
     });
 }
+
 
