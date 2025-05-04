@@ -868,6 +868,7 @@ async function displayMasterInfo(master) {
 
                 return `<img src="${photo.photo}" class="portfolio-photo" data-description="${safeDescription}">`;
             }).join('');
+console.log('data.photos:', data.photos);
 
             // Навешиваем обработчики клика по фото
             grid.querySelectorAll('.portfolio-photo').forEach(img => {
