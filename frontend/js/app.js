@@ -776,31 +776,32 @@ async function loadUserBookings() {
 async function loadMasters() {
     const container = document.getElementById('masters-list');
     container.innerHTML = '<div class="loader">Загрузка мастеров...</div>';
-    
+
     try {
-        const response = await fetch('/.netlify/functions/getportfolio');
+        const response = await fetch('/.netlify/functions/getmaster');
         const data = await response.json();
-        
+
         if (data.masters && data.masters.length > 0) {
             let html = '<div class="masters-grid">';
             data.masters.forEach(master => {
                 html += `
                     <div class="master-card">
-                        <img src="${master.photo || 'img/default-master.jpg'}" alt="${master.name_master}">
+                        <img src="img/default-master.jpg" alt="${master.name_master}">
                         <h3>${master.name_master}</h3>
-                        <p>${master.description || 'Опытный мастер'}</p>
+                        <p>Телефон: ${master.phone_master}</p>
                         <button class="view-portfolio" data-master-id="${master.id_master}">Портфолио</button>
                     </div>
                 `;
             });
             html += '</div>';
             container.innerHTML = html;
-            
-            // Обработчики просмотра портфолио
+
             document.querySelectorAll('.view-portfolio').forEach(btn => {
-                btn.addEventListener('click', function() {
+                btn.addEventListener('click', async function() {
                     const masterId = this.getAttribute('data-master-id');
-                    showPortfolio(masterId);
+                    const res = await fetch(`/.netlify/functions/getportfolio?master_id=${masterId}`);
+                    const data = await res.json();
+                    showPortfolioModal(data.photos); // реализуй показ модального окна
                 });
             });
         } else {
@@ -810,6 +811,7 @@ async function loadMasters() {
         container.innerHTML = '<p class="error">Ошибка загрузки мастеров</p>';
     }
 }
+
 
 // Функция отмены записи
 async function cancelBooking(bookingId) {
