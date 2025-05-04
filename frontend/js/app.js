@@ -840,13 +840,7 @@ async function cancelBooking(bookingId) {
     }
 }
 
-function escapeHtml(str) {
-  return str
-    .replace(/&/g, '&amp;')
-    .replace(/"/g, '&quot;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
-}
+
 
 
 async function displayMasterInfo(master) {
@@ -864,10 +858,15 @@ async function displayMasterInfo(master) {
         const res = await fetch(`/.netlify/functions/getportfolio?master_id=${master.id_master}`);
         const data = await res.json();
         const grid = document.getElementById(`portfolio-${master.id_master}`);
+
         if (data.photos && data.photos.length > 0) {
             grid.innerHTML = data.photos.map(photo => {
-                const safeDesc = escapeHtml(photo.description_photo || 'Описание отсутствует');
-                return `<img src="${photo.photo}" class="portfolio-photo" data-description="${safeDesc}">`;
+                const safeDescription = (photo.description_photo || 'Описание отсутствует')
+                    .replace(/"/g, '&quot;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;');
+
+                return `<img src="${photo.photo}" class="portfolio-photo" data-description="${safeDescription}">`;
             }).join('');
 
             // Навешиваем обработчики клика по фото
@@ -889,6 +888,7 @@ async function displayMasterInfo(master) {
         container.querySelector('.portfolio-grid').innerHTML = '<p class="error">Ошибка загрузки портфолио</p>';
     }
 }
+
 
 
 
