@@ -859,6 +859,18 @@ async function displayMasterInfo(master) {
             grid.innerHTML = data.photos.map(photo => `
                 <img src="${photo}" class="portfolio-photo">
             `).join('');
+            // Навешиваем обработчики клика по фото
+            grid.querySelectorAll('.portfolio-photo').forEach(img => {
+                img.addEventListener('click', () => {
+                    const modal = document.getElementById('portfolio-modal');
+                    const modalImg = document.getElementById('modal-photo');
+                    const modalDesc = document.getElementById('modal-description');
+
+                    modalImg.src = img.src;
+                    modalDesc.textContent = img.dataset.description;
+                    modal.classList.remove('hidden');
+                });
+            });
         } else {
             grid.innerHTML = '<p>Портфолио пока пусто</p>';
         }
