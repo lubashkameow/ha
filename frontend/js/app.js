@@ -21,9 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
         showBookingForm();
     });
     
-    document.getElementById('close-portfolio-modal').addEventListener('click', () => {
-    document.getElementById('portfolio-modal').classList.add('hidden');
-});
+
 
 });
 
@@ -840,6 +838,37 @@ async function cancelBooking(bookingId) {
     }
 }
 
+let currentPhotos = [];
+let currentIndex = 0;
+
+function openModal(photoObj, index) {
+  const modal = document.getElementById('portfolio-modal');
+  const modalImg = document.getElementById('modal-photo');
+  const modalDesc = document.getElementById('modal-description');
+
+  modalImg.src = photoObj.photo;
+  modalDesc.textContent = photoObj.description_photo || 'Описание отсутствует';
+  currentIndex = index;
+  modal.classList.remove('hidden');
+}
+
+document.getElementById('close-portfolio-modal').addEventListener('click', () => {
+  document.getElementById('portfolio-modal').classList.add('hidden');
+});
+
+document.getElementById('prev-photo').addEventListener('click', () => {
+  if (currentPhotos.length === 0) return;
+  currentIndex = (currentIndex - 1 + currentPhotos.length) % currentPhotos.length;
+  openModal(currentPhotos[currentIndex], currentIndex);
+});
+
+document.getElementById('next-photo').addEventListener('click', () => {
+  if (currentPhotos.length === 0) return;
+  currentIndex = (currentIndex + 1) % currentPhotos.length;
+  openModal(currentPhotos[currentIndex], currentIndex);
+});
+
+
 async function displayMasterInfo(master) {
     const container = document.getElementById('master-info');
     container.innerHTML = `
@@ -856,24 +885,19 @@ async function displayMasterInfo(master) {
         const data = await res.json();
         const grid = document.getElementById(`portfolio-${master.id_master}`);
         if (data.photos && data.photos.length > 0) {
-            grid.innerHTML = data.photos.map(photo => `
-                <img src="${photo.photo}" class="portfolio-photo" data-description="${photo.description_photo}">
-            `).join('');
-            // Навешиваем обработчики клика по фото
-            grid.querySelectorAll('.portfolio-photo').forEach(img => {
-                img.addEventListener('click', () => {
-                    const modal = document.getElementById('portfolio-modal');
-                    const modalImg = document.getElementById('modal-photo');
-                    const modalDesc = document.getElementById('modal-description');
+  currentPhotos = data.photos;
 
-                    modalImg.src = img.src;
-                    modalDesc.textContent = img.dataset.description;
-                    modal.classList.remove('hidden');
-                });
-            });
-        } else {
-            grid.innerHTML = '<p>Портфолио пока пусто</p>';
-        }
+  grid.innerHTML = currentPhotos.map((photo, index) => `
+    <img src="${photo.photo}" class="portfolio-photo" data-index="${index}">
+  `).join('');
+
+  grid.querySelectorAll('.portfolio-photo').forEach((img, index) => {
+    img.addEventListener('click', () => openModal(currentPhotos[index], index));
+  });
+} else {
+  grid.innerHTML = '<p>Портфолио пока пусто</p>';
+}
+
     } catch (err) {
         container.querySelector('.portfolio-grid').innerHTML = '<p class="error">Ошибка загрузки портфолио</p>';
     }
