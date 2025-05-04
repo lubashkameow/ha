@@ -856,7 +856,7 @@ async function displayMasterInfo(master) {
         const grid = document.getElementById(`portfolio-${master.id_master}`);
         if (data.photos && data.photos.length > 0) {
             grid.innerHTML = data.photos.map(photo => `
-                <img src="${photo}" class="portfolio-photo" data-description="${photo.description_photo}>
+                <img src="${photo}" class="portfolio-photo">
             `).join('');
             // Навешиваем обработчики клика по фото
             grid.querySelectorAll('.portfolio-photo').forEach(img => {
