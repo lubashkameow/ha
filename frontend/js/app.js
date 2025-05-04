@@ -856,7 +856,7 @@ async function displayMasterInfo(master) {
         const grid = document.getElementById(`portfolio-${master.id_master}`);
         if (data.photos && data.photos.length > 0) {
             grid.innerHTML = data.photos.map(photo => `
-                <img src="${photo}" class="portfolio-photo">
+                <img src="${photo}" class="portfolio-photo" data-description="${photo.description_photo}>
             `).join('');
             // Навешиваем обработчики клика по фото
             grid.querySelectorAll('.portfolio-photo').forEach(img => {
@@ -878,33 +878,7 @@ async function displayMasterInfo(master) {
     }
 }
 
-function showPortfolioModal(photos) {
-  const portfolioGrid = document.getElementById('portfolio-photos');
-  portfolioGrid.innerHTML = '';
 
-  photos.forEach(photo => {
-    const div = document.createElement('div');
-    div.className = 'portfolio-photo-wrapper';
-
-    const img = document.createElement('img');
-    img.className = 'portfolio-photo';
-    img.src = photo.photo;
-    img.alt = 'Работа мастера';
-    img.addEventListener('click', () => {
-      document.getElementById('modal-photo').src = photo.photo;
-      document.getElementById('modal-description').textContent = photo.description_photo || 'Описание отсутствует';
-      document.getElementById('portfolio-modal').classList.remove('hidden');
-    });
-
-    div.appendChild(img);
-    portfolioGrid.appendChild(div);
-  });
-
-  // Закрытие модального окна
-  document.getElementById('close-portfolio-modal').onclick = () => {
-    document.getElementById('portfolio-modal').classList.add('hidden');
-  };
-}
 
 
 
