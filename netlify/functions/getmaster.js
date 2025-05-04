@@ -10,7 +10,7 @@ exports.handler = async (event) => {
         };
     }
     
-    const url = `https://plastic-reproduction-resorts-barbara.trycloudflare.com/api/master?date=${date}`;
+    const url = `https://equity-connectivity-loops-entertainment.trycloudflare.com/api/master?date=${date}`;
     
     try {
         const response = await fetch(url);
