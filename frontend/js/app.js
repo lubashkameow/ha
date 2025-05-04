@@ -749,7 +749,7 @@ async function loadUserBookings() {
             data.bookings.forEach(booking => {
                 html += `
                     <div class="booking-item">
-                        <div class="booking-service">${booking.service_name} (${booking.service_length}) (${booking.price})</div>
+                        <div class="booking-service">${booking.service_length} (${booking.service_name}) (${booking.price})</div>
                         <div class="booking-date">${booking.date} в ${booking.time}</div>
                         <div class="booking-master">Мастер: ${booking.master_name}</div>
                         <button class="cancel-btn" data-booking-id="${booking.id_app}">Отменить</button>
