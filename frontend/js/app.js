@@ -835,7 +835,7 @@ async function cancelBooking(bookingId) {
     }
 }
 
-async function displayMasterInfo(master) {
+async function displayMasterInfo(master) { 
     const container = document.getElementById('master-info');
     container.innerHTML = `
         <div class="master-card">
@@ -851,10 +851,21 @@ async function displayMasterInfo(master) {
         const res = await fetch(`/.netlify/functions/getportfolio?master_id=${master.id_master}`);
         const data = await res.json();
         const grid = document.getElementById(`portfolio-${master.id_master}`);
+        grid.innerHTML = ''; // очистим
+
         if (data.photos && data.photos.length > 0) {
-            grid.innerHTML = data.photos.map(photo => `
-                <img src="${photo}" class="portfolio-photo">
-            `).join('');
+            data.photos.forEach(photo => {
+                const img = document.createElement('img');
+                img.src = photo.photo;
+                img.alt = 'Работа мастера';
+                img.className = 'portfolio-photo';
+                img.addEventListener('click', () => {
+                    document.getElementById('modal-photo').src = photo.photo;
+                    document.getElementById('modal-description').textContent = photo.description_photo || 'Описание отсутствует';
+                    document.getElementById('portfolio-modal').classList.remove('hidden');
+                });
+                grid.appendChild(img);
+            });
         } else {
             grid.innerHTML = '<p>Портфолио пока пусто</p>';
         }
@@ -862,6 +873,7 @@ async function displayMasterInfo(master) {
         container.querySelector('.portfolio-grid').innerHTML = '<p class="error">Ошибка загрузки портфолио</p>';
     }
 }
+
 
 function showPortfolioModal(photos) {
   const portfolioGrid = document.getElementById('portfolio-photos');
