@@ -833,7 +833,28 @@ async function cancelBooking(bookingId) {
 }
 
 // Функция показа портфолио
-function showPortfolio(masterId) {
-    // Здесь можно реализовать модальное окно с работами мастера
-    alert(`Портфолио мастера ID: ${masterId} будет показано здесь`);
+function showPortfolioModal(master, portfolio) {
+    const modal = document.createElement('div');
+    modal.classList.add('portfolio-modal');
+    modal.innerHTML = `
+        <div class="portfolio-content">
+            <button class="close-modal">&times;</button>
+            <h2>${master.name_master}</h2>
+            <p>${master.description}</p>
+            <div class="portfolio-grid">
+                ${portfolio.map(item => `
+                    <div class="portfolio-item">
+                        <img src="${item.image}" alt="Работа">
+                        <p>${item.description || ''}</p>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+
+    document.querySelector('.close-modal').addEventListener('click', () => {
+        modal.remove();
+    });
 }
+
