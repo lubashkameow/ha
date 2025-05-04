@@ -774,44 +774,45 @@ async function loadUserBookings() {
 
 // Загрузка информации о мастерах
 async function loadMasters() {
-    const container = document.getElementById('masters-list');
-    container.innerHTML = '<div class="loader">Загрузка мастеров...</div>';
+    const btnContainer = document.getElementById('master-buttons');
+    const infoContainer = document.getElementById('master-info');
+    btnContainer.innerHTML = '<div class="loader">Загрузка мастеров...</div>';
+    infoContainer.innerHTML = '';
 
     try {
         const response = await fetch('/.netlify/functions/getmasters');
         const data = await response.json();
+        const masters = data.masters;
 
-        if (data.masters && data.masters.length > 0) {
-            let html = '<div class="masters-grid">';
-            data.masters.forEach(master => {
-                html += `
-                    <div class="master-card">
-                        <img src="${master.photo || 'img/default-master.jpg'}" alt="${master.name_master}">
-                        <h3>${master.name_master}</h3>
-                        <p>${master.description || 'Опытный мастер'}</p>
-                        <p><strong>Телефон:</strong> ${master.phone_master || '—'}</p>
-                        <button class="view-portfolio" data-master-id="${master.id_master}">Портфолио</button>
-                    </div>
-                `;
-            });
-            html += '</div>';
-            container.innerHTML = html;
-
-            document.querySelectorAll('.view-portfolio').forEach(btn => {
-                btn.addEventListener('click', async function () {
-                    const masterId = this.getAttribute('data-master-id');
-                    const res = await fetch(`/.netlify/functions/getportfolio?master_id=${masterId}`);
-                    const data = await res.json();
-                    showPortfolioModal(data.photos); // Реализуй эту функцию для показа фото в модалке
-                });
-            });
-        } else {
-            container.innerHTML = '<p>Информация о мастерах временно недоступна</p>';
+        if (!masters || masters.length === 0) {
+            btnContainer.innerHTML = '<p>Информация о мастерах временно недоступна</p>';
+            return;
         }
+
+        btnContainer.innerHTML = '';
+
+        masters.forEach((master, index) => {
+            const btn = document.createElement('button');
+            btn.textContent = master.name_master;
+            btn.className = 'master-button';
+            if (index === 0) btn.classList.add('active');
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.master-button').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                displayMasterInfo(master);
+            });
+            btnContainer.appendChild(btn);
+        });
+
+        // Показать первого мастера
+        displayMasterInfo(masters[0]);
+
     } catch (error) {
-        container.innerHTML = '<p class="error">Ошибка загрузки мастеров</p>';
+        btnContainer.innerHTML = '<p class="error">Ошибка загрузки мастеров</p>';
+        infoContainer.innerHTML = '';
     }
 }
+
 
 
 
@@ -834,64 +835,33 @@ async function cancelBooking(bookingId) {
     }
 }
 
-function showPortfolioModal(photos) {
-    // Проверка на корректный массив
-    if (!Array.isArray(photos)) {
-        alert("Портфолио недоступно или пусто");
-        return;
+async function displayMasterInfo(master) {
+    const container = document.getElementById('master-info');
+    container.innerHTML = `
+        <div class="master-card">
+            <img src="img/default-master.jpg" alt="${master.name_master}">
+            <h3>${master.name_master}</h3>
+            <p>Телефон: ${master.phone_master}</p>
+            <p>${master.description || 'Опытный мастер'}</p>
+            <div class="portfolio-grid" id="portfolio-${master.id_master}">Загрузка портфолио...</div>
+        </div>
+    `;
+
+    try {
+        const res = await fetch(`/.netlify/functions/getportfolio?master_id=${master.id_master}`);
+        const data = await res.json();
+        const grid = document.getElementById(`portfolio-${master.id_master}`);
+        if (data.photos && data.photos.length > 0) {
+            grid.innerHTML = data.photos.map(photo => `
+                <img src="${photo}" class="portfolio-photo">
+            `).join('');
+        } else {
+            grid.innerHTML = '<p>Портфолио пока пусто</p>';
+        }
+    } catch (err) {
+        container.querySelector('.portfolio-grid').innerHTML = '<p class="error">Ошибка загрузки портфолио</p>';
     }
-
-    // Создание модального окна
-    let modal = document.getElementById('portfolio-modal');
-    if (!modal) {
-        modal = document.createElement('div');
-        modal.id = 'portfolio-modal';
-        modal.style.position = 'fixed';
-        modal.style.top = 0;
-        modal.style.left = 0;
-        modal.style.width = '100%';
-        modal.style.height = '100%';
-        modal.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
-        modal.style.display = 'flex';
-        modal.style.alignItems = 'center';
-        modal.style.justifyContent = 'center';
-        modal.style.flexDirection = 'column';
-        modal.style.zIndex = '9999';
-
-        const closeBtn = document.createElement('button');
-        closeBtn.textContent = 'Закрыть';
-        closeBtn.style.marginBottom = '15px';
-        closeBtn.style.padding = '8px 16px';
-        closeBtn.style.background = '#fff';
-        closeBtn.style.border = 'none';
-        closeBtn.style.cursor = 'pointer';
-        closeBtn.onclick = () => document.body.removeChild(modal);
-
-        const grid = document.createElement('div');
-        grid.style.display = 'grid';
-        grid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(150px, 1fr))';
-        grid.style.gap = '10px';
-        grid.style.maxWidth = '90%';
-        grid.style.maxHeight = '80%';
-        grid.style.overflowY = 'auto';
-
-        modal.appendChild(closeBtn);
-        modal.appendChild(grid);
-        document.body.appendChild(modal);
-    }
-
-    // Очистка предыдущих фото
-    const grid = modal.querySelector('div');
-    grid.innerHTML = '';
-
-    // Добавление фото
-    photos.forEach(photo => {
-        const img = document.createElement('img');
-        img.src = photo;
-        img.style.width = '100%';
-        img.style.borderRadius = '10px';
-        grid.appendChild(img);
-    });
 }
+
 
 
