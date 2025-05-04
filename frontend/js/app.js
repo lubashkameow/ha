@@ -840,29 +840,25 @@ async function cancelBooking(bookingId) {
     }
 }
 
-
 async function displayMasterInfo(master) {
     const container = document.getElementById('master-info');
-    container.innerHTML = 
+    container.innerHTML = `
         <div class="master-card">
             <h3>${master.name_master}</h3>
             <p>Телефон: ${master.phone_master}</p>
             <p>${master.description || 'Опытный мастер'}</p>
             <div class="portfolio-grid" id="portfolio-${master.id_master}">Загрузка портфолио...</div>
         </div>
-    ;
+    `;
 
     try {
-        const res = await fetch(/.netlify/functions/getportfolio?master_id=${master.id_master});
+        const res = await fetch(`/.netlify/functions/getportfolio?master_id=${master.id_master}`);
         const data = await res.json();
-        const grid = document.getElementById(portfolio-${master.id_master});
+        const grid = document.getElementById(`portfolio-${master.id_master}`);
         if (data.photos && data.photos.length > 0) {
             grid.innerHTML = data.photos.map(photo => `
-                <img src="${photo.photo}" class="portfolio-photo" data-description="${photo.description_photo}">
+                <img src="${photo}" class="portfolio-photo">
             `).join('');
-
-
-
             // Навешиваем обработчики клика по фото
             grid.querySelectorAll('.portfolio-photo').forEach(img => {
                 img.addEventListener('click', () => {
@@ -882,7 +878,6 @@ async function displayMasterInfo(master) {
         container.querySelector('.portfolio-grid').innerHTML = '<p class="error">Ошибка загрузки портфолио</p>';
     }
 }
-
 
 
 
