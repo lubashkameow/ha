@@ -843,7 +843,6 @@ async function displayMasterInfo(master) {
     const container = document.getElementById('master-info');
     container.innerHTML = `
         <div class="master-card">
-            <img src="img/default-master.jpg" alt="${master.name_master}">
             <h3>${master.name_master}</h3>
             <p>Телефон: ${master.phone_master}</p>
             <p>${master.description || 'Опытный мастер'}</p>
