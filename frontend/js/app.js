@@ -20,6 +20,10 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('book-btn').addEventListener('click', () => {
         showBookingForm();
     });
+    
+    document.getElementById('close-portfolio-modal').addEventListener('click', () => {
+    document.getElementById('portfolio-modal').classList.add('hidden');
+});
 });
 
 let selectedDate = null;
@@ -835,7 +839,7 @@ async function cancelBooking(bookingId) {
     }
 }
 
-async function displayMasterInfo(master) { 
+async function displayMasterInfo(master) {
     const container = document.getElementById('master-info');
     container.innerHTML = `
         <div class="master-card">
@@ -851,21 +855,25 @@ async function displayMasterInfo(master) {
         const res = await fetch(`/.netlify/functions/getportfolio?master_id=${master.id_master}`);
         const data = await res.json();
         const grid = document.getElementById(`portfolio-${master.id_master}`);
-        grid.innerHTML = ''; // очистим
 
         if (data.photos && data.photos.length > 0) {
-            data.photos.forEach(photo => {
-                const img = document.createElement('img');
-                img.src = photo.photo;
-                img.alt = 'Работа мастера';
-                img.className = 'portfolio-photo';
+            grid.innerHTML = data.photos.map(photo => `
+                <img src="${photo.photo}" class="portfolio-photo" data-description="${photo.description_photo || 'Описание отсутствует'}">
+            `).join('');
+
+            // Навешиваем обработчики клика по фото
+            grid.querySelectorAll('.portfolio-photo').forEach(img => {
                 img.addEventListener('click', () => {
-                    document.getElementById('modal-photo').src = photo.photo;
-                    document.getElementById('modal-description').textContent = photo.description_photo || 'Описание отсутствует';
-                    document.getElementById('portfolio-modal').classList.remove('hidden');
+                    const modal = document.getElementById('portfolio-modal');
+                    const modalImg = document.getElementById('modal-photo');
+                    const modalDesc = document.getElementById('modal-description');
+
+                    modalImg.src = img.src;
+                    modalDesc.textContent = img.dataset.description;
+                    modal.classList.remove('hidden');
                 });
-                grid.appendChild(img);
             });
+
         } else {
             grid.innerHTML = '<p>Портфолио пока пусто</p>';
         }
@@ -873,6 +881,7 @@ async function displayMasterInfo(master) {
         container.querySelector('.portfolio-grid').innerHTML = '<p class="error">Ошибка загрузки портфолио</p>';
     }
 }
+
 
 
 function showPortfolioModal(photos) {
@@ -902,6 +911,7 @@ function showPortfolioModal(photos) {
     document.getElementById('portfolio-modal').classList.add('hidden');
   };
 }
+
 
 
 
