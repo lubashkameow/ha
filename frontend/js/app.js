@@ -660,6 +660,7 @@ function formatDate(dateStr) {
             body: JSON.stringify({
                 user_id: tg.initDataUnsafe.user.id,
                 service_id: selectedService.id,
+                service_length: selectedService.length,
                 service_name: selectedService.name,
                 service_price: selectedService.price,
                 slot_id: selectedSlot,
@@ -691,7 +692,7 @@ function formatDate(dateStr) {
         <div class="confirmation success-message">
             <h2>🎉 Ура! Вы успешно записались!</h2>
             <div class="confirmation-details">
-                <p><strong>💇 Услуга:</strong> ${booking.name_service} (${booking.price} ₽)</p>
+                <p><strong>💇 Услуга:</strong> ${booking.name_service} (${booking.service_length}) (${booking.price} ₽)</p>
                 <p><strong>📅 Дата:</strong> ${booking.date}</p>
                 <p><strong>⏰ Время:</strong> ${booking.time}</p>
                 <p><strong>👩‍🎨 Мастер:</strong> ${booking.name_master}</p>
