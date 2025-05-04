@@ -608,7 +608,7 @@ async function loadMastersSlots(date, duration) {
             <h3>Подтверждение записи</h3>
             <div class="summary-item">
                 <span class="summary-label">Услуга:</span>
-                <span class="summary-value">${selectedService.name} (${selectedService.price})</span>
+                <span class="summary-value">${selectedService.name} (${selectedService.length}) (${selectedService.price})</span>
             </div>
             <div class="summary-item">
                 <span class="summary-label">Дата:</span>
