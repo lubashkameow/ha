@@ -778,7 +778,7 @@ async function loadMasters() {
     container.innerHTML = '<div class="loader">Загрузка мастеров...</div>';
 
     try {
-        const response = await fetch('/.netlify/functions/getmaster');
+        const response = await fetch('/.netlify/functions/getmasters');
         const data = await response.json();
 
         if (data.masters && data.masters.length > 0) {
@@ -786,9 +786,10 @@ async function loadMasters() {
             data.masters.forEach(master => {
                 html += `
                     <div class="master-card">
-                        <img src="img/default-master.jpg" alt="${master.name_master}">
+                        <img src="${master.photo || 'img/default-master.jpg'}" alt="${master.name_master}">
                         <h3>${master.name_master}</h3>
-                        <p>Телефон: ${master.phone_master}</p>
+                        <p>${master.description || 'Опытный мастер'}</p>
+                        <p><strong>Телефон:</strong> ${master.phone_master || '—'}</p>
                         <button class="view-portfolio" data-master-id="${master.id_master}">Портфолио</button>
                     </div>
                 `;
@@ -797,11 +798,11 @@ async function loadMasters() {
             container.innerHTML = html;
 
             document.querySelectorAll('.view-portfolio').forEach(btn => {
-                btn.addEventListener('click', async function() {
+                btn.addEventListener('click', async function () {
                     const masterId = this.getAttribute('data-master-id');
                     const res = await fetch(`/.netlify/functions/getportfolio?master_id=${masterId}`);
                     const data = await res.json();
-                    showPortfolioModal(data.photos); // реализуй показ модального окна
+                    showPortfolioModal(data.photos); // Реализуй эту функцию для показа фото в модалке
                 });
             });
         } else {
@@ -811,6 +812,7 @@ async function loadMasters() {
         container.innerHTML = '<p class="error">Ошибка загрузки мастеров</p>';
     }
 }
+
 
 
 // Функция отмены записи
