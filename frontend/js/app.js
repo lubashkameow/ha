@@ -20,9 +20,45 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('book-btn').addEventListener('click', () => {
         showBookingForm();
     });
+
+
+
+let currentIndex = 0;
+let currentPhotos = data.photos;
+
+function showPhoto(index) {
+    const modal = document.getElementById('portfolio-modal');
+    const modalImg = document.getElementById('modal-photo');
+    const modalDesc = document.getElementById('modal-description');
+    const photo = currentPhotos[index];
+
+    modalImg.src = photo.photo;
+    modalDesc.textContent = photo.description_photo || 'Описание отсутствует';
+}
+
+grid.querySelectorAll('.portfolio-photo').forEach((img, idx) => {
+    img.addEventListener('click', () => {
+        currentIndex = idx;
+        showPhoto(currentIndex);
+        const modal = document.getElementById('portfolio-modal');
+        modal.classList.remove('hidden');
+        setTimeout(() => modal.classList.add('show'), 10);
+    });
+});
     
     document.getElementById('close-portfolio-modal').addEventListener('click', () => {
     document.getElementById('portfolio-modal').classList.add('hidden');
+});
+    document.getElementById('prev-photo').addEventListener('click', () => {
+    if (currentPhotos.length === 0) return;
+    currentIndex = (currentIndex - 1 + currentPhotos.length) % currentPhotos.length;
+    showPhoto(currentIndex);
+});
+
+    document.getElementById('next-photo').addEventListener('click', () => {
+    if (currentPhotos.length === 0) return;
+    currentIndex = (currentIndex + 1) % currentPhotos.length;
+    showPhoto(currentIndex);
 });
 });
 
