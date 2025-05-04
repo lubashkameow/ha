@@ -624,24 +624,24 @@ option {
   color: white;
 }
 
-.navv-btn {
+.nav-arrow {
   position: absolute;
   top: 50%;
-  transform: translateY(-50%);
-  background: none;
-  border: none;
+  font-size: 50px;
   color: white;
-  font-size: 40px;
   cursor: pointer;
+  user-select: none;
+  transform: translateY(-50%);
   z-index: 1;
+  padding: 10px;
 }
 
 #prev-photo {
-  left: -60px;
+  left: 10px;
 }
 
 #next-photo {
-  right: -60px;
+  right: 10px;
 }
 
 
