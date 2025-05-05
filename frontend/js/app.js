@@ -608,23 +608,23 @@ async function loadMastersSlots(date, duration) {
         <div class="confirmation-summary">
             <h3>Подтверждение записи</h3>
             <div class="summary-item">
-                <span class="summary-label">Услуга:</span>
+                <span class="summary-label">💇 Услуга:</span>
                 <span class="summary-value">${selectedService.name_length} (${selectedService.name}) (${selectedService.price})</span>
             </div>
             <div class="summary-item">
-                <span class="summary-label">Дата:</span>
+                <span class="summary-label">📅 Дата:</span>
                 <span class="summary-value">${formatDate(selectedDate)}</span>
             </div>
             <div class="summary-item">
-                <span class="summary-label">Время:</span>
+                <span class="summary-label">⏰ Время:</span>
                 <span class="summary-value">${timeSlot.textContent}</span>
             </div>
             <div class="summary-item">
-                <span class="summary-label">Мастер:</span>
+                <span class="summary-label">👩‍🎨 Мастер:</span>
                 <span class="summary-value">${selectedMaster.name || 'не выбран'}</span>
             </div>
             <div class="summary-item">
-                <span class="summary-label">Комментарий:</span>
+                <span class="summary-label">📝 Комментарий:</span>
                 <span class="summary-value">${document.getElementById('booking-comment').value || 'нет'}</span>
             </div>
         </div>
