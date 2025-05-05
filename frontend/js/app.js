@@ -274,7 +274,8 @@ function initBookingForm() {
                         id: item.id_service,
                         name: item.name,
                         price: item.price,
-                        duration: item.duration_minutes
+                        duration: item.duration_minutes,
+                        name_length: subcategory
                     });
                     option.textContent = `${item.name} (${item.price})`;
                     optgroup.appendChild(option);
@@ -295,8 +296,8 @@ function initBookingForm() {
             selectedService = JSON.parse(this.value);
             console.log('Parsed service:', selectedService);
             
-            // Добавим проверку структуры
-            if (!selectedService.id || !selectedService.name) {
+            // Проверка структуры
+            if (!selectedService.id || !selectedService.name || !selectedService.name_length) {
                 console.error('Invalid service structure:', selectedService);
                 selectedService = null;
             }
@@ -608,7 +609,7 @@ async function loadMastersSlots(date, duration) {
             <h3>Подтверждение записи</h3>
             <div class="summary-item">
                 <span class="summary-label">Услуга:</span>
-                <span class="summary-value">${selectedService.length} (${selectedService.name}) (${selectedService.price})</span>
+                <span class="summary-value">${selectedService.name_length} (${selectedService.name}) (${selectedService.price})</span>
             </div>
             <div class="summary-item">
                 <span class="summary-label">Дата:</span>
@@ -660,7 +661,7 @@ function formatDate(dateStr) {
             body: JSON.stringify({
                 user_id: tg.initDataUnsafe.user.id,
                 service_id: selectedService.id,
-                service_length: selectedService.length,
+                service_length: selectedService.name_length,
                 service_name: selectedService.name,
                 service_price: selectedService.price,
                 slot_id: selectedSlot,
@@ -692,7 +693,7 @@ function formatDate(dateStr) {
         <div class="confirmation success-message">
             <h2>🎉 Ура! Вы успешно записались!</h2>
             <div class="confirmation-details">
-                <p><strong>💇 Услуга:</strong> ${booking.name_length} ${booking.name_service} (${booking.price} ₽)</p>
+                <p><strong>💇 Услуга:</strong> ${booking.service_length} ${booking.name_service} (${booking.price} ₽)</p>
                 <p><strong>📅 Дата:</strong> ${booking.date}</p>
                 <p><strong>⏰ Время:</strong> ${booking.time}</p>
                 <p><strong>👩‍🎨 Мастер:</strong> ${booking.name_master}</p>
