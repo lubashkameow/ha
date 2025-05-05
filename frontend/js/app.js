@@ -29,7 +29,6 @@ let selectedDate = null;
 let selectedService = null;
 let selectedSlot = null;
 let selectedMaster = null;
-let isMaster = false;
 
 // Блокировка масштабирования
 function disableZoom() {
@@ -57,27 +56,6 @@ function initUserData() {
             if (avatarElement) {
                 avatarElement.src = user.photo_url;
             }
-        }
-        // Проверка, является ли пользователь мастером
-        try {
-            const response = await fetch(`/.netlify/functions/check_master?user_id=${user.id}`);
-            const data = await response.json();
-            isMaster = data.is_master;
-
-            if (isMaster) {
-                // Добавляем кнопку "Отчеты" в панель навигации
-                const navContainer = document.querySelector('.bottom-nav');
-                const reportsNavItem = document.createElement('div');
-                reportsNavItem.className = 'nav-item';
-                reportsNavItem.setAttribute('data-page', 'reports');
-                reportsNavItem.innerHTML = `
-                    <i>📊</i>
-                    <span>Отчеты</span>
-                `;
-                navContainer.appendChild(reportsNavItem);
-            }
-        } catch (error) {
-            console.error('Ошибка проверки статуса мастера:', error);
         }
     }
 }
