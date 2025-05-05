@@ -653,7 +653,20 @@ function formatDate(dateStr) {
         alert('Пожалуйста, выберите услугу, мастера и время');
         return;
     }
-
+    console.log('Sending booking data:', {
+        user_id: tg.initDataUnsafe.user.id,
+        service_id: selectedService.id,
+        service_length: selectedService.name_length,
+        service_name: selectedService.name,
+        service_price: selectedService.price,
+        slot_id: selectedSlot,
+        master_id: selectedMaster.id,
+        master_name: selectedMaster.name,
+        date: selectedDate,
+        time: timeSlot.textContent,
+        comment: comment
+    });
+        
     try {
         const response = await fetch('/.netlify/functions/createbooking', {
             method: 'POST',
@@ -750,9 +763,9 @@ async function loadUserBookings() {
             data.bookings.forEach(booking => {
                 html += `
                     <div class="booking-item">
-                        <div class="booking-service">${booking.service_length} (${booking.service_name}) (${booking.price})</div>
-                        <div class="booking-date">${booking.date} в ${booking.time}</div>
-                        <div class="booking-master">Мастер: ${booking.master_name}</div>
+                        <div class="booking-service">Вы записаны на услугу 💇: ${booking.service_length} ${booking.service_name} (${booking.price})</div>
+                        <div class="booking-date">📅 ${booking.date} в ${booking.time}</div>
+                        <div class="booking-master">К мастеру 👩‍🎨: ${booking.master_name}</div>
                         <button class="cancel-btn" data-booking-id="${booking.id_app}">Отменить</button>
                     </div>
                 `;
