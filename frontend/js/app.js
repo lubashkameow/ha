@@ -704,13 +704,10 @@ function formatDate(dateStr) {
     const formContainer = document.getElementById('booking-form-container');
     formContainer.innerHTML = `
         <div class="confirmation success-message">
-            <h2>🎉 Ура! Вы успешно записались!</h2>
+            <h2>🎉 Вы успешно записались!</h2>
             <div class="confirmation-details">
-                <p><strong>💇 Услуга:</strong> ${booking.service_length} ${booking.name_service} (${booking.price} ₽)</p>
-                <p><strong>📅 Дата:</strong> ${booking.date}</p>
-                <p><strong>⏰ Время:</strong> ${booking.time}</p>
-                <p><strong>👩‍🎨 Мастер:</strong> ${booking.name_master}</p>
-                <p><strong>📝 Комментарий:</strong> ${booking.comment || 'нет'}</p>
+                <p align="center">Детали записи Вы можете посмотреть во вкладке</p>
+                <p align="center"><strong>"Мои записи 📅"</strong></p>
             </div>
             <button id="close-booking" class="btn-primary">Закрыть</button>
         </div>
@@ -763,9 +760,10 @@ async function loadUserBookings() {
             data.bookings.forEach(booking => {
                 html += `
                     <div class="booking-item">
-                        <div class="booking-service">Вы записаны на услугу 💇: ${booking.service_length} ${booking.service_name} (${booking.price})</div>
+                        <div class="booking-service"><p>Вы записаны на услугу 💇:</p><p>${booking.service_length} ${booking.service_name} (${booking.price}.0 ₽)</p></div>
                         <div class="booking-date">📅 ${booking.date} в ${booking.time}</div>
                         <div class="booking-master">К мастеру 👩‍🎨: ${booking.master_name}</div>
+                        <div class="booking-master">Ваш комментарий 📝: ${booking.comment || 'нет'}</div>
                         <button class="cancel-btn" data-booking-id="${booking.id_app}">Отменить</button>
                     </div>
                 `;
