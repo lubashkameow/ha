@@ -20,7 +20,9 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('book-btn').addEventListener('click', () => {
         showBookingForm();
     });
-    
+
+    checkIfUserIsMaster();
+
 
 
 });
@@ -59,6 +61,57 @@ function initUserData() {
         }
     }
 }
+
+async function checkIfUserIsMaster() {
+    const tg = window.Telegram.WebApp;
+    const userId = tg.initDataUnsafe.user?.id;
+    if (!userId) return;
+
+    try {
+        const response = await fetch(`/.netlify/functions/ismaster?user_id=${userId}`);
+        const data = await response.json();
+
+        if (data.is_master) {
+            addReportsNavItem();
+        }
+    } catch (error) {
+        console.error('Ошибка при проверке мастера:', error);
+    }
+}
+
+function addReportsNavItem() {
+    const nav = document.querySelector('.bottom-nav');
+    if (!nav) return;
+
+    const reportsItem = document.createElement('div');
+    reportsItem.className = 'nav-item';
+    reportsItem.setAttribute('data-page', 'reports');
+    reportsItem.innerHTML = `
+        <i>📊</i>
+        <span>Отчеты</span>
+    `;
+    nav.appendChild(reportsItem);
+
+    reportsItem.addEventListener('click', function() {
+        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+
+        this.classList.add('active');
+
+        // Покажем заглушку или настоящую страницу
+        let page = document.getElementById('page-reports');
+        if (!page) {
+            page = document.createElement('div');
+            page.id = 'page-reports';
+            page.className = 'page active';
+            page.innerHTML = '<h3>Страница отчетов</h3><p>Здесь будут отчеты мастера.</p>';
+            document.querySelector('.main-content').appendChild(page);
+        } else {
+            page.classList.add('active');
+        }
+    });
+}
+
 
 // Загрузка услуг для просмотра
 async function loadServicesForView() {
