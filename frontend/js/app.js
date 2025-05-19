@@ -17,9 +17,9 @@ document.addEventListener('DOMContentLoaded', () => {
     loadServicesForView();
     
     // Обработчик кнопки записи
-    //document.getElementById('book-btn').addEventListener('click', () => {
-      //  showBookingForm();
-   // });
+    document.getElementById('book-btn').addEventListener('click', () => {
+        showBookingForm();
+    });
 
     checkIfUserIsMaster();
 
@@ -126,7 +126,7 @@ async function loadServicesForView() {
         
         const data = await response.json();
         renderServicesForView(data);
-        showBookingForm();
+
     } catch (error) {
         console.error('Ошибка загрузки услуг:', error);
         container.innerHTML = '<p class="error">Не удалось загрузить услуги. Пожалуйста, попробуйте позже.</p>';
