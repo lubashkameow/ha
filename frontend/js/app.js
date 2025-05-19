@@ -279,7 +279,26 @@ function showBookingForm() {
 `;
     
     // Вставляем форму в подготовленный контейнер
-    document.querySelector('.main-content').insertAdjacentHTML('beforeend', formHtml);
+    const placeholder = document.getElementById('booking-form-placeholder');
+if (placeholder) {
+    placeholder.innerHTML = formHtml;
+
+    // Показать модалку
+    const modal = document.getElementById('booking-modal');
+    if (modal) {
+        modal.classList.remove('hidden');
+    }
+
+    // Назначить обработчик на крестик
+    const closeBtn = document.getElementById('close-booking-modal');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+            modal.classList.add('hidden');
+            placeholder.innerHTML = ''; // очищаем форму при закрытии
+        });
+    }
+}
+
     
     // Инициализация обработчиков формы
     initBookingForm();
