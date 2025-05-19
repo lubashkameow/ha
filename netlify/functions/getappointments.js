@@ -11,7 +11,7 @@ exports.handler = async (event) => {
     }
 
     const response = await fetch(
-      `https://same-impacts-theories-larger.trycloudflare.com/api/appointments?user_id=${userId}`
+      `https://want-nursing-period-noise.trycloudflare.com/api/appointments?user_id=${userId}`
     );
 
     if (!response.ok) throw new Error('API request failed');
