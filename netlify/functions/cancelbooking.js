@@ -11,7 +11,7 @@ exports.handler = async (event) => {
       };
     }
 
-    const response = await fetch('https://same-impacts-theories-larger.trycloudflare.com/api/bookings/cancel', {
+    const response = await fetch('https://want-nursing-period-noise.trycloudflare.com/api/bookings/cancel', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ booking_id }),
