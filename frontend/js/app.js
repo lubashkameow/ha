@@ -517,7 +517,7 @@ function initBookingForm() {
     
     // Загрузка доступных дат
     async function loadAvailableDates(service) {
-    const container = document.getElementById('week-days-container'); // Изменили здесь
+    const container = document.getElementById('week-days-container'); 
     container.innerHTML = '<div class="loader">Загрузка дат...</div>';
     
     try {
@@ -737,19 +737,7 @@ function formatDate(dateStr) {
         alert('Пожалуйста, выберите услугу, мастера и время');
         return;
     }
-    console.log('Sending booking data:', {
-        user_id: tg.initDataUnsafe.user.id,
-        service_id: selectedService.id,
-        service_length: selectedService.name_length,
-        service_name: selectedService.name,
-        service_price: selectedService.price,
-        slot_id: selectedSlot,
-        master_id: selectedMaster.id,
-        master_name: selectedMaster.name,
-        date: selectedDate,
-        time: timeSlot.textContent,
-        comment: comment
-    });
+    
 
     let userId = tg.initDataUnsafe.user.id;
 
