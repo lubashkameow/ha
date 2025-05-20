@@ -31,6 +31,7 @@ let selectedDate = null;
 let selectedService = null;
 let selectedSlot = null;
 let selectedMaster = null;
+let isCurrentUserMaster = false;
 
 // Блокировка масштабирования
 function disableZoom() {
@@ -72,11 +73,13 @@ async function checkIfUserIsMaster() {
         const data = await response.json();
 
         if (data.is_master) {
+            isCurrentUserMaster = true;
             addReportsNavItem();
         }
     } catch (error) {
         console.error('Ошибка при проверке мастера:', error);
     }
+    
 }
 
 function addReportsNavItem() {
@@ -229,7 +232,16 @@ function showBookingForm() {
     
     const formHtml = `
 <div id="booking-form-container" class="booking-form-container">
-    <h3>Запись на услугу</h3>
+    <h3>${isCurrentUserMaster ? 'Создание новой записи' : 'Запись на услугу'}</h3>
+    
+    ${isCurrentUserMaster ? `
+    <div class="form-step active" id="step-client-info">
+        <label>Имя клиента:</label>
+        <input type="text" id="client-name" class="form-control">
+        <label>Телефон клиента:</label>
+        <input type="tel" id="client-phone" class="form-control">
+    </div>
+    ` : ''}
     
     <div class="form-step active" id="step-catalog">
         <label>Выберите каталог:</label>
@@ -738,13 +750,44 @@ function formatDate(dateStr) {
         time: timeSlot.textContent,
         comment: comment
     });
-        
+
+    let userId = tg.initDataUnsafe.user.id;
+
+    // 🔸 Если мастер, создаём клиента
+    if (isCurrentUserMaster) {
+        const name = document.getElementById('client-name').value.trim();
+        const phone = document.getElementById('client-phone').value.trim();
+
+        if (!name || !phone) {
+            alert('Введите имя и телефон клиента');
+            return;
+        }
+
+        try {
+            const clientResponse = await fetch('/.netlify/functions/createclient', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, phone })
+            });
+
+            const clientData = await clientResponse.json();
+            if (!clientData.id_user) {
+                alert('Ошибка при создании клиента');
+                return;
+            }
+
+            userId = clientData.id_user;
+        } catch (err) {
+            alert('Ошибка соединения при создании клиента');
+            return;
+        }
+    }
     try {
         const response = await fetch('/.netlify/functions/createbooking', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                user_id: tg.initDataUnsafe.user.id,
+                user_id: userId,
                 service_id: selectedService.id,
                 service_length: selectedService.name_length,
                 service_name: selectedService.name,
