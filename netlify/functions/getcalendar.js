@@ -22,7 +22,7 @@ exports.handler = async (event) => {
       };
     }
 
-    const apiUrl = `https://want-nursing-period-noise.trycloudflare.com/api/calendar?id_service=${id_service}`;
+    const apiUrl = `https://concept-bedrooms-christopher-guide.trycloudflare.com/api/calendar?id_service=${id_service}`;
     console.log('Requesting:', apiUrl);
     
     const response = await fetch(apiUrl);
