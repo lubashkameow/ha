@@ -1077,6 +1077,7 @@ function renderWeekForMaster(startDate) {
     today.setHours(0, 0, 0, 0);
 
     let html = '';
+    let todayDateStr = today.toISOString().split('T')[0];
     for (let i = 0; i < 7; i++) {
         const date = new Date(startDate);
         date.setDate(startDate.getDate() + i);
@@ -1087,7 +1088,7 @@ function renderWeekForMaster(startDate) {
         const isToday = date.toDateString() === new Date().toDateString();
 
         html += `
-            <div class="day-cell ${isToday ? 'today' : ''}" data-date="${dateStr}">
+            <div class="day-cell ${isToday ? 'today selected' : ''}" data-date="${dateStr}">
                 <div class="week-day">${weekDay}</div>
                 <div class="day-number">${day}</div>
             </div>
