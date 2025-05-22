@@ -884,20 +884,17 @@ document.querySelectorAll('.nav-item').forEach(item => {
         this.classList.add('active');
         document.getElementById(`page-${pageId}`).classList.add('active');
         
-        // Загружаем данные при необходимости
-        if (pageId === 'bookings' && isCurrentUserMaster) {
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            renderWeekForMaster(today);
-            loadMasterBookingsByDate(today.toISOString().split('T')[0]);
+        if (pageId === 'bookings') {
+            if (isCurrentUserMaster) {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                renderWeekForMaster(today);
+                loadMasterBookingsByDate(today.toISOString().split('T')[0]);
+            } else {
+                loadUserBookings();
+            }
         }
 
-        // можно оставить также loadUserBookings(), если ты показываешь клиенту
-        if (pageId === 'bookings' && !isCurrentUserMaster) {
-            loadUserBookings();
-        } else if (pageId === 'masters') {
-            loadMasters();
-        }
     });
 });
 
