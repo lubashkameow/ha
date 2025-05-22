@@ -1191,18 +1191,35 @@ async function loadMasterBookingsByDate(date) {
                             ` : ''}
                         </div>
                         <div>💇 ${booking.service_length} (${booking.service_name})</div>
-                        <div>💬 Комментарий: ${booking.comment || 'нет'}</div>
                         <div>💰 ${booking.price}.0 ₽</div>
+                        <div>💬 Комментарий: ${booking.comment || 'нет'}</div>
+                        <button class="cancel-btn" data-booking-id="${booking.id_app}">Отменить</button>
+                        
                     </div>
                 `;
             });
 
             container.innerHTML = html;
+        // Добавление обработчиков для кнопок отмены
+            document.querySelectorAll('#master-bookings-list .cancel-btn').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    const id = btn.getAttribute('data-booking-id');
+                    if (confirm('Вы уверены, что хотите отменить запись?')) {
+                        try {
+                            await fetch(`/.netlify/functions/cancelbooking?id=${id}&by_master=true`, { method: 'DELETE' });
+                            loadMasterBookingsByDate(date); // Обновляем список записей
+                        } catch (error) {
+                            console.error('Ошибка отмены записи:', error);
+                            alert('Не удалось отменить запись. Попробуйте снова.');
+                        }
+                    }
+                });
+            });
         } else {
             container.innerHTML = `<p>На ${formattedDate} записей нет</p>`;
         }
     } catch (error) {
-        container.innerHTML = '<p class="error">Ошибка загрузки записей</p>';
+        container.innerHTML = '<p class="error">Ошибка загрузки записей</p><button onclick="loadMasterBookingsByDate('${date}')">Повторить</button>';
         console.error('loadMasterBookingsByDate error:', error);
     }
 }
