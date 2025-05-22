@@ -23,6 +23,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     checkIfUserIsMaster();
 
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    renderWeekForMaster(today);
 
 
 });
@@ -1077,6 +1080,8 @@ function renderWeekForMaster(startDate) {
     today.setHours(0, 0, 0, 0);
 
     let html = '';
+    let todayDateStr = today.toISOString().split('T')[0];
+
     for (let i = 0; i < 7; i++) {
         const date = new Date(startDate);
         date.setDate(startDate.getDate() + i);
@@ -1084,15 +1089,34 @@ function renderWeekForMaster(startDate) {
         const day = date.getDate();
         const weekDay = weekDays[date.getDay()];
         const dateStr = date.toISOString().split('T')[0];
-        const isToday = date.toDateString() === new Date().toDateString();
+        const isToday = date.toDateString() === today.toDateString();
 
         html += `
-            <div class="day-cell ${isToday ? 'today' : ''}" data-date="${dateStr}">
+            <div class="day-cell ${isToday ? 'today selected' : ''}" data-date="${dateStr}">
                 <div class="week-day">${weekDay}</div>
                 <div class="day-number">${day}</div>
             </div>
         `;
     }
+
+    container.innerHTML = html;
+
+    // Назначаем обработчики
+    document.querySelectorAll('#week-days-master .day-cell').forEach(cell => {
+        cell.addEventListener('click', function () {
+            document.querySelectorAll('#week-days-master .day-cell').forEach(c => c.classList.remove('selected'));
+            this.classList.add('selected');
+
+            selectedDate = this.getAttribute('data-date');
+            loadMasterBookingsByDate(selectedDate);
+        });
+    });
+
+    // 🚀 Вызываем сразу загрузку для сегодняшнего дня
+    selectedDate = todayDateStr;
+    loadMasterBookingsByDate(selectedDate);
+}
+
 
     container.innerHTML = html;
 
