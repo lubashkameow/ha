@@ -11,7 +11,7 @@ exports.handler = async (event) => {
     }
 
     const response = await fetch(
-      `https://concept-bedrooms-christopher-guide.trycloudflare.com/api/portfolio?master_id=${masterId}`
+      `https://monkey-bandwidth-suggesting-murray.trycloudflare.com/api/portfolio?master_id=${masterId}`
     );
 
     if (!response.ok) throw new Error('API request failed');
