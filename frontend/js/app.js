@@ -32,6 +32,7 @@ let selectedService = null;
 let selectedSlot = null;
 let selectedMaster = null;
 let isCurrentUserMaster = false;
+let currentWeekStart = new Date();
 
 // Блокировка масштабирования
 function disableZoom() {
@@ -62,7 +63,7 @@ function initUserData() {
         }
     }
 }
-
+// Проверка, является ли пользователь мастером
 async function checkIfUserIsMaster() {
     const tg = window.Telegram.WebApp;
     const userId = tg.initDataUnsafe.user?.id;
@@ -1106,40 +1107,61 @@ function renderWeekForMaster(startDate) {
         `;
     }
 
-    container.innerHTML = html;
+    container.innerHTML = html || '<p>Нет доступных дат</p>';
+    updateMasterWeekRangeText(weekStart);
 
+    // Выбираем текущий день по умолчанию
+    const todayCell = container.querySelector('.day-cell.today');
+    if (todayCell) {
+        todayCell.classList.add('selected');
+        selectedDate = todayCell.getAttribute('data-date');
+        loadMasterBookingsByDate(selectedDate);
+    }
+
+    // Обработчики клика по дням
     document.querySelectorAll('#week-days-master .day-cell').forEach(cell => {
         cell.addEventListener('click', function () {
             document.querySelectorAll('#week-days-master .day-cell').forEach(c => c.classList.remove('selected'));
             this.classList.add('selected');
-
             selectedDate = this.getAttribute('data-date');
             loadMasterBookingsByDate(selectedDate);
         });
     });
-    // Показ диапазона
-    const endDate = new Date(startDate);
-    endDate.setDate(startDate.getDate() + 6);
-    const rangeText = `${startDate.toLocaleDateString()} — ${endDate.toLocaleDateString()}`;
-    document.getElementById('current-week-range-master').textContent = rangeText;
-
-    // Автозагрузка первой даты
-    const firstDate = new Date(startDate);
-    selectedDate = firstDate.toISOString().split('T')[0];
-    loadMasterBookingsByDate(selectedDate);
 }
 
-// Обработчики стрелок
-document.getElementById('prev-week-master').addEventListener('click', () => {
-    currentMasterWeekStart.setDate(currentMasterWeekStart.getDate() - 7);
-    renderWeekForMaster(currentMasterWeekStart);
-});
+// Обновление текста диапазона недель
+function updateMasterWeekRangeText(startDate) {
+    const endDate = new Date(startDate);
+    endDate.setDate(startDate.getDate() + 6);
+    
+    const rangeElement = document.getElementById('master-current-week-range');
+    if (rangeElement) {
+        rangeElement.textContent = `${startDate.toLocaleDateString('ru-RU')} - ${endDate.toLocaleDateString('ru-RU')}`;
+    } else {
+        console.error('Element #master-current-week-range not found');
+    }
+}
 
-document.getElementById('next-week-master').addEventListener('click', () => {
-    currentMasterWeekStart.setDate(currentMasterWeekStart.getDate() + 7);
-    renderWeekForMaster(currentMasterWeekStart);
-});
+// Инициализация навигации по неделям
+function initMasterCalendarNavigation() {
+    const prevButton = document.getElementById('master-prev-week');
+    const nextButton = document.getElementById('master-next-week');
+    
+    if (!prevButton || !nextButton) {
+        console.error('Navigation buttons not found');
+        return;
+    }
 
+    prevButton.addEventListener('click', () => {
+        currentWeekStart.setDate(currentWeekStart.getDate() - 7);
+        renderWeekForMaster(currentWeekStart);
+    });
+
+    nextButton.addEventListener('click', () => {
+        currentWeekStart.setDate(currentWeekStart.getDate() + 7);
+        renderWeekForMaster(currentWeekStart);
+    });
+}
 
 async function loadMasterBookingsByDate(date) {
     const container = document.getElementById('master-bookings-list');
