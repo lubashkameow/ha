@@ -11,7 +11,7 @@ exports.handler = async (event) => {
       };
     }
 
-    const response = await fetch('https://concept-bedrooms-christopher-guide.trycloudflare.com/api/bookings/cancel', {
+    const response = await fetch('https://monkey-bandwidth-suggesting-murray.trycloudflare.com/api/bookings/cancel', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ booking_id }),
