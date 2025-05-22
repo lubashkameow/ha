@@ -725,9 +725,10 @@ option {
         .nav-item {
             flex: 1;
             text-align: center;
-            padding: 12px 0;
+            padding: 8px 0;
             cursor: pointer;
             transition: all 0.3s;
+            font-size: 12px;
         }
         
         .nav-item.active {
@@ -737,8 +738,8 @@ option {
         
         .nav-item i {
             display: block;
-            font-size: 20px;
-            margin-bottom: 4px;
+            font-size: 16px;
+            margin-bottom: 2px;
         }
         
         .page-container {
