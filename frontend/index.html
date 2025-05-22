@@ -40,14 +40,14 @@
             <!-- Страница 2: Мои записи -->
             <div id="page-bookings" class="page">
                 <h3>Мои записи</h3>
-                
-                <!-- Только для мастера -->
-                <div class="week-header">
-                    <button id="prev-week-master">←</button>
-                    <span id="current-week-range-master"></span>
-                    <button id="next-week-master">→</button>
+                <div class="master-calendar">
+                    <div class="calendar-header">
+                        <button id="master-prev-week">&lt;</button>
+                        <div id="master-current-week-range"></div>
+                        <button id="master-next-week">&gt;</button>
+                    </div>
+                    <div id="week-days-master" class="week-days"></div>
                 </div>
-                <div id="week-days-master" class="week-calendar"></div>
                 <div id="master-bookings-list" class="appointments-list"></div>
 
                 <!-- Только для клиента -->
