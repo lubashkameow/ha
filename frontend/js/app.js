@@ -1117,9 +1117,12 @@ async function loadMasterBookingsByDate(date) {
         const tg = window.Telegram.WebApp;
         const response = await fetch(`/.netlify/functions/getapp?user_id=${tg.initDataUnsafe.user.id}&date=${date}`);
         const data = await response.json();
-
+        const [yyyy, mm, dd] = date.split('-');
+        const formattedDate = `${dd}.${mm}.${yyyy}`;
+        
         if (data.bookings && data.bookings.length > 0) {
-            let html = `<h3>Записи на ${new Date(date).toLocaleDateString()}</h3>`;
+            let html = `<h3>Записи на ${formattedDate}</h3>`;
+
             data.bookings.forEach(booking => {
                 const phoneLink = booking.phone_user?.replace(/[^0-9]/g, '');
                 html += `
