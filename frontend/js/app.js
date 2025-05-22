@@ -81,6 +81,7 @@ async function checkIfUserIsMaster() {
     }
     
 }
+
 async function loadReport(type) {
     const tg = window.Telegram.WebApp;
     const userId = tg.initDataUnsafe.user.id;
@@ -112,6 +113,7 @@ function renderReportTable(data, type) {
     html += '</tbody></table>';
     return html;
 }
+
 
 function addReportsNavItem() {
     const nav = document.querySelector('.bottom-nav');
