@@ -17,7 +17,7 @@ exports.handler = async (event) => {
         };
     }
 
-    const apiUrl = 'https://concept-bedrooms-christopher-guide.trycloudflare.com/api/createclient'; 
+    const apiUrl = 'https://monkey-bandwidth-suggesting-murray.trycloudflare.com/api/createclient'; 
 
     try {
         const response = await fetch(apiUrl, {
