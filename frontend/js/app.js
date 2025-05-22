@@ -1101,7 +1101,7 @@ function renderWeekForMaster(startDate) {
             document.querySelectorAll('#week-days-master .day-cell').forEach(c => c.classList.remove('selected'));
             this.classList.add('selected');
 
-            const selectedDate = this.getAttribute('data-date');
+            selectedDate = this.getAttribute('data-date');
             loadMasterBookingsByDate(selectedDate);
         });
     });
