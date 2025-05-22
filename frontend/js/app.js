@@ -902,6 +902,8 @@ document.querySelectorAll('.nav-item').forEach(item => {
             } else {
                 loadUserBookings();
             }
+        } else if (pageId === 'masters') {
+            loadMasters(); 
         }
 
     });
