@@ -10,7 +10,7 @@ exports.handler = async (event) => {
         };
     }
     
-    const url = `https://concept-bedrooms-christopher-guide.trycloudflare.com/api/master?date=${date}`;
+    const url = `https://monkey-bandwidth-suggesting-murray.trycloudflare.com/api/master?date=${date}`;
     
     try {
         const response = await fetch(url);
