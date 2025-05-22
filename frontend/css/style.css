@@ -679,39 +679,6 @@ option {
     font-weight: bold;
     cursor: pointer;
 }
-.week-calendar.horizontal {
-    display: flex;
-    justify-content: space-between;
-    gap: 5px;
-    margin-bottom: 10px;
-    overflow-x: auto;
-}
-
-.week-calendar .day-cell {
-    flex: 1 1 13%;
-    background-color: #eee;
-    text-align: center;
-    padding: 8px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 14px;
-}
-
-.day-cell.today {
-    border: 2px solid #007aff;
-}
-
-.day-cell.selected {
-    background-color: #d0eaff;
-    font-weight: bold;
-}
-
-.week-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin: 10px 0 5px;
-}
 
  /* Добавляем стили для нижней панели */
         .bottom-nav {
