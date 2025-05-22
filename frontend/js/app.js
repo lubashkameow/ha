@@ -82,6 +82,39 @@ async function checkIfUserIsMaster() {
     
 }
 
+async function loadReport(type) {
+    const tg = window.Telegram.WebApp;
+    const userId = tg.initDataUnsafe.user.id;
+    const month = document.getElementById('report-month').value;
+
+    const response = await fetch(`/.netlify/functions/getreport?user_id=${userId}&month=${month}&type=${type}`);
+    const data = await response.json();
+
+    const container = document.getElementById('report-result');
+    container.innerHTML = renderReportTable(data, type);
+}
+
+function renderReportTable(data, type) {
+    if (!Array.isArray(data) || data.length === 0) {
+        return '<p>Нет данных для отчета.</p>';
+    }
+
+    const headers = Object.keys(data[0]);
+    let html = '<table><thead><tr>';
+    headers.forEach(h => html += `<th>${h}</th>`);
+    html += '</tr></thead><tbody>';
+
+    data.forEach(row => {
+        html += '<tr>';
+        headers.forEach(h => html += `<td>${row[h]}</td>`);
+        html += '</tr>';
+    });
+
+    html += '</tbody></table>';
+    return html;
+}
+
+
 function addReportsNavItem() {
     const nav = document.querySelector('.bottom-nav');
     if (!nav) return;
@@ -96,7 +129,7 @@ function addReportsNavItem() {
     nav.appendChild(reportsItem);
 
     reportsItem.addEventListener('click', function() {
-        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+        document.querySelectorAll('.gender-btn').forEach(i => i.classList.remove('active'));
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
 
         this.classList.add('active');
@@ -107,14 +140,26 @@ function addReportsNavItem() {
             page = document.createElement('div');
             page.id = 'page-reports';
             page.className = 'page active';
-            page.innerHTML = '<h3>Страница отчетов</h3><p>Здесь будут отчеты мастера.</p>';
+            page.innerHTML = `
+                <h3>Отчеты</h3>
+                <label for="report-month">Выберите месяц:</label>
+                <input type="month" id="report-month" value="${new Date().toISOString().slice(0, 7)}" />
+
+                <div class="report-buttons">
+                    <button onclick="loadReport('clients')">1. Отчет по клиентам</button>
+                    <button onclick="loadReport('appointments')">2. Отчет по записям</button>
+                    <button onclick="loadReport('materials')">3. Расход материалов</button>
+                    <button onclick="loadReport('services')">4. Оказанные услуги</button>
+                </div>
+
+                <div id="report-result" class="report-result"></div>
+            `;
             document.querySelector('.main-content').appendChild(page);
         } else {
             page.classList.add('active');
         }
     });
 }
-
 
 // Загрузка услуг для просмотра
 async function loadServicesForView() {
