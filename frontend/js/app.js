@@ -898,7 +898,8 @@ document.querySelectorAll('.nav-item').forEach(item => {
             if (isCurrentUserMaster) {
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
-                renderWeekForMaster(today);
+                renderWeekForMaster(currentWeekStart);
+                initMasterCalendarNavigation();
                 loadMasterBookingsByDate(today.toISOString().split('T')[0]);
             } else {
                 loadUserBookings();
