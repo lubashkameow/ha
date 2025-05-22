@@ -812,7 +812,6 @@ function formatDate(dateStr) {
                 <p align="center">Детали записи Вы можете посмотреть во вкладке</p>
                 <p align="center"><strong>"Мои записи 📅"</strong></p>
             </div>
-            <button id="close-booking" class="btn-primary">Закрыть</button>
         </div>
     `;
 
