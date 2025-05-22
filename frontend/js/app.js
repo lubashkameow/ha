@@ -302,13 +302,13 @@ if (placeholder) {
     }
 
     // Назначить обработчик на крестик
-    const closeBtn = document.getElementById('close-booking-modal');
-    if (closeBtn) {
-        closeBtn.addEventListener('click', () => {
-            modal.classList.add('hidden');
-            placeholder.innerHTML = ''; // очищаем форму при закрытии
-        });
-    }
+    //const closeBtn = document.getElementById('close-booking-modal');
+    //if (closeBtn) {
+    //    closeBtn.addEventListener('click', () => {
+    //        modal.classList.add('hidden');
+    //        placeholder.innerHTML = ''; // очищаем форму при закрытии
+    //    });
+    //}
 }
 
     
@@ -815,9 +815,9 @@ function formatDate(dateStr) {
         </div>
     `;
 
-    document.getElementById('close-booking').addEventListener('click', () => {
-        formContainer.style.display = 'none';
-    });
+    //document.getElementById('close-booking').addEventListener('click', () => {
+    //    formContainer.style.display = 'none';
+    //});
 }
 }
 
