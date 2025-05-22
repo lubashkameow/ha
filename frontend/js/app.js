@@ -815,9 +815,9 @@ function formatDate(dateStr) {
         </div>
     `;
 
-    document.getElementById('close-booking').addEventListener('click', () => {
-        formContainer.style.display = 'none';
-    });
+    //document.getElementById('close-booking').addEventListener('click', () => {
+    //    formContainer.style.display = 'none';
+    //});
 }
 }
 
