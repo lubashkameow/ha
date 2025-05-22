@@ -127,7 +127,7 @@ function addReportsNavItem() {
     nav.appendChild(reportsItem);
 
     reportsItem.addEventListener('click', function() {
-        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+        document.querySelectorAll('.gender-btn').forEach(i => i.classList.remove('active'));
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
 
         this.classList.add('active');
@@ -139,7 +139,7 @@ function addReportsNavItem() {
             page.id = 'page-reports';
             page.className = 'page active';
             page.innerHTML = `
-                <h2>📊 Отчеты</h2>
+                <h3>Отчеты</h3>
                 <label for="report-month">Выберите месяц:</label>
                 <input type="month" id="report-month" value="${new Date().toISOString().slice(0, 7)}" />
 
