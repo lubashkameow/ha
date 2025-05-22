@@ -597,25 +597,30 @@ function initBookingForm() {
 }
     
     // Отрисовка календаря
-    function renderWeekDays(startDate) {
+function renderWeekDays(startDate) {
     const container = document.getElementById('week-days-container');
     const weekDays = ['ВС', 'ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ'];
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-        
+
+    // Клонируем startDate и выравниваем по началу дня
+    const weekStart = new Date(startDate);
+    weekStart.setHours(0, 0, 0, 0);
+
     let html = '';
     for (let i = 0; i < 7; i++) {
-        const date = new Date(startDate);
-        date.setDate(startDate.getDate() + i);
+        const date = new Date(weekStart);
+        date.setDate(weekStart.getDate() + i);
 
         // Пропускаем прошедшие даты
         if (date < today) continue;
-        
+
         const day = date.getDate();
         const weekDay = weekDays[date.getDay()];
-        const dateStr = date.toISOString().split('T')[0];
+        // Форматируем дату вручную, чтобы избежать смещений из-за UTC
+        const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
         const isToday = date.toDateString() === new Date().toDateString();
-        
+
         html += `
             <div class="day-cell ${isToday ? 'today' : ''}" data-date="${dateStr}">
                 <div class="week-day">${weekDay}</div>
@@ -623,25 +628,23 @@ function initBookingForm() {
             </div>
         `;
     }
-    
+
     container.innerHTML = html || '<p>Нет доступных дат</p>';
-    updateWeekRangeText(startDate);
-    
+    updateWeekRangeText(weekStart);
+
     // Обработчики клика по дням
     document.querySelectorAll('.day-cell').forEach(cell => {
-    cell.addEventListener('click', function() {
-        document.querySelectorAll('.day-cell').forEach(c => {
-            c.classList.remove('selected');
+        cell.addEventListener('click', function () {
+            document.querySelectorAll('.day-cell').forEach(c => c.classList.remove('selected'));
+            this.classList.add('selected');
+
+            selectedDate = this.getAttribute('data-date'); // Сохраняем выбранную дату
+            loadMastersSlots(selectedDate, selectedService.duration);
+
+            // Показываем следующий шаг автоматически
+            document.getElementById('step-masters').style.display = 'block';
         });
-        this.classList.add('selected');
-        
-        selectedDate = this.getAttribute('data-date'); // Сохраняем выбранную дату
-        loadMastersSlots(selectedDate, selectedService.duration);
-        
-        // Показываем следующий шаг автоматически
-        document.getElementById('step-masters').style.display = 'block';
     });
-});
 }
 
 function updateWeekRangeText(startDate) {
@@ -763,7 +766,9 @@ async function loadMastersSlots(date, duration) {
 
 // Добавьте функцию форматирования даты
 function formatDate(dateStr) {
-    const date = new Date(dateStr);
+    // Предполагаем, что dateStr в формате YYYY-MM-DD
+    const [year, month, day] = dateStr.split('-');
+    const date = new Date(year, month - 1, day); // Месяцы в JS начинаются с 0
     const options = { day: 'numeric', month: 'long', weekday: 'short' };
     return date.toLocaleDateString('ru-RU', options);
 }
@@ -787,7 +792,7 @@ function formatDate(dateStr) {
 
     let userId = tg.initDataUnsafe.user.id;
 
-    // 🔸 Если мастер, создаём клиента
+    // Если мастер, создаём клиента
     if (isCurrentUserMaster) {
         const name = document.getElementById('client-name').value.trim();
         const phone = document.getElementById('client-phone').value.trim();
@@ -816,6 +821,10 @@ function formatDate(dateStr) {
             return;
         }
     }
+    // Убедимся, что selectedDate в формате YYYY-MM-DD
+    const [year, month, day] = selectedDate.split('-');
+    const formattedDate = `${year}-${month}-${day}`; // Гарантируем формат
+        
     try {
         const response = await fetch('/.netlify/functions/createbooking', {
             method: 'POST',
@@ -829,7 +838,7 @@ function formatDate(dateStr) {
                 slot_id: selectedSlot,
                 master_id: selectedMaster.id,
                 master_name: selectedMaster.name,
-                date: selectedDate,
+                date: formattedDate,
                 time: timeSlot.textContent,
                 comment: comment
             })
@@ -1076,15 +1085,18 @@ function renderWeekForMaster(startDate) {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
+    // Клонируем startDate и выравниваем по началу дня
+    const weekStart = new Date(startDate);
+    weekStart.setHours(0, 0, 0, 0);
+
     let html = '';
-    let todayDateStr = today.toISOString().split('T')[0];
     for (let i = 0; i < 7; i++) {
-        const date = new Date(startDate);
-        date.setDate(startDate.getDate() + i);
+        const date = new Date(weekStart);
+        date.setDate(weekStart.getDate() + i);
 
         const day = date.getDate();
         const weekDay = weekDays[date.getDay()];
-        const dateStr = date.toISOString().split('T')[0];
+        const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
         const isToday = date.toDateString() === new Date().toDateString();
 
         html += `
