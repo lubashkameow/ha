@@ -1164,6 +1164,7 @@ function initMasterCalendarNavigation() {
     });
 }
 
+// Загрузка записей мастера
 async function loadMasterBookingsByDate(date) {
     const container = document.getElementById('master-bookings-list');
     container.innerHTML = '<div class="loader">Загрузка записей...</div>';
