@@ -301,7 +301,7 @@ if (placeholder) {
         modal.classList.remove('hidden');
     }
 
-     Назначить обработчик на крестик
+    // Назначить обработчик на крестик
     const closeBtn = document.getElementById('close-booking-modal');
     if (closeBtn) {
         closeBtn.addEventListener('click', () => {
@@ -311,6 +311,7 @@ if (placeholder) {
     }
 }
 
+    
     // Инициализация обработчиков формы
     initBookingForm();
 }
