@@ -1193,12 +1193,21 @@ async function loadMasterBookingsByDate(date) {
                         <div>💇 ${booking.service_length} (${booking.service_name})</div>
                         <div>💰 ${booking.price}.0 ₽</div>
                         <div>💬 Комментарий: ${booking.comment || 'нет'}</div>
-                        
+                        <button class="cancel-btn" data-booking-id="${booking.id_app}">Отменить</button>
                     </div>
                 `;
             });
 
             container.innerHTML = html;
+            document.querySelectorAll('.cancel-btn').forEach(btn => {
+                btn.addEventListener('click', async function() {
+                    const bookingId = this.getAttribute('data-booking-id');
+                    if (confirm('Вы уверены, что хотите отменить запись?')) {
+                        await cancelBooking(bookingId);
+                        loadUserBookings(); // Обновляем список
+                    }
+                });
+            });
         } else {
             container.innerHTML = `<p>На ${formattedDate} записей нет</p>`;
         }
