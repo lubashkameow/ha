@@ -1117,7 +1117,28 @@ function renderWeekForMaster(startDate) {
             loadMasterBookingsByDate(selectedDate);
         });
     });
+    // Показ диапазона
+    const endDate = new Date(startDate);
+    endDate.setDate(startDate.getDate() + 6);
+    const rangeText = `${startDate.toLocaleDateString()} — ${endDate.toLocaleDateString()}`;
+    document.getElementById('current-week-range-master').textContent = rangeText;
+
+    // Автозагрузка первой даты
+    const firstDate = new Date(startDate);
+    selectedDate = firstDate.toISOString().split('T')[0];
+    loadMasterBookingsByDate(selectedDate);
 }
+
+// Обработчики стрелок
+document.getElementById('prev-week-master').addEventListener('click', () => {
+    currentMasterWeekStart.setDate(currentMasterWeekStart.getDate() - 7);
+    renderWeekForMaster(currentMasterWeekStart);
+});
+
+document.getElementById('next-week-master').addEventListener('click', () => {
+    currentMasterWeekStart.setDate(currentMasterWeekStart.getDate() + 7);
+    renderWeekForMaster(currentMasterWeekStart);
+});
 
 
 async function loadMasterBookingsByDate(date) {
