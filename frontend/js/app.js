@@ -1143,7 +1143,7 @@ async function loadMasterBookingsByDate(date) {
 
             container.innerHTML = html;
         } else {
-            container.innerHTML = `<p>На ${new Date(date).toLocaleDateString()} записей нет</p>`;
+            container.innerHTML = `<p>На ${formattedDate} записей нет</p>`;
         }
     } catch (error) {
         container.innerHTML = '<p class="error">Ошибка загрузки записей</p>';
