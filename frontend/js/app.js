@@ -311,7 +311,6 @@ if (placeholder) {
     }
 }
 
-    
     // Инициализация обработчиков формы
     initBookingForm();
 }
