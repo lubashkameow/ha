@@ -82,39 +82,6 @@ async function checkIfUserIsMaster() {
     
 }
 
-async function loadReport(type) {
-    const tg = window.Telegram.WebApp;
-    const userId = tg.initDataUnsafe.user.id;
-    const month = document.getElementById('report-month').value;
-
-    const response = await fetch(`/.netlify/functions/getreport?user_id=${userId}&month=${month}&type=${type}`);
-    const data = await response.json();
-
-    const container = document.getElementById('report-result');
-    container.innerHTML = renderReportTable(data, type);
-}
-
-function renderReportTable(data, type) {
-    if (!Array.isArray(data) || data.length === 0) {
-        return '<p>Нет данных для отчета.</p>';
-    }
-
-    const headers = Object.keys(data[0]);
-    let html = '<table><thead><tr>';
-    headers.forEach(h => html += `<th>${h}</th>`);
-    html += '</tr></thead><tbody>';
-
-    data.forEach(row => {
-        html += '<tr>';
-        headers.forEach(h => html += `<td>${row[h]}</td>`);
-        html += '</tr>';
-    });
-
-    html += '</tbody></table>';
-    return html;
-}
-
-
 function addReportsNavItem() {
     const nav = document.querySelector('.bottom-nav');
     if (!nav) return;
@@ -129,7 +96,7 @@ function addReportsNavItem() {
     nav.appendChild(reportsItem);
 
     reportsItem.addEventListener('click', function() {
-        document.querySelectorAll('.gender-btn').forEach(i => i.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
 
         this.classList.add('active');
@@ -140,20 +107,7 @@ function addReportsNavItem() {
             page = document.createElement('div');
             page.id = 'page-reports';
             page.className = 'page active';
-            page.innerHTML = `
-                <h3>Отчеты</h3>
-                <label for="report-month">Выберите месяц:</label>
-                <input type="month" id="report-month" value="${new Date().toISOString().slice(0, 7)}" />
-
-                <div class="report-buttons">
-                    <button onclick="loadReport('clients')">1. Отчет по клиентам</button>
-                    <button onclick="loadReport('appointments')">2. Отчет по записям</button>
-                    <button onclick="loadReport('materials')">3. Расход материалов</button>
-                    <button onclick="loadReport('services')">4. Оказанные услуги</button>
-                </div>
-
-                <div id="report-result" class="report-result"></div>
-            `;
+            page.innerHTML = '<h3>Страница отчетов</h3><p>Здесь будут отчеты мастера.</p>';
             document.querySelector('.main-content').appendChild(page);
         } else {
             page.classList.add('active');
@@ -597,30 +551,25 @@ function initBookingForm() {
 }
     
     // Отрисовка календаря
-function renderWeekDays(startDate) {
+    function renderWeekDays(startDate) {
     const container = document.getElementById('week-days-container');
     const weekDays = ['ВС', 'ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ'];
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-
-    // Клонируем startDate и выравниваем по началу дня
-    const weekStart = new Date(startDate);
-    weekStart.setHours(0, 0, 0, 0);
-
+        
     let html = '';
     for (let i = 0; i < 7; i++) {
-        const date = new Date(weekStart);
-        date.setDate(weekStart.getDate() + i);
+        const date = new Date(startDate);
+        date.setDate(startDate.getDate() + i);
 
         // Пропускаем прошедшие даты
         if (date < today) continue;
-
+        
         const day = date.getDate();
         const weekDay = weekDays[date.getDay()];
-        // Форматируем дату вручную, чтобы избежать смещений из-за UTC
-        const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        const dateStr = date.toISOString().split('T')[0];
         const isToday = date.toDateString() === new Date().toDateString();
-
+        
         html += `
             <div class="day-cell ${isToday ? 'today' : ''}" data-date="${dateStr}">
                 <div class="week-day">${weekDay}</div>
@@ -628,23 +577,25 @@ function renderWeekDays(startDate) {
             </div>
         `;
     }
-
+    
     container.innerHTML = html || '<p>Нет доступных дат</p>';
-    updateWeekRangeText(weekStart);
-
+    updateWeekRangeText(startDate);
+    
     // Обработчики клика по дням
     document.querySelectorAll('.day-cell').forEach(cell => {
-        cell.addEventListener('click', function () {
-            document.querySelectorAll('.day-cell').forEach(c => c.classList.remove('selected'));
-            this.classList.add('selected');
-
-            selectedDate = this.getAttribute('data-date'); // Сохраняем выбранную дату
-            loadMastersSlots(selectedDate, selectedService.duration);
-
-            // Показываем следующий шаг автоматически
-            document.getElementById('step-masters').style.display = 'block';
+    cell.addEventListener('click', function() {
+        document.querySelectorAll('.day-cell').forEach(c => {
+            c.classList.remove('selected');
         });
+        this.classList.add('selected');
+        
+        selectedDate = this.getAttribute('data-date'); // Сохраняем выбранную дату
+        loadMastersSlots(selectedDate, selectedService.duration);
+        
+        // Показываем следующий шаг автоматически
+        document.getElementById('step-masters').style.display = 'block';
     });
+});
 }
 
 function updateWeekRangeText(startDate) {
@@ -766,9 +717,7 @@ async function loadMastersSlots(date, duration) {
 
 // Добавьте функцию форматирования даты
 function formatDate(dateStr) {
-    // Предполагаем, что dateStr в формате YYYY-MM-DD
-    const [year, month, day] = dateStr.split('-');
-    const date = new Date(year, month - 1, day); // Месяцы в JS начинаются с 0
+    const date = new Date(dateStr);
     const options = { day: 'numeric', month: 'long', weekday: 'short' };
     return date.toLocaleDateString('ru-RU', options);
 }
@@ -792,7 +741,7 @@ function formatDate(dateStr) {
 
     let userId = tg.initDataUnsafe.user.id;
 
-    // Если мастер, создаём клиента
+    // 🔸 Если мастер, создаём клиента
     if (isCurrentUserMaster) {
         const name = document.getElementById('client-name').value.trim();
         const phone = document.getElementById('client-phone').value.trim();
@@ -821,10 +770,6 @@ function formatDate(dateStr) {
             return;
         }
     }
-    // Убедимся, что selectedDate в формате YYYY-MM-DD
-    const [year, month, day] = selectedDate.split('-');
-    const formattedDate = `${year}-${month}-${day}`; // Гарантируем формат
-        
     try {
         const response = await fetch('/.netlify/functions/createbooking', {
             method: 'POST',
@@ -838,7 +783,7 @@ function formatDate(dateStr) {
                 slot_id: selectedSlot,
                 master_id: selectedMaster.id,
                 master_name: selectedMaster.name,
-                date: formattedDate,
+                date: selectedDate,
                 time: timeSlot.textContent,
                 comment: comment
             })
@@ -870,9 +815,9 @@ function formatDate(dateStr) {
         </div>
     `;
 
-    //document.getElementById('close-booking').addEventListener('click', () => {
-    //    formContainer.style.display = 'none';
-    //});
+    document.getElementById('close-booking').addEventListener('click', () => {
+        formContainer.style.display = 'none';
+    });
 }
 }
 
@@ -893,17 +838,12 @@ document.querySelectorAll('.nav-item').forEach(item => {
         this.classList.add('active');
         document.getElementById(`page-${pageId}`).classList.add('active');
         
+        // Загружаем данные при необходимости
         if (pageId === 'bookings') {
-            if (isCurrentUserMaster) {
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
-                renderWeekForMaster(today);
-                loadMasterBookingsByDate(today.toISOString().split('T')[0]);
-            } else {
-                loadUserBookings();
-            }
+            loadUserBookings();
+        } else if (pageId === 'masters') {
+            loadMasters();
         }
-
     });
 });
 
@@ -926,7 +866,7 @@ async function loadUserBookings() {
                         <div class="booking-date">📅 ${booking.date} в ${booking.time}</div>
                         <div class="booking-master">👩‍🎨 К мастеру: ${booking.master_name}</div>
                         <div class="booking-master">📝 Ваш комментарий: ${booking.comment || 'нет'}</div>
-                        <div class="booking-master">💰 Стоимость: ${booking.price}.0 ₽</div>
+                        <div class="booking-master">Стоимость: ${booking.price}.0 ₽</div>
                         <button class="cancel-btn" data-booking-id="${booking.id_app}">Отменить</button>
                     </div>
                 `;
@@ -1076,90 +1016,6 @@ async function displayMasterInfo(master) {
 
     } catch (err) {
         container.querySelector('.portfolio-grid').innerHTML = '<p class="error">Ошибка загрузки портфолио</p>';
-    }
-}
-
-function renderWeekForMaster(startDate) {
-    const container = document.getElementById('week-days-master');
-    const weekDays = ['ВС', 'ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ'];
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    // Клонируем startDate и выравниваем по началу дня
-    const weekStart = new Date(startDate);
-    weekStart.setHours(0, 0, 0, 0);
-
-    let html = '';
-    for (let i = 0; i < 7; i++) {
-        const date = new Date(weekStart);
-        date.setDate(weekStart.getDate() + i);
-
-        const day = date.getDate();
-        const weekDay = weekDays[date.getDay()];
-        const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-        const isToday = date.toDateString() === new Date().toDateString();
-
-        html += `
-            <div class="day-cell ${isToday ? 'today selected' : ''}" data-date="${dateStr}">
-                <div class="week-day">${weekDay}</div>
-                <div class="day-number">${day}</div>
-            </div>
-        `;
-    }
-
-    container.innerHTML = html;
-
-    document.querySelectorAll('#week-days-master .day-cell').forEach(cell => {
-        cell.addEventListener('click', function () {
-            document.querySelectorAll('#week-days-master .day-cell').forEach(c => c.classList.remove('selected'));
-            this.classList.add('selected');
-
-            selectedDate = this.getAttribute('data-date');
-            loadMasterBookingsByDate(selectedDate);
-        });
-    });
-}
-
-
-async function loadMasterBookingsByDate(date) {
-    const container = document.getElementById('master-bookings-list');
-    container.innerHTML = '<div class="loader">Загрузка записей...</div>';
-
-    try {
-        const tg = window.Telegram.WebApp;
-        const response = await fetch(`/.netlify/functions/getapp?user_id=${tg.initDataUnsafe.user.id}&date=${date}`);
-        const data = await response.json();
-        const [yyyy, mm, dd] = date.split('-');
-        const formattedDate = `${dd}.${mm}.${yyyy}`;
-        
-        if (data.bookings && data.bookings.length > 0) {
-            let html = `<h3>Записи на ${formattedDate}</h3>`;
-
-            data.bookings.forEach(booking => {
-                const phoneLink = booking.phone_user?.replace(/[^0-9]/g, '');
-                html += `
-                    <div class="booking-item">
-                        <div><strong>${booking.time}</strong> — ${booking.name_user || 'Клиент'}</div>
-                        <div>📞 ${booking.phone_user || 'нет'}
-                            ${phoneLink ? `
-                                <a href="tel:+${phoneLink}" class="phone-link">📲</a>
-                                <a href="https://t.me/+${phoneLink}" class="tg-link">Telegram</a>
-                            ` : ''}
-                        </div>
-                        <div>💇 ${booking.service_length} (${booking.service_name})</div>
-                        <div>💬 Комментарий: ${booking.comment || 'нет'}</div>
-                        <div>💰 ${booking.price}.0 ₽</div>
-                    </div>
-                `;
-            });
-
-            container.innerHTML = html;
-        } else {
-            container.innerHTML = `<p>На ${formattedDate} записей нет</p>`;
-        }
-    } catch (error) {
-        container.innerHTML = '<p class="error">Ошибка загрузки записей</p>';
-        console.error('loadMasterBookingsByDate error:', error);
     }
 }
 
