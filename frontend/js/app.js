@@ -912,7 +912,7 @@ async function loadUserBookings() {
                         <div class="booking-date">📅 ${booking.date} в ${booking.time}</div>
                         <div class="booking-master">👩‍🎨 К мастеру: ${booking.master_name}</div>
                         <div class="booking-master">📝 Ваш комментарий: ${booking.comment || 'нет'}</div>
-                        <div class="booking-master">Стоимость: ${booking.price}.0 ₽</div>
+                        <div class="booking-master">💰 Стоимость: ${booking.price}.0 ₽</div>
                         <button class="cancel-btn" data-booking-id="${booking.id_app}">Отменить</button>
                     </div>
                 `;
@@ -1064,6 +1064,84 @@ async function displayMasterInfo(master) {
         container.querySelector('.portfolio-grid').innerHTML = '<p class="error">Ошибка загрузки портфолио</p>';
     }
 }
+
+function renderWeekForMaster(startDate) {
+    const container = document.getElementById('week-days-master');
+    const weekDays = ['ВС', 'ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ'];
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    let html = '';
+    for (let i = 0; i < 7; i++) {
+        const date = new Date(startDate);
+        date.setDate(startDate.getDate() + i);
+
+        const day = date.getDate();
+        const weekDay = weekDays[date.getDay()];
+        const dateStr = date.toISOString().split('T')[0];
+        const isToday = date.toDateString() === new Date().toDateString();
+
+        html += `
+            <div class="day-cell ${isToday ? 'today' : ''}" data-date="${dateStr}">
+                <div class="week-day">${weekDay}</div>
+                <div class="day-number">${day}</div>
+            </div>
+        `;
+    }
+
+    container.innerHTML = html;
+
+    document.querySelectorAll('#week-days-master .day-cell').forEach(cell => {
+        cell.addEventListener('click', function () {
+            document.querySelectorAll('#week-days-master .day-cell').forEach(c => c.classList.remove('selected'));
+            this.classList.add('selected');
+
+            const selectedDate = this.getAttribute('data-date');
+            loadMasterBookingsByDate(selectedDate);
+        });
+    });
+}
+
+
+async function loadMasterBookingsByDate(date) {
+    const container = document.getElementById('master-bookings-list');
+    container.innerHTML = '<div class="loader">Загрузка записей...</div>';
+
+    try {
+        const tg = window.Telegram.WebApp;
+        const response = await fetch(`/.netlify/functions/getapp?user_id=${tg.initDataUnsafe.user.id}&date=${date}`);
+        const data = await response.json();
+
+        if (data.bookings && data.bookings.length > 0) {
+            let html = `<h3>Записи на ${new Date(date).toLocaleDateString()}</h3>`;
+            data.bookings.forEach(booking => {
+                const phoneLink = booking.phone_user?.replace(/[^0-9]/g, '');
+                html += `
+                    <div class="booking-item">
+                        <div><strong>${booking.time}</strong> — ${booking.name_user || 'Клиент'}</div>
+                        <div>📞 ${booking.phone_user || 'нет'}
+                            ${phoneLink ? `
+                                <a href="tel:+${phoneLink}" class="phone-link">📲</a>
+                                <a href="https://t.me/+${phoneLink}" class="tg-link">Telegram</a>
+                            ` : ''}
+                        </div>
+                        <div>💇 ${booking.service_length} (${booking.service_name})</div>
+                        <div>💬 Комментарий: ${booking.comment || 'нет'}</div>
+                        <div>💰 ${booking.price}.0 ₽</div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        } else {
+            container.innerHTML = `<p>На ${new Date(date).toLocaleDateString()} записей нет</p>`;
+        }
+    } catch (error) {
+        container.innerHTML = '<p class="error">Ошибка загрузки записей</p>';
+        console.error('loadMasterBookingsByDate error:', error);
+    }
+}
+
 
 
 
