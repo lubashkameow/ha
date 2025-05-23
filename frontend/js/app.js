@@ -1516,13 +1516,16 @@ async function updatePortfolioDescription(photoId, description) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ user_id: userId, photo_id: photoId, description })
         });
+        const data = await response.json();
         if (response.ok) {
             alert('Описание обновлено');
         } else {
-            throw new Error('Ошибка обновления описания');
+            console.error('Ошибка сервера:', data);
+            throw new Error(data.error || `Ошибка обновления описания (статус: ${response.status})`);
         }
     } catch (error) {
-        alert(error.message);
+        console.error('Ошибка при обновлении описания:', error);
+        alert(`Ошибка: ${error.message}`);
     }
 }
 
@@ -1536,13 +1539,15 @@ async function deletePortfolioPhoto(photoId) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ user_id: userId, photo_id: photoId })
         });
+        const data = await response.json(); // Парсим ответ один раз здесь
         if (response.ok) {
             alert('Фото удалено');
         } else {
             throw new Error(data.error || 'Ошибка удаления фото');
         }
     } catch (error) {
-        alert(error.message);
+        console.error('Ошибка при удалении фото из портфолио:', error);
+        alert(`Ошибка: ${error.message}`);
     }
 }
 
