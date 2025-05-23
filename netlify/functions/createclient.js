@@ -17,7 +17,7 @@ exports.handler = async (event) => {
         };
     }
 
-    const apiUrl = 'https://psi-wires-catch-italia.trycloudflare.com/api/createclient'; 
+    const apiUrl = 'https://probability-published-oxide-warcraft.trycloudflare.com/api/createclient'; 
 
     try {
         const response = await fetch(apiUrl, {
