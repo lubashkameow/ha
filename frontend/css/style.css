@@ -603,10 +603,11 @@ option {
 }
 
 .portfolio-photo {
-    width: 100%;
-    height: 150px;
-    object-fit: cover;
-    border-radius: 0;
+    width: 50%;
+    height: 750px;
+    overflow: hidden;
+    border-radius: 8px; /* Квадрат с мягкими углами */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .portfolio-modal {
