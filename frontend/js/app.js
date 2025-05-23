@@ -76,6 +76,8 @@ async function checkIfUserIsMaster() {
         if (data.is_master) {
             isCurrentUserMaster = true;
             addReportsNavItem();
+            document.getElementById('edit-portfolio-btn').style.display = 'block';
+            initPortfolioEditModal();
         }
     } catch (error) {
         console.error('Ошибка при проверке мастера:', error);
@@ -1401,6 +1403,147 @@ async function loadMasterBookingsByDate(date) {
 
 
 
+// Инициализация модального окна портфолио
+function initPortfolioEditModal() {
+    const editButton = document.getElementById('edit-portfolio-btn');
+    const modal = document.getElementById('portfolio-edit-modal');
+    const closeModal = document.getElementById('close-portfolio-edit-modal');
+    const addPhotoButton = document.getElementById('add-portfolio-photo');
 
+    editButton.addEventListener('click', () => {
+        modal.classList.remove('hidden');
+        loadPortfolioEditList();
+    });
+
+    closeModal.addEventListener('click', () => {
+        modal.classList.add('hidden');
+    });
+
+    addPhotoButton.addEventListener('click', async () => {
+        const photoInput = document.getElementById('new-portfolio-photo');
+        const description = document.getElementById('new-portfolio-description').value;
+
+        if (!photoInput.files[0]) {
+            alert('Выберите фото');
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+            const photo = e.target.result;
+            await addPortfolioPhoto(photo, description);
+            loadPortfolioEditList();
+        };
+        reader.readAsDataURL(photoInput.files[0]);
+    });
+}
+
+// Загрузка списка фотографий для редактирования
+async function loadPortfolioEditList() {
+    const tg = window.Telegram.WebApp;
+    const userId = tg.initDataUnsafe.user.id;
+    const container = document.getElementById('portfolio-edit-list');
+    container.innerHTML = '<div class="loader">Загрузка портфолио...</div>';
+
+    try {
+        const response = await fetch(`/.netlify/functions/getportfolio?master_id=${userId}`);
+        const data = await response.json();
+        if (data.photos && data.photos.length > 0) {
+            container.innerHTML = data.photos.map((photo) => `
+                <div class="portfolio-item" data-photo-id="${photo.id_photo}">
+                    <img src="${photo.photo}" class="portfolio-photo">
+                    <textarea class="form-control" data-description="${photo.id_photo}">${photo.description_photo || ''}</textarea>
+                    <button class="save-description-btn" data-photo-id="${photo.id_photo}">Сохранить описание</button>
+                    <button class="delete-portfolio-photo" data-photo-id="${photo.id_photo}">Удалить</button>
+                </div>
+            `).join('');
+
+            document.querySelectorAll('.save-description-btn').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    const photoId = btn.getAttribute('data-photo-id');
+                    const description = document.querySelector(`textarea[data-description="${photoId}"]`).value;
+                    await updatePortfolioDescription(photoId, description);
+                    loadPortfolioEditList();
+                });
+            });
+
+            document.querySelectorAll('.delete-portfolio-photo').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    const photoId = btn.getAttribute('data-photo-id');
+                    if (confirm('Удалить фото?')) {
+                        await deletePortfolioPhoto(photoId);
+                        loadPortfolioEditList();
+                    }
+                });
+            });
+        } else {
+            container.innerHTML = '<p>Портфолио пусто</p>';
+        }
+    } catch (error) {
+        container.innerHTML = '<p class="error">Ошибка загрузки портфолио</p>';
+    }
+}
+
+// Добавление нового фото в портфолио
+async function addPortfolioPhoto(photo, description) {
+    const tg = window.Telegram.WebApp;
+    const userId = tg.initDataUnsafe.user.id;
+    try {
+        const response = await fetch('/.netlify/functions/addportfoliophoto', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user_id: userId, photo, description })
+        });
+        if (response.ok) {
+            alert('Фото добавлено');
+            document.getElementById('new-portfolio-photo').value = '';
+            document.getElementById('new-portfolio-description').value = '';
+        } else {
+            throw new Error('Ошибка добавления фото');
+        }
+    } catch (error) {
+        alert(error.message);
+    }
+}
+
+// Обновление описания фото
+async function updatePortfolioDescription(photoId, description) {
+    const tg = window.Telegram.WebApp;
+    const userId = tg.initDataUnsafe.user.id;
+    try {
+        const response = await fetch('/.netlify/functions/updateportfoliodescription', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user_id: userId, photo_id: photoId, description })
+        });
+        if (response.ok) {
+            alert('Описание обновлено');
+        } else {
+            throw new Error('Ошибка обновления описания');
+        }
+    } catch (error) {
+        alert(error.message);
+    }
+}
+
+// Удаление фото из портфолио
+async function deletePortfolioPhoto(photoId) {
+    const tg = window.Telegram.WebApp;
+    const userId = tg.initDataUnsafe.user.id;
+    try {
+        const response = await fetch('/.netlify/functions/deleteportfoliophoto', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user_id: userId, photo_id: photoId })
+        });
+        if (response.ok) {
+            alert('Фото удалено');
+        } else {
+            throw new Error('Ошибка удаления фото');
+        }
+    } catch (error) {
+        alert(error.message);
+    }
+}
 
 
