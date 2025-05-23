@@ -773,11 +773,14 @@ option {
 
 /* Стили для кнопки редактирования календаря */
 .master-actions {
+  display: flex;
+    justify-content: center;
     margin-bottom: 15px;
     text-align: center;
 }
 
 .edit-calendar-btn {
+  text-align: center;
     background: var(--primary-color);
     color: var(--white);
     border: none;
