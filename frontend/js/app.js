@@ -1216,49 +1216,57 @@ async function renderCalendar(date) {
     const startDay = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1; // Корректируем для ПН как первого дня
 
     // Получаем данные о рабочих днях и записях
-    const response = await fetch(`/.netlify/functions/getcalendardata?user_id=${userId}&month=${year}-${String(month + 1).padStart(2, '0')}`);
-    const data = await response.json();
-    const workDays = data.workdays || [];
-    const bookings = data.bookings || [];
+    try {
+        const response = await fetch(`/.netlify/functions/getcalendardata?user_id=${userId}&month=${year}-${String(month + 1).padStart(2, '0')}`);
+        if (!response.ok) {
+            throw new Error(`Ошибка при загрузке данных календаря: ${response.status}`);
+        }
+        const data = await response.json();
+        const workDays = data.workdays || [];
+        const bookings = data.bookings || [];
 
-    let html = '';
-    // Добавить пустые клетки для начала месяца
-    for (let i = 0; i < startDay; i++) {
-        html += '<div class="calendar-day disabled"></div>';
-    }
-
-    // Отрисовка дней
-    today.setHours(0, 0, 0, 0);
-    for (let day = 1; day <= daysInMonth; day++) {
-        const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-        const isPast = new Date(year, month, day) < today;
-        const workDay = workDays.find(w => w.date_work === dateStr);
-        const hasBookings = bookings.some(b => b.date === dateStr);
-        let className = 'calendar-day';
-
-        if (workDay && workDay.is_working) {
-            className += hasBookings ? ' booked' : ' working';
-        } else {
-            className += ' holiday';
+        let html = '';
+        // Добавить пустые клетки для начала месяца
+        for (let i = 0; i < startDay; i++) {
+            html += '<div class="calendar-day disabled"></div>';
         }
 
-        if (isPast) {
-            className += ' disabled';
+        // Отрисовка дней
+        today.setHours(0, 0, 0, 0);
+        for (let day = 1; day <= daysInMonth; day++) {
+            const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            const isPast = new Date(year, month, day) < today;
+            const workDay = workDays.find(w => w.date_work === dateStr);
+            const hasBookings = bookings.some(b => b.date === dateStr);
+            let className = 'calendar-day';
+
+            if (workDay && workDay.is_working) {
+                className += hasBookings ? ' booked' : ' working';
+            } else {
+                className += ' holiday';
+            }
+
+            if (isPast) {
+                className += ' disabled';
+            }
+
+            html += `<div class="${className}" data-date="${dateStr}" ${isPast ? 'disabled' : ''}>${day}</div>`;
         }
 
-        html += `<div class="${className}" data-date="${dateStr}" ${isPast ? 'disabled' : ''}>${day}</div>`;
-    }
+        container.innerHTML = html;
 
-    container.innerHTML = html;
-
-    // Обработчики клика по дням
-    document.querySelectorAll('.calendar-day:not(.disabled)').forEach(cell => {
-        cell.addEventListener('click', async () => {
-            const date = cell.getAttribute('data-date');
-            await toggleWorkDay(date, userId);
-            renderCalendar(new Date(date)); // Перерисовываем календарь
+        // Обработчики клика по дням
+        document.querySelectorAll('.calendar-day:not(.disabled)').forEach(cell => {
+            cell.addEventListener('click', async () => {
+                const date = cell.getAttribute('data-date');
+                await toggleWorkDay(date, userId);
+                renderCalendar(new Date(date)); // Перерисовываем календарь
+            });
         });
-    });
+    } catch (error) {
+        console.error('Ошибка в renderCalendar:', error);
+        alert('Не удалось загрузить данные календаря. Попробуйте позже.');
+    }
 
     // Навигация по месяцам
     prevMonthBtn.onclick = () => {
@@ -1278,19 +1286,38 @@ async function renderCalendar(date) {
 
 // Переключение статуса дня (рабочий/выходной)
 async function toggleWorkDay(date, userId) {
-    const response = await fetch(`/.netlify/functions/getapp?user_id=${userId}&date=${date}`);
-    const data = await response.json();
-    const bookings = data.bookings || [];
-    const workDayResponse = await fetch(`/.netlify/functions/getworkday?user_id=${userId}&date=${date}`);
-    const workDayData = await workDayResponse.json();
-    const isWorking = workDayData.is_working;
-
-    if (isWorking && bookings.length > 0) {
-        const confirmed = confirm(`На ${formatDate(date)} есть ${bookings.length} записей. Вы уверены, что хотите отменить все записи и сделать этот день выходным?`);
-        if (!confirmed) return;
-    }
-
     try {
+        // Получаем данные о записях
+        const appResponse = await fetch(`/.netlify/functions/getapp?user_id=${userId}&date=${date}`);
+        if (!appResponse.ok) {
+            throw new Error(`Ошибка при загрузке записей: ${appResponse.status}`);
+        }
+        const appData = await appResponse.json();
+        const bookings = appData.bookings || [];
+
+        // Получаем статус рабочего дня
+        const workDayResponse = await fetch(`/.netlify/functions/getworkday?user_id=${userId}&date=${date}`);
+        if (!workDayResponse.ok) {
+            throw new Error(`Ошибка при загрузке статуса дня: ${workDayResponse.status}`);
+        }
+        const workDayData = await workDayResponse.json();
+        const isWorking = workDayData.is_working;
+
+        // Подтверждение изменения статуса
+        const action = isWorking ? 'выходным' : 'рабочим';
+        let confirmMessage = `Вы уверены, что хотите сделать ${formatDate(date)} ${action}?`;
+        if (isWorking && bookings.length > 0) {
+            confirmMessage = `На ${formatDate(date)} есть ${bookings.length} записей. Вы уверены, что хотите отменить все записи и сделать этот день выходным?`;
+        }
+
+        const confirmed = confirm(confirmMessage);
+        if (!confirmed) {
+            console.log('Пользователь отменил изменение статуса дня:', date);
+            return;
+        }
+
+        // Отправляем запрос на изменение статуса
+        console.log(`Отправка запроса на изменение статуса дня ${date}: is_working = ${!isWorking}`);
         const response = await fetch('/.netlify/functions/toggleworkday', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -1302,12 +1329,16 @@ async function toggleWorkDay(date, userId) {
         });
 
         if (!response.ok) {
-            throw new Error('Ошибка при обновлении статуса дня');
+            const errorData = await response.json();
+            throw new Error(`Ошибка при обновлении статуса дня: ${errorData.error || response.status}`);
         }
 
+        const result = await response.json();
+        console.log('Ответ от сервера:', result);
         alert(isWorking ? 'День установлен как выходной' : 'День установлен как рабочий');
     } catch (error) {
-        alert(error.message);
+        console.error('Ошибка в toggleWorkDay:', error);
+        alert(`Не удалось изменить статус дня: ${error.message}`);
     }
 }
 
