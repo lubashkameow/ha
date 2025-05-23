@@ -1552,4 +1552,41 @@ async function deletePortfolioPhoto(photoId) {
     }
 }
 
+// Обработчик выбора файла для нового фото в портфолио
+document.getElementById('new-portfolio-photo').addEventListener('change', async function(event) {
+    const file = event.target.files[0];
+    if (!file) {
+        alert('Файл не выбран');
+        return;
+    }
+
+    // Проверяем размер файла (до 3 МБ)
+    if (file.size > 3 * 1024 * 1024) {
+        alert('Файл слишком большой. Выберите фото до 3 МБ.');
+        return;
+    }
+
+    // Проверяем тип файла (только JPEG или PNG)
+    if (!file.type.match('image/jpeg|image/png|image/jpg')) {
+        alert('Поддерживаются только форматы JPEG и PNG.');
+        return;
+    }
+
+    try {
+        const reader = new FileReader();
+        reader.onload = async function(e) {
+            const photo = e.target.result; // Base64 строка
+            const description = document.getElementById('new-portfolio-description').value;
+            await addPortfolioPhoto(photo, description);
+            // loadPortfolioEditList() вызывается внутри addPortfolioPhoto, если нужно
+        };
+        reader.onerror = function() {
+            alert('Ошибка чтения файла. Попробуйте другое фото.');
+        };
+        reader.readAsDataURL(file);
+    } catch (error) {
+        console.error('Ошибка обработки файла:', error);
+        alert('Ошибка обработки файла: ' + error.message);
+    }
+});
 
