@@ -604,7 +604,7 @@ option {
 
 .portfolio-photo {
     width: 100%;
-    height: 100px;
+    height: 150px;
     object-fit: cover;
     border-radius: 0;
 }
