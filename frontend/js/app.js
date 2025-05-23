@@ -77,7 +77,12 @@ async function checkIfUserIsMaster() {
             isCurrentUserMaster = true;
             addReportsNavItem();
             document.getElementById('edit-portfolio-btn').style.display = 'block';
+            document.getElementById('edit-calendar-btn').style.display = 'block';
+            document.getElementById('prev-appointments').style.display = 'block';
+            document.getElementById('next-appointments').style.display = 'block';
             initPortfolioEditModal();
+        } else {
+            isCurrentUserMaster = false;
         }
     } catch (error) {
         console.error('Ошибка при проверке мастера:', error);
