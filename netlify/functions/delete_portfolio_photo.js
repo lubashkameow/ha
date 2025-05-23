@@ -1,28 +1,40 @@
 const fetch = require('node-fetch');
 
 exports.handler = async (event) => {
-    const apiUrl = `https://probability-published-oxide-warcraft.trycloudflare.com/api/delete_portfolio_photo`;
+  const apiUrl = 'https://probability-published-oxide-warcraft.trycloudflare.com/api/delete_portfolio_photo';
 
-    console.log('Запрос к /deleteportfolio:', event.body);
+  try {
+    // Parse the incoming JSON body
+    const { user_id, photo_id } = JSON.parse(event.body);
 
-    try {
-        const response = await fetch(apiUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: event.body
-        });
-        const data = await response.json();
-        console.log('Ответ от сервера:', data);
-        return {
-            statusCode: response.ok ? 200 : response.status,
-            headers: { 'Access-Control-Allow-Origin': '*' },
-            body: JSON.stringify(data)
-        };
-    } catch (e) {
-        console.error('Ошибка в deleteportfolio:', e);
-        return {
-            statusCode: 500,
-            body: JSON.stringify({ error: e.message })
-        };
+    if (!user_id || !photo_id) {
+      return {
+        statusCode: 400,
+        headers: { 'Access-Control-Allow-Origin': '*' },
+        body: JSON.stringify({ error: 'Missing user_id or photo_id' }),
+      };
     }
+
+    // Forward the request to the backend API
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_id, photo_id }),
+    });
+
+    const data = await response.json();
+
+    return {
+      statusCode: response.ok ? 200 : response.status,
+      headers: { 'Access-Control-Allow-Origin': '*' },
+      body: JSON.stringify(data),
+    };
+  } catch (error) {
+    console.error('Error in delete_portfolio_photo:', error);
+    return {
+      statusCode: 500,
+      headers: { 'Access-Control-Allow-Origin': '*' },
+      body: JSON.stringify({ error: error.message }),
+    };
+  }
 };
