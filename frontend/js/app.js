@@ -1480,6 +1480,7 @@ async function loadPortfolioEditList() {
             container.innerHTML = '<p>Портфолио пусто</p>';
         }
     } catch (error) {
+        console.error('Ошибка загрузки портфолио:', error);
         container.innerHTML = '<p class="error">Ошибка загрузки портфолио</p>';
     }
 }
