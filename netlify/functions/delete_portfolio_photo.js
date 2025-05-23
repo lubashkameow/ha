@@ -4,7 +4,6 @@ exports.handler = async (event) => {
   const apiUrl = 'https://probability-published-oxide-warcraft.trycloudflare.com/api/delete_portfolio_photo';
 
   try {
-    // Parse the incoming JSON body
     const { user_id, photo_id } = JSON.parse(event.body);
 
     if (!user_id || !photo_id) {
@@ -15,7 +14,6 @@ exports.handler = async (event) => {
       };
     }
 
-    // Forward the request to the backend API
     const response = await fetch(apiUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
