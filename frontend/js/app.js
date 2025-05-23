@@ -1185,6 +1185,9 @@ let currentMonth = new Date();
 async function renderCalendar(date) {
     const container = document.getElementById('calendar-grid');
     const monthYear = document.getElementById('current-month');
+    const weekdaysContainer = document.getElementById('calendar-weekdays');
+    const prevMonthBtn = document.getElementById('prev-month');
+    const nextMonthBtn = document.getElementById('next-month');
     const tg = window.Telegram.WebApp;
     const userId = tg.initDataUnsafe.user.id;
 
@@ -1192,11 +1195,25 @@ async function renderCalendar(date) {
     const month = date.getMonth();
     monthYear.textContent = date.toLocaleString('ru-RU', { month: 'long', year: 'numeric' });
 
+    // Ограничение навигации
+    const today = new Date();
+    const currentYear = today.getFullYear();
+    const currentMonthIndex = today.getMonth();
+    const maxMonth = new Date(currentYear, currentMonthIndex + 1);
+    const minMonth = new Date(currentYear, currentMonthIndex);
+
+    prevMonthBtn.disabled = date.getFullYear() === minMonth.getFullYear() && date.getMonth() === minMonth.getMonth();
+    nextMonthBtn.disabled = date.getFullYear() === maxMonth.getFullYear() && date.getMonth() === maxMonth.getMonth();
+
+    // Отображение дней недели
+    const weekdays = ['ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ', 'ВС'];
+    weekdaysContainer.innerHTML = weekdays.map(day => `<div>${day}</div>`).join('');
+
     // Получаем первый день месяца и количество дней
     const firstDay = new Date(year, month, 1);
     const lastDay = new Date(year, month + 1, 0);
     const daysInMonth = lastDay.getDate();
-    const startDay = firstDay.getDay();
+    const startDay = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1; // Корректируем для ПН как первого дня
 
     // Получаем данные о рабочих днях и записях
     const response = await fetch(`/.netlify/functions/getcalendardata?user_id=${userId}&month=${year}-${String(month + 1).padStart(2, '0')}`);
@@ -1211,9 +1228,7 @@ async function renderCalendar(date) {
     }
 
     // Отрисовка дней
-    const today = new Date();
     today.setHours(0, 0, 0, 0);
-
     for (let day = 1; day <= daysInMonth; day++) {
         const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
         const isPast = new Date(year, month, day) < today;
@@ -1246,15 +1261,19 @@ async function renderCalendar(date) {
     });
 
     // Навигация по месяцам
-    document.getElementById('prev-month').addEventListener('click', () => {
-        currentMonth.setMonth(currentMonth.getMonth() - 1);
-        renderCalendar(currentMonth);
-    });
+    prevMonthBtn.onclick = () => {
+        if (!prevMonthBtn.disabled) {
+            currentMonth.setMonth(currentMonth.getMonth() - 1);
+            renderCalendar(currentMonth);
+        }
+    };
 
-    document.getElementById('next-month').addEventListener('click', () => {
-        currentMonth.setMonth(currentMonth.getMonth() + 1);
-        renderCalendar(currentMonth);
-    });
+    nextMonthBtn.onclick = () => {
+        if (!nextMonthBtn.disabled) {
+            currentMonth.setMonth(currentMonth.getMonth() + 1);
+            renderCalendar(currentMonth);
+        }
+    };
 }
 
 // Переключение статуса дня (рабочий/выходной)
@@ -1291,7 +1310,6 @@ async function toggleWorkDay(date, userId) {
         alert(error.message);
     }
 }
-
 
 // Загрузка записей мастера
 async function loadMasterBookingsByDate(date) {
