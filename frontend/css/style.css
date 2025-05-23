@@ -579,7 +579,7 @@ option {
 }
 
 .master-card img {
-    width: 100%;
+    width: 50%;
     margin-bottom: 10px;
 }
 
@@ -603,7 +603,7 @@ option {
 
 .portfolio-photo {
     width: 60px;
-    height: 20px;
+    height: 60px;
     object-fit: cover;
     border-radius: 0;
 }
