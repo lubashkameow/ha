@@ -4,7 +4,15 @@ exports.handler = async (event) => {
   const apiUrl = 'https://probability-published-oxide-warcraft.trycloudflare.com/api/add_portfolio_photo';
 
   try {
-    // Parse the incoming JSON body
+    // Проверяем размер тела запроса (до 3 МБ)
+    if (event.body.length > 3 * 1024 * 1024) {
+      return {
+        statusCode: 413,
+        headers: { 'Access-Control-Allow-Origin': '*' },
+        body: JSON.stringify({ error: 'Файл слишком большой' }),
+      };
+    }
+
     const { user_id, photo, description } = JSON.parse(event.body);
 
     if (!user_id || !photo) {
@@ -15,7 +23,6 @@ exports.handler = async (event) => {
       };
     }
 
-    // Forward the request to the backend API
     const response = await fetch(apiUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
