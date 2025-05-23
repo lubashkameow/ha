@@ -1204,7 +1204,7 @@ async function loadMasterBookingsByDate(date) {
                     const bookingId = this.getAttribute('data-booking-id');
                     if (confirm('Вы уверены, что хотите отменить запись?')) {
                         await cancelBooking(bookingId);
-                        loadUserBookings(); // Обновляем список
+                        loadMasterBookingsByDate(date); // Обновляем список
                     }
                 });
             });
