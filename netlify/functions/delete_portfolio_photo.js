@@ -1,7 +1,7 @@
 const fetch = require('node-fetch');
 
 exports.handler = async (event) => {
-    const apiUrl = `https://probability-published-oxide-warcraft.trycloudflare.com/api/deleteportfolio`;
+    const apiUrl = `https://probability-published-oxide-warcraft.trycloudflare.com/api/delete_portfolio_photo`;
 
     console.log('Запрос к /deleteportfolio:', event.body);
 
