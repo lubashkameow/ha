@@ -39,6 +39,9 @@
 
             <!-- Страница 2: Мои записи -->
             <div id="page-bookings" class="page">
+                <div class="master-actions">
+                    <button id="edit-calendar-btn" class="nav-btn">Редактировать календарь</button>
+                </div>
                 <h3>Мои записи</h3>
                 <div class="master-calendar">
                     <div class="calendar-header">
@@ -109,6 +112,24 @@
   </div>
 </div>
 
+    <!-- Модальное окно для календаря -->
+<div id="calendar-modal" class="modal hidden">
+    <div class="modal-content">
+        <span id="close-calendar-modal" class="close">&times;</span>
+        <h3>Редактировать календарь</h3>
+        <div class="calendar-header">
+            <button id="prev-month">&lt;</button>
+            <div id="current-month"></div>
+            <button id="next-month">&gt;</button>
+        </div>
+        <div class="calendar-legend">
+            <span class="legend-dot holiday"></span> Выходной
+            <span class="legend-dot booked"></span> Рабочий с записями
+            <span class="legend-dot working"></span> Рабочий без записей
+        </div>
+        <div id="calendar-grid" class="calendar-grid"></div>
+    </div>
+</div>
     
     <!-- Нижняя панель навигации -->
     <div class="bottom-nav">
