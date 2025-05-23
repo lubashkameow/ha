@@ -11,7 +11,7 @@ exports.handler = async (event) => {
       };
     }
 
-    const response = await fetch('https://psi-wires-catch-italia.trycloudflare.com/api/bookings/cancel', {
+    const response = await fetch('https://probability-published-oxide-warcraft.trycloudflare.com/api/bookings/cancel', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ booking_id }),
