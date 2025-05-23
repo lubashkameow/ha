@@ -1489,7 +1489,7 @@ async function addPortfolioPhoto(photo, description) {
     const tg = window.Telegram.WebApp;
     const userId = tg.initDataUnsafe.user.id;
     try {
-        const response = await fetch('/.netlify/functions/addportfoliophoto', {
+        const response = await fetch('/.netlify/functions/add_portfolio_photo', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ user_id: userId, photo, description })
@@ -1511,7 +1511,7 @@ async function updatePortfolioDescription(photoId, description) {
     const tg = window.Telegram.WebApp;
     const userId = tg.initDataUnsafe.user.id;
     try {
-        const response = await fetch('/.netlify/functions/updateportfoliodescription', {
+        const response = await fetch('/.netlify/functions/update_portfolio_description', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ user_id: userId, photo_id: photoId, description })
@@ -1531,7 +1531,7 @@ async function deletePortfolioPhoto(photoId) {
     const tg = window.Telegram.WebApp;
     const userId = tg.initDataUnsafe.user.id;
     try {
-        const response = await fetch('/.netlify/functions/deleteportfoliophoto', {
+        const response = await fetch('/.netlify/functions/delete_portfolio_photo', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ user_id: userId, photo_id: photoId })
