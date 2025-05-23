@@ -1287,6 +1287,9 @@ async function renderCalendar(date) {
 // Переключение статуса дня (рабочий/выходной)
 async function toggleWorkDay(date, userId) {
     try {
+        // Форматируем дату для сообщений
+        const formattedDate = new Date(date).toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
         // Получаем данные о записях
         const appResponse = await fetch(`/.netlify/functions/getapp?user_id=${userId}&date=${date}`);
         if (!appResponse.ok) {
@@ -1305,9 +1308,9 @@ async function toggleWorkDay(date, userId) {
 
         // Подтверждение изменения статуса
         const action = isWorking ? 'выходным' : 'рабочим';
-        let confirmMessage = `Вы уверены, что хотите сделать ${formatDate(date)} ${action}?`;
+        let confirmMessage = `Вы уверены, что хотите сделать ${formattedDate} ${action}?`;
         if (isWorking && bookings.length > 0) {
-            confirmMessage = `На ${formatDate(date)} есть ${bookings.length} записей. Вы уверены, что хотите отменить все записи и сделать этот день выходным?`;
+            confirmMessage = `На ${formattedDate} есть ${bookings.length} записей. Вы уверены, что хотите отменить все записи и сделать этот день выходным?`;
         }
 
         const confirmed = confirm(confirmMessage);
@@ -1335,7 +1338,7 @@ async function toggleWorkDay(date, userId) {
 
         const result = await response.json();
         console.log('Ответ от сервера:', result);
-        alert(isWorking ? 'День установлен как выходной' : 'День установлен как рабочий');
+        alert(`День ${formattedDate} установлен как ${action}`);
     } catch (error) {
         console.error('Ошибка в toggleWorkDay:', error);
         alert(`Не удалось изменить статус дня: ${error.message}`);
