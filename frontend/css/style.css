@@ -861,6 +861,23 @@ option {
     background: #f0f0f0;
     cursor: not-allowed;
 }
+
+/* Стили для дней недели */
+.calendar-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+    margin-bottom: 5px;
+    font-size: 12px;
+    font-weight: bold;
+    color: var(--text-color);
+    text-align: center;
+}
+
+.calendar-weekdays div {
+    padding: 5px;
+}
+
  /* Добавляем стили для нижней панели */
         .bottom-nav {
             position: fixed;
