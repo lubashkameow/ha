@@ -62,6 +62,9 @@
             
             <!-- Страница 3: Мастера и работы -->
             <div id="page-masters" class="page">
+                <div class="master-actions">
+                    <button id="edit-portfolio-btn" class="edit-portfolio-btn" style="display: none;">Редактировать портфолио</button>
+                </div>
                 <h3>Наши мастера</h3>
                 <div id="master-buttons" class="master-buttons"></div>
                 <div id="master-info"></div>
@@ -131,7 +134,20 @@
         <div id="calendar-grid" class="calendar-grid"></div>
     </div>
 </div>
-    
+    <!-- Модальное окно для редактирования портфолио -->
+<div id="portfolio-edit-modal" class="modal hidden">
+    <div class="modal-content">
+        <span id="close-portfolio-edit-modal" class="modal-close">×</span>
+        <h3>Редактировать портфолио</h3>
+        <div class="form-group">
+            <label>Добавить новое фото:</label>
+            <input type="file" id="new-portfolio-photo" accept="image/*">
+            <textarea id="new-portfolio-description" class="form-control" placeholder="Описание..."></textarea>
+            <button id="add-portfolio-photo" class="form-button">Добавить</button>
+        </div>
+        <div id="portfolio-edit-list" class="portfolio-grid"></div>
+    </div>
+</div>
     <!-- Нижняя панель навигации -->
     <div class="bottom-nav">
         <div class="nav-item active" data-page="services">
