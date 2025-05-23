@@ -603,12 +603,10 @@ option {
 }
 
 .portfolio-photo {
-  width: 100px; /* Уменьшено в 2 раза, предполагая, что было 200px */
+    width: 100%;
     height: 100px;
-    margin: 10px;
-    overflow: hidden;
-    border-radius: 8px; /* Квадрат с мягкими углами */
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    object-fit: cover;
+    border-radius: 0;
 }
 
 .portfolio-modal {
