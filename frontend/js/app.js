@@ -1539,7 +1539,7 @@ async function deletePortfolioPhoto(photoId) {
         if (response.ok) {
             alert('Фото удалено');
         } else {
-            throw new Error('Ошибка удаления фото');
+            throw new Error(data.error || 'Ошибка удаления фото');
         }
     } catch (error) {
         alert(error.message);
