@@ -78,14 +78,24 @@ async function checkIfUserIsMaster() {
             addReportsNavItem();
             document.getElementById('edit-portfolio-btn').style.display = 'block';
             document.getElementById('edit-calendar-btn').style.display = 'block';
-            document.getElementById('prev-appointments').style.display = 'block';
-            document.getElementById('next-appointments').style.display = 'block';
+            document.getElementById('master-prev-week').style.display = 'block';
+            document.getElementById('master-next-week').style.display = 'block';
             initPortfolioEditModal();
-        } 
+        } else {
+            isCurrentUserMaster = false;
+            document.getElementById('edit-portfolio-btn').style.display = 'none';
+            document.getElementById('edit-calendar-btn').style.display = 'none';
+            document.getElementById('master-prev-week').style.display = 'none';
+            document.getElementById('master-next-week').style.display = 'none';
+        }
     } catch (error) {
         console.error('Ошибка при проверке мастера:', error);
+        isCurrentUserMaster = false;
+        document.getElementById('edit-portfolio-btn').style.display = 'none';
+        document.getElementById('edit-calendar-btn').style.display = 'none';
+        document.getElementById('master-prev-week').style.display = 'none';
+        document.getElementById('master-next-week').style.display = 'none';
     }
-    
 }
 
 async function loadReport(type) {
