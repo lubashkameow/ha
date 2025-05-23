@@ -1,7 +1,7 @@
 const fetch = require('node-fetch');
 
 exports.handler = async (event) => {
-    const apiUrl = `https://probability-published-oxide-warcraft.trycloudflare.com/api/updateportfolio`;
+    const apiUrl = `https://probability-published-oxide-warcraft.trycloudflare.com/api/update_portfolio_description`;
 
     console.log('Запрос к /updateportfolio:', event.body);
 
