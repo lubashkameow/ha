@@ -81,9 +81,7 @@ async function checkIfUserIsMaster() {
             document.getElementById('prev-appointments').style.display = 'block';
             document.getElementById('next-appointments').style.display = 'block';
             initPortfolioEditModal();
-        } else {
-            isCurrentUserMaster = false;
-        }
+        } 
     } catch (error) {
         console.error('Ошибка при проверке мастера:', error);
     }
