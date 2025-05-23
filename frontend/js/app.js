@@ -1495,15 +1495,18 @@ async function addPortfolioPhoto(photo, description) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ user_id: userId, photo, description })
         });
+        const data = await response.json();
         if (response.ok) {
             alert('Фото добавлено');
             document.getElementById('new-portfolio-photo').value = '';
             document.getElementById('new-portfolio-description').value = '';
+            loadPortfolioEditList(); // Обновляем список портфолио
         } else {
-            throw new Error('Ошибка добавления фото');
+            throw new Error(data.error || 'Ошибка добавления фото');
         }
     } catch (error) {
-        alert(error.message);
+        console.error('Ошибка при добавлении фото:', error);
+        alert('Ошибка добавления фото: ' + error.message);
     }
 }
 
