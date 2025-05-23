@@ -10,7 +10,7 @@ exports.handler = async (event) => {
         };
     }
     
-    const url = `https://psi-wires-catch-italia.trycloudflare.com/api/master?date=${date}`;
+    const url = `https://probability-published-oxide-warcraft.trycloudflare.com/api/master?date=${date}`;
     
     try {
         const response = await fetch(url);
