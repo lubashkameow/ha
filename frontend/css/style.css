@@ -1045,83 +1045,107 @@ option {
     background: #e67399;
 }
 
-/* Стили для редактирования услуг */
-.service-edit-item {
-    background: #fff;
+/* Стили для вкладок в модальном окне */
+.services-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    justify-content: center;
+}
+
+.tab-btn {
+    background: #f0f0f0;
+    border: none;
+    padding: 10px 20px;
     border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s;
+}
+
+.tab-btn.active {
+    background: var(--primary-color);
+    color: white;
+}
+
+.tab-content {
+    display: block;
+}
+
+.tab-content.hidden {
+    display: none;
+}
+
+/* Стили для списка услуг */
+.service-edit-item {
+    background: #ffffff;
+    border-radius: 10px;
     padding: 15px;
     margin-bottom: 15px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
-.service-edit-item h4 {
-    margin: 0 0 10px;
-    color: var(--text-color);
+.service-edit-item input, .service-edit-item select {
+    width: 100%;
+    padding: 8px;
+    margin: 5px 0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
 }
 
 .material-list {
-    margin: 10px 0;
+    margin-top: 10px;
 }
 
 .material-item {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    padding: 5px 0;
-    border-bottom: 1px solid #f0f0f0;
+    gap: 10px;
+    margin: 5px 0;
 }
 
-.add-material-form {
-    margin-top: 15px;
+.material-item input {
+    width: 80px;
+}
+
+/* Стили для списка материалов */
+.material-edit-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
     padding: 10px;
-    background: #f8f9fa;
+    background: #ffffff;
     border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
-.add-service-form, .add-material-form {
-    margin-top: 20px;
-    padding: 15px;
-    background: #f8f9fa;
-    border-radius: 8px;
-}
-
-.add-service-form label, .add-material-form label {
-    display: block;
-    margin: 10px 0 5px;
-    font-weight: 500;
-}
-
-.add-service-form input, .add-service-form select,
-.add-material-form input, .add-material-form select {
-    width: 100%;
+.material-edit-item input {
+    width: 100px;
     padding: 8px;
     border: 1px solid #ddd;
     border-radius: 5px;
 }
 
-.add-service-form button, .add-material-form button {
-    margin-top: 10px;
+/* Стили для формы добавления услуги или материала */
+.add-service-form, .add-material-form {
+    background: #ffffff;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.add-service-form input, .add-service-form select, .add-material-form input, .add-material-form select {
     width: 100%;
-    padding: 10px;
-    background: var(--primary-color);
-    color: white;
-    border: none;
+    padding: 8px;
+    margin: 5px 0;
+    border: 1px solid #ddd;
     border-radius: 5px;
-    cursor: pointer;
 }
 
-.delete-service-btn, .delete-material-btn {
-    background: #ff6b6b;
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-left: 10px;
-}
-
-#services-edit-modal .modal-content {
-    max-width: 600px;
+.add-service-form .material-list {
+    margin-top: 15px;
 }
 
  /* Добавляем стили для нижней панели */
