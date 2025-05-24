@@ -135,8 +135,45 @@ async function loadReport(type) {
     }
 }
 
+async function loadReport(type) {
+    const tg = window.Telegram.WebApp;
+    const userId = tg.initDataUnsafe.user?.id;
+    const month = document.getElementById('report-month').value;
+
+    if (!userId) {
+        console.error('Ошибка: user_id не найден');
+        document.getElementById('report-result').innerHTML = '<p class="error">Ошибка: пользователь не авторизован</p>';
+        return;
+    }
+
+    if (!month) {
+        console.error('Ошибка: месяц не выбран');
+        document.getElementById('report-result').innerHTML = '<p class="error">Ошибка: выберите месяц</p>';
+        return;
+    }
+
+    console.log(`Loading report: type=${type}, user_id=${userId}, month=${month}`);
+
+    try {
+        const response = await fetch(`/.netlify/functions/getreport?user_id=${userId}&month=${month}&type=${type}`);
+        const data = await response.json();
+
+        if (!response.ok) {
+            console.error('Report error:', data);
+            document.getElementById('report-result').innerHTML = `<p class="error">Ошибка: ${data.error || 'Не удалось загрузить отчет'}</p>`;
+            return;
+        }
+
+        const container = document.getElementById('report-result');
+        container.innerHTML = renderReportTable(data, type);
+    } catch (error) {
+        console.error('Ошибка загрузки отчета:', error);
+        document.getElementById('report-result').innerHTML = '<p class="error">Ошибка загрузки отчета</p>';
+    }
+}
+
 function renderReportTable(data, type) {
-    if (!data || !data.data || !Array.isArray(data.data) || data.data.length === 0) {
+    if (!data || !data.data || !Array.isArray(data.data)) {
         return '<p>Нет данных для отчета.</p>';
     }
 
@@ -187,7 +224,8 @@ function renderReportTable(data, type) {
             html += `<p>Предстоящие записи: ${data.summary.upcoming}</p>`;
         } else if (type === 'materials') {
             html += `<p>Общий расход (выполненные): ${data.summary.total_cost} ₽</p>`;
-            html += `<p>Ожидаемый расход (предстоящие): ${data.summary.expected_cost} ₽</p>`;
+            html += `<p>Расход на предстоящие услуги: ${data.summary.upcoming_cost} ₽</p>`;
+            html += `<p>Ожидаемый расход (общий): ${data.summary.expected_cost} ₽</p>`;
         } else if (type === 'profit') {
             html += `<p>Выручка: ${data.summary.total_revenue} ₽</p>`;
             html += `<p>Расход на материалы: ${data.summary.total_material_cost} ₽</p>`;
@@ -197,27 +235,58 @@ function renderReportTable(data, type) {
         html += '</div>';
     }
 
-    // Data table
-    const headers = headersMap[type] || Object.keys(data.data[0]);
-    html += '<table class="report-table"><thead><tr>';
-    Object.values(headers).forEach(h => html += `<th>${h}</th>`);
-    html += '</tr></thead><tbody>';
+    // Data table (выполненные услуги)
+    if (data.data.length > 0) {
+        const headers = headersMap[type] || Object.keys(data.data[0]);
+        html += '<h4>Расход материалов (выполненные услуги)</h4>';
+        html += '<table class="report-table"><thead><tr>';
+        Object.values(headers).forEach(h => html += `<th>${h}</th>`);
+        html += '</tr></thead><tbody>';
 
-    data.data.forEach(row => {
-        html += '<tr>';
-        Object.keys(headers).forEach(key => {
-            let value = row[key] || '';
-            if (key === 'is_new') value = value === 1 ? 'Да' : 'Нет';
-            if (key === 'cost' || key === 'revenue') value = `${value} ₽`;
-            if (key === 'name_length' && !value) value = 'Не указана';
-            html += `<td>${value}</td>`;
+        data.data.forEach(row => {
+            html += '<tr>';
+            Object.keys(headers).forEach(key => {
+                let value = row[key] || '';
+                if (key === 'is_new') value = value === 1 ? 'Да' : 'Нет';
+                if (key === 'cost' || key === 'revenue') value = `${value} ₽`;
+                if (key === 'name_length' && !value) value = 'Не указана';
+                html += `<td>${value}</td>`;
+            });
+            html += '</tr>';
         });
-        html += '</tr>';
-    });
 
-    html += '</tbody></table>';
+        html += '</tbody></table>';
+    } else {
+        html += '<p>Нет данных о расходе материалов для выполненных услуг.</p>';
+    }
+
+    // Upcoming data table (предстоящие услуги, только для materials)
+    if (type === 'materials' && data.upcoming_data && Array.isArray(data.upcoming_data) && data.upcoming_data.length > 0) {
+        const headers = headersMap[type];
+        html += '<h4>Расход материалов (предстоящие услуги)</h4>';
+        html += '<table class="report-table"><thead><tr>';
+        Object.values(headers).forEach(h => html += `<th>${h}</th>`);
+        html += '</tr></thead><tbody>';
+
+        data.upcoming_data.forEach(row => {
+            html += '<tr>';
+            Object.keys(headers).forEach(key => {
+                let value = row[key] || '';
+                if (key === 'cost') value = `${value} ₽`;
+                html += `<td>${value}</td>`;
+            });
+            html += '</tr>';
+        });
+
+        html += '</tbody></table>';
+    } else if (type === 'materials') {
+        html += '<p>Нет данных о расходе материалов для предстоящих услуг.</p>';
+    }
+
     return html;
 }
+
+
 
 function addReportsNavItem() {
     const nav = document.querySelector('.bottom-nav');
