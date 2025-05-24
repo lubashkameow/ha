@@ -1026,6 +1026,103 @@ option {
     margin-top: 20px;
 }
 
+/* Стили для кнопки редактирования услуг */
+.edit-services-btn {
+    background: var(--primary-color);
+    color: var(--white);
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.edit-services-btn:hover {
+    background: #e67399;
+}
+
+/* Стили для редактирования услуг */
+.service-edit-item {
+    background: #fff;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.service-edit-item h4 {
+    margin: 0 0 10px;
+    color: var(--text-color);
+}
+
+.material-list {
+    margin: 10px 0;
+}
+
+.material-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.add-material-form {
+    margin-top: 15px;
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.add-service-form, .add-material-form {
+    margin-top: 20px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.add-service-form label, .add-material-form label {
+    display: block;
+    margin: 10px 0 5px;
+    font-weight: 500;
+}
+
+.add-service-form input, .add-service-form select,
+.add-material-form input, .add-material-form select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.add-service-form button, .add-material-form button {
+    margin-top: 10px;
+    width: 100%;
+    padding: 10px;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.delete-service-btn, .delete-material-btn {
+    background: #ff6b6b;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+#services-edit-modal .modal-content {
+    max-width: 600px;
+}
 
  /* Добавляем стили для нижней панели */
         .bottom-nav {
