@@ -1,2 +1,5 @@
 [build]
   functions = "netlify/functions"
+[[functions]]
+  name = "updatecompletedbookings"
+  schedule = "*/15 * * * *"
