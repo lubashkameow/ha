@@ -689,7 +689,6 @@ async function loadMastersSlots(date) {
     const container = document.getElementById('masters-slots-container');
     container.innerHTML = '<div class="loader">Загрузка мастеров...</div>';
 
-    // Проверка, что selectedService существует и содержит id
     if (!selectedService || !selectedService.id) {
         console.error('Ошибка: услуга не выбрана или отсутствует id');
         container.innerHTML = '<p class="error">Пожалуйста, выберите услугу</p>';
@@ -699,13 +698,16 @@ async function loadMastersSlots(date) {
     try {
         const mastersResponse = await fetch(`/.netlify/functions/getmaster?date=${date}`);
         const mastersData = await mastersResponse.json();
+        console.log('Masters data:', mastersData);
 
         let html = '';
         for (const master of mastersData.masters) {
+            console.log(`Fetching slots for master ${master.id_master}`);
             const slotsResponse = await fetch(
                 `/.netlify/functions/gettimeslots?date=${date}&master_id=${master.id_master}&service_id=${selectedService.id}`
             );
             const slotsData = await slotsResponse.json();
+            console.log(`Slots data for master ${master.id_master}:`, slotsData);
 
             if (slotsData.slots && slotsData.slots.length > 0) {
                 html += `
@@ -723,19 +725,19 @@ async function loadMastersSlots(date) {
                         </div>
                     </div>
                 `;
+            } else {
+                console.log(`No slots available for master ${master.id_master}`);
             }
         }
 
         container.innerHTML = html || '<p>Нет доступных мастеров на эту дату</p>';
 
-        // Обработчики выбора времени
         document.querySelectorAll('.time-slot').forEach(button => {
             button.addEventListener('click', function () {
                 document.querySelectorAll('.time-slot').forEach(b => b.classList.remove('selected'));
                 this.classList.add('selected');
 
                 selectedSlot = this.getAttribute('data-slot-id');
-
                 selectedMaster = {
                     id: this.getAttribute('data-master-id'),
                     name: this.getAttribute('data-master-name')
@@ -743,7 +745,7 @@ async function loadMastersSlots(date) {
 
                 console.log('✅ Slot selected:', selectedSlot);
                 console.log('✅ Master selected:', selectedMaster);
-                updateBookingNavigation(); // Обновляем навигацию, если есть
+                updateBookingNavigation();
             });
         });
 
