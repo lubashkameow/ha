@@ -689,6 +689,13 @@ async function loadMastersSlots(date) {
     const container = document.getElementById('masters-slots-container');
     container.innerHTML = '<div class="loader">Загрузка мастеров...</div>';
 
+    // Проверка, что selectedService существует и содержит id
+    if (!selectedService || !selectedService.id) {
+        console.error('Ошибка: услуга не выбрана или отсутствует id');
+        container.innerHTML = '<p class="error">Пожалуйста, выберите услугу</p>';
+        return;
+    }
+
     try {
         const mastersResponse = await fetch(`/.netlify/functions/getmaster?date=${date}`);
         const mastersData = await mastersResponse.json();
@@ -696,11 +703,11 @@ async function loadMastersSlots(date) {
         let html = '';
         for (const master of mastersData.masters) {
             const slotsResponse = await fetch(
-                `/.netlify/functions/gettimeslots?date=${date}&master_id=${master.id_master}&service_id=${selectedService.id_service}`
+                `/.netlify/functions/gettimeslots?date=${date}&master_id=${master.id_master}&service_id=${selectedService.id}`
             );
             const slotsData = await slotsResponse.json();
 
-            if (slotsData.slots.length > 0) {
+            if (slotsData.slots && slotsData.slots.length > 0) {
                 html += `
                     <div class="master-slots">
                         <h3>${master.name_master}</h3>
