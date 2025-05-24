@@ -1196,3 +1196,7 @@ input[type="tel"] {
     box-sizing: border-box;
     max-width: 100%;
 }
+textarea {
+    box-sizing: border-box;
+    max-width: 100%;
+}
