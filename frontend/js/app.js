@@ -685,7 +685,7 @@ document.getElementById('next-week').addEventListener('click', () => {
 });
 
 // Новая функция для загрузки мастеров и слотов
-async function loadMastersSlots(date, duration) {
+async function loadMastersSlots(date) {
     const container = document.getElementById('masters-slots-container');
     container.innerHTML = '<div class="loader">Загрузка мастеров...</div>';
 
@@ -696,7 +696,7 @@ async function loadMastersSlots(date, duration) {
         let html = '';
         for (const master of mastersData.masters) {
             const slotsResponse = await fetch(
-                `/.netlify/functions/gettimeslots?date=${date}&master_id=${master.id_master}&duration=${duration}`
+                `/.netlify/functions/gettimeslots?date=${date}&master_id=${master.id_master}&service_id=${selectedService.id_service}`
             );
             const slotsData = await slotsResponse.json();
 
@@ -736,6 +736,7 @@ async function loadMastersSlots(date, duration) {
 
                 console.log('✅ Slot selected:', selectedSlot);
                 console.log('✅ Master selected:', selectedMaster);
+                updateBookingNavigation(); // Обновляем навигацию, если есть
             });
         });
 
