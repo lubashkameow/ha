@@ -152,16 +152,21 @@
     </div>
 </div>
 
-    <!-- Модальное окно для редактирования услуг и материалов -->
+<!-- Модальное окно для редактирования услуг и материалов -->
 <div id="services-edit-modal" class="modal hidden">
     <div class="modal-content">
         <span id="close-services-edit-modal" class="modal-close">×</span>
         <h3>Редактировать услуги и материалы</h3>
-        <div class="report-buttons">
-            <button id="services-list-btn" class="report-btn">Перечень услуг</button>
-            <button id="materials-list-btn" class="report-btn">Перечень материалов</button>
+        <div class="services-tabs">
+            <button id="tab-services" class="tab-btn active">Перечень услуг</button>
+            <button id="tab-materials" class="tab-btn">Перечень материалов</button>
         </div>
-        <div id="services-edit-content" class="services-edit-content"></div>
+        <div id="services-tab-content" class="tab-content">
+            <!-- Сюда будет загружаться контент для услуг -->
+        </div>
+        <div id="materials-tab-content" class="tab-content hidden">
+            <!-- Сюда будет загружаться контент для материалов -->
+        </div>
     </div>
 </div>
     
