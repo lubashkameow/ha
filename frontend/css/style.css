@@ -952,8 +952,8 @@ option {
 }
 
 .report-btn {
-    background-color: #007bff;
-    color: white;
+    background: var(--primary-color);
+    color: var(--white);
     border: none;
     padding: 10px 20px;
     border-radius: 8px;
@@ -1007,7 +1007,7 @@ option {
 }
 
 .report-table th {
-    background-color: #007bff;
+    background-color: var(--primary-color);
     color: white;
     font-weight: 600;
 }
