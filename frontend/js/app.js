@@ -100,14 +100,39 @@ async function checkIfUserIsMaster() {
 
 async function loadReport(type) {
     const tg = window.Telegram.WebApp;
-    const userId = tg.initDataUnsafe.user.id;
+    const userId = tg.initDataUnsafe.user?.id;
     const month = document.getElementById('report-month').value;
 
-    const response = await fetch(`/.netlify/functions/getreport?user_id=${userId}&month=${month}&type=${type}`);
-    const data = await response.json();
+    if (!userId) {
+        console.error('Ошибка: user_id не найден');
+        document.getElementById('report-result').innerHTML = '<p class="error">Ошибка: пользователь не авторизован</p>';
+        return;
+    }
 
-    const container = document.getElementById('report-result');
-    container.innerHTML = renderReportTable(data, type);
+    if (!month) {
+        console.error('Ошибка: месяц не выбран');
+        document.getElementById('report-result').innerHTML = '<p class="error">Ошибка: выберите месяц</p>';
+        return;
+    }
+
+    console.log(`Loading report: type=${type}, user_id=${userId}, month=${month}`);
+
+    try {
+        const response = await fetch(`/.netlify/functions/getreport?user_id=${userId}&month=${month}&type=${type}`);
+        const data = await response.json();
+
+        if (!response.ok) {
+            console.error('Report error:', data);
+            document.getElementById('report-result').innerHTML = `<p class="error">Ошибка: ${data.error || 'Не удалось загрузить отчет'}</p>`;
+            return;
+        }
+
+        const container = document.getElementById('report-result');
+        container.innerHTML = renderReportTable(data, type);
+    } catch (error) {
+        console.error('Ошибка загрузки отчета:', error);
+        document.getElementById('report-result').innerHTML = '<p class="error">Ошибка загрузки отчета</p>';
+    }
 }
 
 function renderReportTable(data, type) {
@@ -115,14 +140,39 @@ function renderReportTable(data, type) {
         return '<p>Нет данных для отчета.</p>';
     }
 
-    const headers = Object.keys(data[0]);
+    const headersMap = {
+        clients: {
+            name_user: 'Имя клиента',
+            phone_user: 'Телефон'
+        },
+        appointments: {
+            date: 'Дата',
+            time: 'Время',
+            service: 'Услуга',
+            name_user: 'Клиент',
+            status: 'Статус'
+        },
+        materials: {
+            name_mat: 'Материал',
+            total_spent: 'Сумма расходов'
+        },
+        services: {
+            service_name: 'Услуга',
+            count: 'Количество',
+            total_income: 'Выручка'
+        }
+    };
+
+    const headers = headersMap[type] || Object.keys(data[0]);
     let html = '<table><thead><tr>';
-    headers.forEach(h => html += `<th>${h}</th>`);
+    Object.values(headers).forEach(h => html += `<th>${h}</th>`);
     html += '</tr></thead><tbody>';
 
     data.forEach(row => {
         html += '<tr>';
-        headers.forEach(h => html += `<td>${row[h]}</td>`);
+        Object.keys(headers).forEach(key => {
+            html += `<td>${row[key] || ''}</td>`;
+        });
         html += '</tr>';
     });
 
