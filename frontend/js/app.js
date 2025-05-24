@@ -186,7 +186,8 @@ function renderReportTable(data, type) {
             html += `<p>Отменено записей: ${data.summary.cancelled}</p>`;
             html += `<p>Предстоящие записи: ${data.summary.upcoming}</p>`;
         } else if (type === 'materials') {
-            html += `<p>Общий расход: ${data.summary.total_cost} ₽</p>`;
+            html += `<p>Общий расход (выполненные): ${data.summary.total_cost} ₽</p>`;
+            html += `<p>Ожидаемый расход (предстоящие): ${data.summary.expected_cost} ₽</p>`;
         } else if (type === 'profit') {
             html += `<p>Выручка: ${data.summary.total_revenue} ₽</p>`;
             html += `<p>Расход на материалы: ${data.summary.total_material_cost} ₽</p>`;
@@ -216,6 +217,49 @@ function renderReportTable(data, type) {
 
     html += '</tbody></table>';
     return html;
+}
+
+function addReportsNavItem() {
+    const nav = document.querySelector('.bottom-nav');
+    if (!nav) return;
+
+    const reportsItem = document.createElement('div');
+    reportsItem.className = 'nav-item';
+    reportsItem.setAttribute('data-page', 'reports');
+    reportsItem.innerHTML = `
+        <i>📊</i>
+        <span>Отчеты</span>
+    `;
+    nav.appendChild(reportsItem);
+
+    reportsItem.addEventListener('click', function() {
+        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+
+        this.classList.add('active');
+
+        let page = document.getElementById('page-reports');
+        if (!page) {
+            page = document.createElement('div');
+            page.id = 'page-reports';
+            page.className = 'page active';
+            page.innerHTML = `
+                <h3>Отчеты</h3>
+                <label for="report-month">Выберите месяц:</label>
+                <input type="month" id="report-month" value="${new Date().toISOString().slice(0, 7)}" />
+                <div class="report-buttons">
+                    <button class="report-btn" onclick="loadReport('clients')">Отчет по клиентам</button>
+                    <button class="report-btn" onclick="loadReport('appointments')">Отчет по записям</button>
+                    <button class="report-btn" onclick="loadReport('materials')">Расход материалов</button>
+                    <button class="report-btn" onclick="loadReport('profit')">Прибыль</button>
+                </div>
+                <div id="report-result" class="report-result"></div>
+            `;
+            document.querySelector('.main-content').appendChild(page);
+        } else {
+            page.classList.add('active');
+        }
+    });
 }
 
 
