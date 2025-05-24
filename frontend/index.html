@@ -31,7 +31,10 @@
             <button id="book-btn" class="cta-button">Записаться</button>
         </footer>
             <div id="services-container" class="catalog-container"></div>
-            
+                <!-- Кнопка для админа -->
+            <div class="master-actions">
+            <button id="edit-services-btn" class="edit-services-btn" style="display: none;">Редактировать услуги</button>
+            </div>
         
         <p></p> <p></p> <p></p> <p></p> <p></p> <p></p> <p></p> <p></p> <p></p><p></p> <p></p> <p></p> <p></p> <p></p>
          <p></p> <p></p> <p></p> <p></p> <p></p> <p></p> <p></p> <p></p> <p></p><p></p>        
@@ -148,6 +151,20 @@
         <div id="portfolio-edit-list" class="portfolio-grid"></div>
     </div>
 </div>
+
+    <!-- Модальное окно для редактирования услуг и материалов -->
+<div id="services-edit-modal" class="modal hidden">
+    <div class="modal-content">
+        <span id="close-services-edit-modal" class="modal-close">×</span>
+        <h3>Редактировать услуги и материалы</h3>
+        <div class="report-buttons">
+            <button id="services-list-btn" class="report-btn">Перечень услуг</button>
+            <button id="materials-list-btn" class="report-btn">Перечень материалов</button>
+        </div>
+        <div id="services-edit-content" class="services-edit-content"></div>
+    </div>
+</div>
+    
     <!-- Нижняя панель навигации -->
     <div class="bottom-nav">
         <div class="nav-item active" data-page="services">
