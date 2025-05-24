@@ -1756,3 +1756,452 @@ document.getElementById('new-portfolio-photo').addEventListener('change', async 
     }
 });
 
+// Показ кнопки "Редактировать услуги" для админов
+async function checkAndShowEditServicesButton() {
+    const tg = window.Telegram.WebApp;
+    const userId = tg.initDataUnsafe.user.id;
+    try {
+        const response = await fetch(`/.netlify/functions/isadmin?user_id=${userId}`);
+        const data = await response.json();
+        if (data.is_admin) {
+            document.getElementById('edit-services-btn').style.display = 'block';
+        }
+    } catch (error) {
+        console.error('Ошибка проверки админа:', error);
+    }
+}
+
+// Инициализация модального окна для редактирования услуг
+function initServicesEditModal() {
+    const editButton = document.getElementById('edit-services-btn');
+    const modal = document.getElementById('services-edit-modal');
+    const closeModal = document.getElementById('close-services-edit-modal');
+    const servicesTab = document.getElementById('tab-services');
+    const materialsTab = document.getElementById('tab-materials');
+    const servicesContent = document.getElementById('services-tab-content');
+    const materialsContent = document.getElementById('materials-tab-content');
+
+    editButton.addEventListener('click', () => {
+        modal.classList.remove('hidden');
+        servicesTab.classList.add('active');
+        materialsTab.classList.remove('active');
+        servicesContent.classList.remove('hidden');
+        materialsContent.classList.add('hidden');
+        loadServicesEditList();
+    });
+
+    closeModal.addEventListener('click', () => {
+        modal.classList.add('hidden');
+    });
+
+    servicesTab.addEventListener('click', () => {
+        servicesTab.classList.add('active');
+        materialsTab.classList.remove('active');
+        servicesContent.classList.remove('hidden');
+        materialsContent.classList.add('hidden');
+        loadServicesEditList();
+    });
+
+    materialsTab.addEventListener('click', () => {
+        servicesTab.classList.remove('active');
+        materialsTab.classList.add('active');
+        servicesContent.classList.add('hidden');
+        materialsContent.classList.remove('hidden');
+        loadMaterialsEditList();
+    });
+}
+
+// Загрузка списка услуг для редактирования
+async function loadServicesEditList() {
+    const container = document.getElementById('services-tab-content');
+    container.innerHTML = '<div class="loader">Загрузка услуг...</div>';
+
+    try {
+        const response = await fetch('/.netlify/functions/getservicesedit');
+        const data = await response.json();
+        if (data.services && data.services.length > 0) {
+            let html = `
+                <div class="add-service-form">
+                    <h4>Добавить новую услугу</h4>
+                    <input type="text" id="new-service-name" placeholder="Название услуги">
+                    <select id="new-service-category">
+                        <option value="1">Женский каталог</option>
+                        <option value="2">Мужской каталог</option>
+                    </select>
+                    <select id="new-service-length">
+                        ${data.hairlengths.map(h => `<option value="${h.id_length}">${h.name_length}</option>`).join('')}
+                        <option value="new">Новая длина...</option>
+                    </select>
+                    <input type="text" id="new-length-name" placeholder="Название новой длины" style="display: none;">
+                    <input type="checkbox" id="new-service-ot"> <label for="new-service-ot">Цена "от"</label>
+                    <input type="number" id="new-service-price" placeholder="Цена (₽)">
+                    <input type="number" id="new-service-duration" placeholder="Длительность (мин)">
+                    <div class="material-list" id="new-service-materials">
+                        <h5>Материалы</h5>
+                    </div>
+                    <button id="add-material-btn" class="form-button">Добавить материал</button>
+                    <button id="add-service-btn" class="form-button">Добавить услугу</button>
+                </div>
+            `;
+            data.services.forEach(service => {
+                html += `
+                    <div class="service-edit-item" data-service-id="${service.id_service}">
+                        <input type="text" value="${service.name_service}" disabled>
+                        <input type="text" value="${service.name_length}" disabled>
+                        <input type="number" value="${service.price}" data-price="${service.id_service}">
+                        <input type="checkbox" ${service.ot ? 'checked' : ''} data-ot="${service.id_service}">
+                        <div class="material-list" id="materials-${service.id_service}">
+                            ${service.materials.map(m => `
+                                <div class="material-item" data-material-id="${m.id_material}">
+                                    <span>${m.name_material}</span>
+                                    <input type="number" value="${m.quantity_ml || m.quant || 0}" data-quantity="${m.id_material}">
+                                    <button class="delete-material-btn" data-material-id="${m.id_material}">Удалить</button>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <button class="add-material-to-service-btn" data-service-id="${service.id_service}">Добавить материал</button>
+                        <button class="save-service-btn" data-service-id="${service.id_service}">Сохранить</button>
+                        <button class="delete-service-btn" data-service-id="${service.id_service}">Удалить</button>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+
+            // Обработчики для добавления новой услуги
+            document.getElementById('new-service-length').addEventListener('change', (e) => {
+                document.getElementById('new-length-name').style.display = e.target.value === 'new' ? 'block' : 'none';
+            });
+
+            document.getElementById('add-material-btn').addEventListener('click', () => addMaterialField('new-service-materials'));
+            document.getElementById('add-service-btn').addEventListener('click', addNewService);
+
+            // Обработчики для существующих услуг
+            document.querySelectorAll('.save-service-btn').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    const serviceId = btn.getAttribute('data-service-id');
+                    await updateService(serviceId);
+                });
+            });
+
+            document.querySelectorAll('.delete-service-btn').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    const serviceId = btn.getAttribute('data-service-id');
+                    if (confirm('Удалить услугу и связанные записи?')) {
+                        await deleteService(serviceId);
+                        loadServicesEditList();
+                    }
+                });
+            });
+
+            document.querySelectorAll('.add-material-to-service-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const serviceId = btn.getAttribute('data-service-id');
+                    addMaterialField(`materials-${serviceId}`, serviceId);
+                });
+            });
+
+            document.querySelectorAll('.delete-material-btn').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    const materialId = btn.getAttribute('data-material-id');
+                    const serviceId = btn.closest('.service-edit-item').getAttribute('data-service-id');
+                    if (confirm('Удалить материал из услуги?')) {
+                        await deleteMaterialFromService(serviceId, materialId);
+                        loadServicesEditList();
+                    }
+                });
+            });
+        } else {
+            container.innerHTML = '<p>Услуги отсутствуют</p>';
+        }
+    } catch (error) {
+        container.innerHTML = '<p class="error">Ошибка загрузки услуг</p>';
+        console.error('Ошибка загрузки услуг:', error);
+    }
+}
+
+// Добавление поля для материала
+async function addMaterialField(containerId, serviceId = null) {
+    const container = document.getElementById(containerId);
+    const response = await fetch('/.netlify/functions/getmaterials');
+    const data = await response.json();
+    const materialId = `material-${Date.now()}`;
+    container.innerHTML += `
+        <div class="material-item" data-material-id="${materialId}">
+            <select data-material-select="${materialId}">
+                ${data.materials.map(m => `<option value="${m.id_material}">${m.name_material}</option>`).join('')}
+            </select>
+            <input type="number" placeholder="Количество/ml" data-quantity="${materialId}">
+            <button class="remove-material-btn" data-material-id="${materialId}">Удалить</button>
+        </div>
+    `;
+    document.querySelector(`.remove-material-btn[data-material-id="${materialId}"]`).addEventListener('click', () => {
+        document.querySelector(`.material-item[data-material-id="${materialId}"]`).remove();
+    });
+}
+
+// Добавление новой услуги
+async function addNewService() {
+    const name = document.getElementById('new-service-name').value;
+    const categoryId = document.getElementById('new-service-category').value;
+    const lengthId = document.getElementById('new-service-length').value;
+    const newLengthName = document.getElementById('new-length-name').value;
+    const ot = document.getElementById('new-service-ot').checked;
+    const price = document.getElementById('new-service-price').value;
+    const duration = document.getElementById('new-service-duration').value;
+    const materials = Array.from(document.querySelectorAll('#new-service-materials .material-item')).map(item => ({
+        id_material: item.querySelector('select').value,
+        quantity: item.querySelector('input[data-quantity]').value
+    }));
+
+    if (!name || !price || !duration) {
+        alert('Заполните все обязательные поля');
+        return;
+    }
+
+    try {
+        const response = await fetch('/.netlify/functions/addservice', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                name_service: name,
+                id_category: categoryId,
+                id_length: lengthId === 'new' ? newLengthName : lengthId,
+                ot: ot ? 'от' : null,
+                price,
+                duration_minutes: duration,
+                materials
+            })
+        });
+        if (response.ok) {
+            alert('Услуга добавлена');
+            loadServicesEditList();
+            document.getElementById('new-service-name').value = '';
+            document.getElementById('new-service-price').value = '';
+            document.getElementById('new-service-duration').value = '';
+            document.getElementById('new-service-ot').checked = false;
+            document.getElementById('new-service-materials').innerHTML = '<h5>Материалы</h5>';
+        } else {
+            throw new Error('Ошибка добавления услуги');
+        }
+    } catch (error) {
+        alert('Ошибка: ' + error.message);
+    }
+}
+
+// Обновление услуги
+async function updateService(serviceId) {
+    const price = document.querySelector(`input[data-price="${serviceId}"]`).value;
+    const ot = document.querySelector(`input[data-ot="${serviceId}"]`).checked;
+    const materials = Array.from(document.querySelectorAll(`#materials-${serviceId} .material-item`)).map(item => ({
+        id_material: item.querySelector('span').textContent, // Используем name_material как идентификатор
+        quantity: item.querySelector('input[data-quantity]').value
+    }));
+
+    try {
+        const response = await fetch('/.netlify/functions/updateservice', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                id_service: serviceId,
+                price,
+                ot: ot ? 'от' : null,
+                materials
+            })
+        });
+        if (response.ok) {
+            alert('Услуга обновлена');
+            loadServicesEditList();
+        } else {
+            throw new Error('Ошибка обновления услуги');
+        }
+    } catch (error) {
+        alert('Ошибка: ' + error.message);
+    }
+}
+
+// Удаление услуги
+async function deleteService(serviceId) {
+    try {
+        const response = await fetch('/.netlify/functions/deleteservice', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id_service: serviceId })
+        });
+        if (response.ok) {
+            alert('Услуга удалена');
+        } else {
+            throw new Error('Ошибка удаления услуги');
+        }
+    } catch (error) {
+        alert('Ошибка: ' + error.message);
+    }
+}
+
+// Удаление материала из услуги
+async function deleteMaterialFromService(serviceId, materialId) {
+    try {
+        const response = await fetch('/.netlify/functions/deletematerialfromservice', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id_service: serviceId, id_material: materialId })
+        });
+        if (response.ok) {
+            alert('Материал удален из услуги');
+        } else {
+            throw new Error('Ошибка удаления материала');
+        }
+    } catch (error) {
+        alert('Ошибка: ' + error.message);
+    }
+}
+
+// Загрузка списка материалов для редактирования
+async function loadMaterialsEditList() {
+    const container = document.getElementById('materials-tab-content');
+    container.innerHTML = '<div class="loader">Загрузка материалов...</div>';
+
+    try {
+        const response = await fetch('/.netlify/functions/getmaterials');
+        const data = await response.json();
+        if (data.materials && data.materials.length > 0) {
+            let html = `
+                <div class="add-material-form">
+                    <h4>Добавить новый материал</h4>
+                    <input type="text" id="new-material-name" placeholder="Название материала">
+                    <input type="number" id="new-material-price" placeholder="Цена (₽)">
+                    <input type="number" id="new-material-ml" placeholder="Объем (мл)">
+                    <input type="number" id="new-material-quantity" placeholder="Количество">
+                    <button id="add-material-btn-final" class="form-button">Добавить материал</button>
+                </div>
+            `;
+            data.materials.forEach(material => {
+                html += `
+                    <div class="material-edit-item" data-material-id="${material.id_material}">
+                        <input type="text" value="${material.name_material}" disabled>
+                        <input type="number" value="${material.price_mat}" data-price="${material.id_material}">
+                        <input type="number" value="${material.ml || ''}" data-ml="${material.id_material}">
+                        <input type="number" value="${material.quantity || ''}" data-quantity="${material.id_material}">
+                        <button class="save-material-btn" data-material-id="${material.id_material}">Сохранить</button>
+                        <button class="delete-material-btn" data-material-id="${material.id_material}">Удалить</button>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+
+            document.getElementById('add-material-btn-final').addEventListener('click', addNewMaterial);
+
+            document.querySelectorAll('.save-material-btn').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    const materialId = btn.getAttribute('data-material-id');
+                    await updateMaterial(materialId);
+                });
+            });
+
+            document.querySelectorAll('.delete-material-btn').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    const materialId = btn.getAttribute('data-material-id');
+                    if (confirm('Удалить материал и связанные записи?')) {
+                        await deleteMaterial(materialId);
+                        loadMaterialsEditList();
+                    }
+                });
+            });
+        } else {
+            container.innerHTML = '<p>Материалы отсутствуют</p>';
+        }
+    } catch (error) {
+        container.innerHTML = '<p class="error">Ошибка загрузки материалов</p>';
+        console.error('Ошибка загрузки материалов:', error);
+    }
+}
+
+// Добавление нового материала
+async function addNewMaterial() {
+    const name = document.getElementById('new-material-name').value;
+    const price = document.getElementById('new-material-price').value;
+    const ml = document.getElementById('new-material-ml').value;
+    const quantity = document.getElementById('new-material-quantity').value;
+
+    if (!name || !price) {
+        alert('Заполните название и цену материала');
+        return;
+    }
+
+    try {
+        const response = await fetch('/.netlify/functions/addmaterial', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                name_material: name,
+                price_mat: price,
+                ml: ml || null,
+                quantity: quantity || null
+            })
+        });
+        if (response.ok) {
+            alert('Материал добавлен');
+            loadMaterialsEditList();
+            document.getElementById('new-material-name').value = '';
+            document.getElementById('new-material-price').value = '';
+            document.getElementById('new-material-ml').value = '';
+            document.getElementById('new-material-quantity').value = '';
+        } else {
+            throw new Error('Ошибка добавления материала');
+        }
+    } catch (error) {
+        alert('Ошибка: ' + error.message);
+    }
+}
+
+// Обновление материала
+async function updateMaterial(materialId) {
+    const price = document.querySelector(`input[data-price="${materialId}"]`).value;
+    const ml = document.querySelector(`input[data-ml="${materialId}"]`).value;
+    const quantity = document.querySelector(`input[data-quantity="${materialId}"]`).value;
+
+    try {
+        const response = await fetch('/.netlify/functions/updatematerial', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                id_material: materialId,
+                price_mat: price,
+                ml: ml || null,
+                quantity: quantity || null
+            })
+        });
+        if (response.ok) {
+            alert('Материал обновлен');
+            loadMaterialsEditList();
+        } else {
+            throw new Error('Ошибка обновления материала');
+        }
+    } catch (error) {
+        alert('Ошибка: ' + error.message);
+    }
+}
+
+// Удаление материала
+async function deleteMaterial(materialId) {
+    try {
+        const response = await fetch('/.netlify/functions/deletematerial', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id_material: materialId })
+        });
+        if (response.ok) {
+            alert('Материал удален');
+        } else {
+            throw new Error('Ошибка удаления материала');
+        }
+    } catch (error) {
+        alert('Ошибка: ' + error.message);
+    }
+}
+
+// Вызов функций при загрузке страницы
+document.addEventListener('DOMContentLoaded', () => {
+    checkAndShowEditServicesButton();
+    initServicesEditModal();
+});
+
