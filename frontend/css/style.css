@@ -976,8 +976,9 @@ option {
 .report-summary {
     margin-bottom: 20px;
     padding: 15px;
-    background-color: #f8f9fa;
-    border-radius: 8px;
+    background-color: #ffffff;
+    border: 2px solid var(--primary-color);
+    border-radius: 8px; /* Закругленные углы */
 }
 
 .report-summary p {
@@ -992,12 +993,14 @@ option {
 
 .report-table {
     width: 100%;
-    border-collapse: collapse;
+    border-collapse: separate;
     margin-top: 10px;
     background-color: white;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     overflow-x: auto;
     display: block;
+    border-radius: 8px; 
+    overflow: hidden;
 }
 
 .report-table th, .report-table td {
