@@ -1,16 +1,16 @@
 const fetch = require('node-fetch');
 
 exports.handler = async (event) => {
-    const { date, master_id, duration } = event.queryStringParameters;
+    const { date, master_id, service_id } = event.queryStringParameters;
     
     if (!date || !master_id) {
         return {
             statusCode: 400,
-            body: JSON.stringify({ error: 'date and master_id parameters are required' })
+            body: JSON.stringify({ error: 'date, master_id, and service_id parameters are required' })
         };
     }
     
-    const url = `https://female-bias-wrap-merchandise.trycloudflare.com/api/timeslots?date=${date}&master_id=${master_id}&duration=${duration || 60}`;
+    const url = `https://female-bias-wrap-merchandise.trycloudflare.com/api/timeslots?date=${date}&master_id=${master_id}&service_id=${service_id}`;
     
     try {
         const response = await fetch(url);
