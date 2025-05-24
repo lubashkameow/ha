@@ -1000,7 +1000,6 @@ option {
     overflow-x: auto;
     display: block;
     border-radius: 8px; 
-    overflow: hidden;
 }
 
 .report-table th, .report-table td {
