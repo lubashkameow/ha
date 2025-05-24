@@ -151,6 +151,7 @@ function renderReportTable(data, type) {
             date: 'Дата',
             time: 'Время',
             service: 'Услуга',
+            name_length: 'Длина волос',
             name_user: 'Клиент',
             status: 'Статус'
         },
@@ -179,7 +180,7 @@ function renderReportTable(data, type) {
             html += `<p>Выполнено услуг: ${data.summary.completed_services}</p>`;
             html += `<p>Популярность услуг:</p><ul>`;
             data.summary.service_popularity.forEach(s => {
-                html += `<li>${s.name_service}: ${s.count}</li>`;
+                html += `<li>${s.name_service} (${s.name_length}): ${s.count}</li>`;
             });
             html += `</ul>`;
             html += `<p>Отменено записей: ${data.summary.cancelled}</p>`;
@@ -189,7 +190,8 @@ function renderReportTable(data, type) {
         } else if (type === 'profit') {
             html += `<p>Выручка: ${data.summary.total_revenue} ₽</p>`;
             html += `<p>Расход на материалы: ${data.summary.total_material_cost} ₽</p>`;
-            html += `<p>Примерная прибыль: ${data.summary.profit} ₽</p>`;
+            html += `<p>Примерная прибыль (выполненные): ${data.summary.profit} ₽</p>`;
+            html += `<p>Ожидаемая прибыль: ${data.summary.expected_profit} ₽</p>`;
         }
         html += '</div>';
     }
@@ -206,6 +208,7 @@ function renderReportTable(data, type) {
             let value = row[key] || '';
             if (key === 'is_new') value = value === 1 ? 'Да' : 'Нет';
             if (key === 'cost' || key === 'revenue') value = `${value} ₽`;
+            if (key === 'name_length' && !value) value = 'Не указана';
             html += `<td>${value}</td>`;
         });
         html += '</tr>';
@@ -214,6 +217,7 @@ function renderReportTable(data, type) {
     html += '</tbody></table>';
     return html;
 }
+
 
 function addReportsNavItem() {
     const nav = document.querySelector('.bottom-nav');
