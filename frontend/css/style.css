@@ -993,7 +993,7 @@ option {
 
 .report-table {
     width: 100%;
-    border-collapse: separate;
+    border-collapse: collapse;
     margin-top: 10px;
     background-color: white;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
