@@ -181,8 +181,8 @@ function renderReportTable(data, type) {
         materials: {
             name_material: 'Материал',
             quantity_ml: 'Объем (мл)',
-            quantity: 'Количество',
-            cost: 'Стоимость (₽)'
+            quantity: 'Кол-во',
+            cost: '(₽)'
         }
     };
 
