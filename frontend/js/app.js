@@ -136,14 +136,16 @@ async function loadReport(type) {
 }
 
 function renderReportTable(data, type) {
-    if (!Array.isArray(data) || data.length === 0) {
+    if (!data || !data.data || !Array.isArray(data.data) || data.data.length === 0) {
         return '<p>Нет данных для отчета.</p>';
     }
 
     const headersMap = {
         clients: {
             name_user: 'Имя клиента',
-            phone_user: 'Телефон'
+            phone_user: 'Телефон',
+            visits: 'Визиты',
+            is_new: 'Новый клиент'
         },
         appointments: {
             date: 'Дата',
@@ -153,25 +155,58 @@ function renderReportTable(data, type) {
             status: 'Статус'
         },
         materials: {
-            name_mat: 'Материал',
-            total_spent: 'Сумма расходов'
+            name_material: 'Материал',
+            quantity_ml: 'Объем (мл)',
+            quantity: 'Количество',
+            cost: 'Стоимость (₽)'
         },
-        services: {
+        profit: {
             service_name: 'Услуга',
             count: 'Количество',
-            total_income: 'Выручка'
+            revenue: 'Выручка (₽)'
         }
     };
 
-    const headers = headersMap[type] || Object.keys(data[0]);
-    let html = '<table><thead><tr>';
+    let html = '';
+
+    // Summary section
+    if (data.summary) {
+        html += '<div class="report-summary">';
+        if (type === 'clients') {
+            html += `<p>Всего клиентов: ${data.summary.total_clients}</p>`;
+            html += `<p>Новых клиентов: ${data.summary.new_clients}</p>`;
+        } else if (type === 'appointments') {
+            html += `<p>Выполнено услуг: ${data.summary.completed_services}</p>`;
+            html += `<p>Популярность услуг:</p><ul>`;
+            data.summary.service_popularity.forEach(s => {
+                html += `<li>${s.name_service}: ${s.count}</li>`;
+            });
+            html += `</ul>`;
+            html += `<p>Отменено записей: ${data.summary.cancelled}</p>`;
+            html += `<p>Предстоящие записи: ${data.summary.upcoming}</p>`;
+        } else if (type === 'materials') {
+            html += `<p>Общий расход: ${data.summary.total_cost} ₽</p>`;
+        } else if (type === 'profit') {
+            html += `<p>Выручка: ${data.summary.total_revenue} ₽</p>`;
+            html += `<p>Расход на материалы: ${data.summary.total_material_cost} ₽</p>`;
+            html += `<p>Примерная прибыль: ${data.summary.profit} ₽</p>`;
+        }
+        html += '</div>';
+    }
+
+    // Data table
+    const headers = headersMap[type] || Object.keys(data.data[0]);
+    html += '<table class="report-table"><thead><tr>';
     Object.values(headers).forEach(h => html += `<th>${h}</th>`);
     html += '</tr></thead><tbody>';
 
-    data.forEach(row => {
+    data.data.forEach(row => {
         html += '<tr>';
         Object.keys(headers).forEach(key => {
-            html += `<td>${row[key] || ''}</td>`;
+            let value = row[key] || '';
+            if (key === 'is_new') value = value === 1 ? 'Да' : 'Нет';
+            if (key === 'cost' || key === 'revenue') value = `${value} ₽`;
+            html += `<td>${value}</td>`;
         });
         html += '</tr>';
     });
@@ -179,7 +214,6 @@ function renderReportTable(data, type) {
     html += '</tbody></table>';
     return html;
 }
-
 
 function addReportsNavItem() {
     const nav = document.querySelector('.bottom-nav');
@@ -195,12 +229,11 @@ function addReportsNavItem() {
     nav.appendChild(reportsItem);
 
     reportsItem.addEventListener('click', function() {
-        document.querySelectorAll('.gender-btn').forEach(i => i.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
 
         this.classList.add('active');
 
-        // Покажем заглушку или настоящую страницу
         let page = document.getElementById('page-reports');
         if (!page) {
             page = document.createElement('div');
@@ -210,14 +243,12 @@ function addReportsNavItem() {
                 <h3>Отчеты</h3>
                 <label for="report-month">Выберите месяц:</label>
                 <input type="month" id="report-month" value="${new Date().toISOString().slice(0, 7)}" />
-
                 <div class="report-buttons">
-                    <button onclick="loadReport('clients')">1. Отчет по клиентам</button>
-                    <button onclick="loadReport('appointments')">2. Отчет по записям</button>
-                    <button onclick="loadReport('materials')">3. Расход материалов</button>
-                    <button onclick="loadReport('services')">4. Оказанные услуги</button>
+                    <button class="report-btn" onclick="loadReport('clients')">Отчет по клиентам</button>
+                    <button class="report-btn" onclick="loadReport('appointments')">Отчет по записям</button>
+                    <button class="report-btn" onclick="loadReport('materials')">Расход материалов</button>
+                    <button class="report-btn" onclick="loadReport('profit')">Прибыль</button>
                 </div>
-
                 <div id="report-result" class="report-result"></div>
             `;
             document.querySelector('.main-content').appendChild(page);
