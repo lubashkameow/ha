@@ -1941,13 +1941,13 @@ async function addMaterialField(containerId, serviceId = null) {
 
 // Добавление новой услуги
 async function addNewService() {
-    const name = document.getElementById('new-service-name').value;
-    const categoryId = document.getElementById('new-service-category').value;
-    const lengthId = document.getElementById('new-service-length').value;
-    const newLengthName = document.getElementById('new-length-name').value;
-    const ot = document.getElementById('new-service-ot').checked;
-    const price = document.getElementById('new-service-price').value;
-    const duration = document.getElementById('new-service-duration').value;
+    const name = document.getElementById('new-service-name')?.value;
+    const categoryId = document.getElementById('new-service-category')?.value;
+    const lengthId = document.getElementById('new-service-length')?.value;
+    const newLengthName = document.getElementById('new-length-name')?.value;
+    const ot = document.getElementById('new-service-ot')?.checked;
+    const price = document.getElementById('new-service-price')?.value;
+    const duration = document.getElementById('new-service-duration')?.value;
     const materials = Array.from(document.querySelectorAll('#new-service-materials .material-item')).map(item => ({
         id_material: item.querySelector('select').value,
         quantity: item.querySelector('input[data-quantity]').value
@@ -1965,7 +1965,7 @@ async function addNewService() {
             body: JSON.stringify({
                 name_service: name,
                 id_category: categoryId,
-                id_length: lengthId === 'new' ? newLengthName : lengthId,
+                id_length: lengthId === 'new' ? `new_${newLengthName}` : lengthId,
                 ot: ot ? 'от' : null,
                 price,
                 duration_minutes: duration,
@@ -1974,12 +1974,23 @@ async function addNewService() {
         });
         if (response.ok) {
             alert('Услуга добавлена');
-            loadServicesEditList();
-            document.getElementById('new-service-name').value = '';
-            document.getElementById('new-service-price').value = '';
-            document.getElementById('new-service-duration').value = '';
-            document.getElementById('new-service-ot').checked = false;
-            document.getElementById('new-service-materials').innerHTML = '<h5>Материалы</h5>';
+            await loadServicesEditList(); // Перезагружаем список
+            // Очистка формы после перезагрузки
+            const formReset = () => {
+                const nameInput = document.getElementById('new-service-name');
+                const priceInput = document.getElementById('new-service-price');
+                const durationInput = document.getElementById('new-service-duration');
+                const otInput = document.getElementById('new-service-ot');
+                const materialsContainer = document.getElementById('new-service-materials');
+                if (nameInput && priceInput && durationInput && otInput && materialsContainer) {
+                    nameInput.value = '';
+                    priceInput.value = '';
+                    durationInput.value = '';
+                    otInput.checked = false;
+                    materialsContainer.innerHTML = '<h5>Материалы</h5>';
+                }
+            };
+            setTimeout(formReset, 0); // Выполняем очистку асинхронно после рендеринга
         } else {
             throw new Error('Ошибка добавления услуги');
         }
@@ -2117,10 +2128,10 @@ async function loadMaterialsEditList() {
 
 // Добавление нового материала
 async function addNewMaterial() {
-    const name = document.getElementById('new-material-name').value;
-    const price = document.getElementById('new-material-price').value;
-    const ml = document.getElementById('new-material-ml').value;
-    const quantity = document.getElementById('new-material-quantity').value;
+    const name = document.getElementById('new-material-name')?.value;
+    const price = document.getElementById('new-material-price')?.value;
+    const ml = document.getElementById('new-material-ml')?.value;
+    const quantity = document.getElementById('new-material-quantity')?.value;
 
     if (!name || !price) {
         alert('Заполните название и цену материала');
@@ -2140,11 +2151,21 @@ async function addNewMaterial() {
         });
         if (response.ok) {
             alert('Материал добавлен');
-            loadMaterialsEditList();
-            document.getElementById('new-material-name').value = '';
-            document.getElementById('new-material-price').value = '';
-            document.getElementById('new-material-ml').value = '';
-            document.getElementById('new-material-quantity').value = '';
+            await loadMaterialsEditList(); // Перезагружаем список
+            // Очистка формы после перезагрузки
+            const formReset = () => {
+                const nameInput = document.getElementById('new-material-name');
+                const priceInput = document.getElementById('new-material-price');
+                const mlInput = document.getElementById('new-material-ml');
+                const quantityInput = document.getElementById('new-material-quantity');
+                if (nameInput && priceInput && mlInput && quantityInput) {
+                    nameInput.value = '';
+                    priceInput.value = '';
+                    mlInput.value = '';
+                    quantityInput.value = '';
+                }
+            };
+            setTimeout(formReset, 0); // Выполняем очистку асинхронно после рендеринга
         } else {
             throw new Error('Ошибка добавления материала');
         }
