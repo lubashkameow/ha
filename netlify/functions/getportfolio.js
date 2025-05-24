@@ -11,7 +11,7 @@ exports.handler = async (event) => {
     }
 
     const response = await fetch(
-      `https://probability-published-oxide-warcraft.trycloudflare.com/api/portfolio?master_id=${masterId}`
+      `https://female-bias-wrap-merchandise.trycloudflare.com/api/portfolio?master_id=${masterId}`
     );
 
     if (!response.ok) throw new Error('API request failed');
