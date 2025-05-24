@@ -163,16 +163,15 @@ function renderReportTable(data, type) {
             html += `<li>${s.name_service} (${s.name_length}): ${s.count}</li>`;
         });
         html += `</ul>`;
-        html += `<p>Отменено записей: ${data.summary.cancelled}</p>`;
         html += `<p>Предстоящие записи: ${data.summary.upcoming}</p>`;
     } else if (type === 'materials') {
-        html += `<p>Общий расход (выполненные): ${data.summary.total_cost} ₽</p>`;
+        html += `<p>Текущий расход: ${data.summary.total_cost} ₽</p>`;
         html += `<p>Расход на предстоящие услуги: ${data.summary.upcoming_cost} ₽</p>`;
-        html += `<p>Ожидаемый расход (общий): ${data.summary.expected_cost} ₽</p>`;
+        html += `<p>Ожидаемый расход: ${data.summary.expected_cost} ₽</p>`;
     } else if (type === 'profit') {
         html += `<p>Выручка: ${data.summary.total_revenue} ₽</p>`;
         html += `<p>Расход на материалы: ${data.summary.total_material_cost} ₽</p>`;
-        html += `<p>Примерная прибыль (выполненные): ${data.summary.profit} ₽</p>`;
+        html += `<p>Примерная прибыль: ${data.summary.profit} ₽</p>`;
         html += `<p>Ожидаемая прибыль: ${data.summary.expected_profit} ₽</p>`;
     }
     html += '</div>';
