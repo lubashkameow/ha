@@ -1191,7 +1191,8 @@ option {
         }
 
 input[type="text"],
-input[type="number"] {
+input[type="number"],
+input[type="tel"] {
     box-sizing: border-box;
     max-width: 100%;
 }
