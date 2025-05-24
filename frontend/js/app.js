@@ -178,30 +178,11 @@ function renderReportTable(data, type) {
     }
 
     const headersMap = {
-        clients: {
-            name_user: 'Имя клиента',
-            phone_user: 'Телефон',
-            visits: 'Визиты',
-            is_new: 'Новый клиент'
-        },
-        appointments: {
-            date: 'Дата',
-            time: 'Время',
-            service: 'Услуга',
-            name_length: 'Длина волос',
-            name_user: 'Клиент',
-            status: 'Статус'
-        },
         materials: {
             name_material: 'Материал',
             quantity_ml: 'Объем (мл)',
             quantity: 'Количество',
             cost: 'Стоимость (₽)'
-        },
-        profit: {
-            service_name: 'Услуга',
-            count: 'Количество',
-            revenue: 'Выручка (₽)'
         }
     };
 
@@ -220,16 +201,15 @@ function renderReportTable(data, type) {
                 html += `<li>${s.name_service} (${s.name_length}): ${s.count}</li>`;
             });
             html += `</ul>`;
-            html += `<p>Отменено записей: ${data.summary.cancelled}</p>`;
             html += `<p>Предстоящие записи: ${data.summary.upcoming}</p>`;
         } else if (type === 'materials') {
-            html += `<p>Общий расход (выполненные): ${data.summary.total_cost} ₽</p>`;
+            html += `<p>Общий расход: ${data.summary.total_cost} ₽</p>`;
             html += `<p>Расход на предстоящие услуги: ${data.summary.upcoming_cost} ₽</p>`;
-            html += `<p>Ожидаемый расход (общий): ${data.summary.expected_cost} ₽</p>`;
+            html += `<p>Ожидаемый расход: ${data.summary.expected_cost} ₽</p>`;
         } else if (type === 'profit') {
             html += `<p>Выручка: ${data.summary.total_revenue} ₽</p>`;
             html += `<p>Расход на материалы: ${data.summary.total_material_cost} ₽</p>`;
-            html += `<p>Примерная прибыль (выполненные): ${data.summary.profit} ₽</p>`;
+            html += `<p>Примерная прибыль: ${data.summary.profit} ₽</p>`;
             html += `<p>Ожидаемая прибыль: ${data.summary.expected_profit} ₽</p>`;
         }
         html += '</div>';
@@ -238,7 +218,6 @@ function renderReportTable(data, type) {
     // Data table (выполненные услуги)
     if (data.data.length > 0) {
         const headers = headersMap[type] || Object.keys(data.data[0]);
-        html += '<h4>Расход материалов (выполненные услуги)</h4>';
         html += '<table class="report-table"><thead><tr>';
         Object.values(headers).forEach(h => html += `<th>${h}</th>`);
         html += '</tr></thead><tbody>';
