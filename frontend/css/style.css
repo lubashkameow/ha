@@ -1183,3 +1183,9 @@ option {
         .page-container {
             padding-bottom: 60px; /* Чтобы контент не перекрывался панелью */
         }
+
+input[type="text"],
+input[type="number"] {
+    box-sizing: border-box;
+    max-width: 100%;
+}
