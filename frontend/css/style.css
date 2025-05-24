@@ -1148,6 +1148,12 @@ option {
     margin-top: 15px;
 }
 
+.add-material-btn,
+.add-material-to-service-btn {
+    padding: 8px 12px;
+    font-size: 14px;
+}
+
  /* Добавляем стили для нижней панели */
         .bottom-nav {
             position: fixed;
