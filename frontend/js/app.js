@@ -1823,16 +1823,16 @@ async function loadServicesEditList() {
             let html = `
                 <div class="add-service-form">
                     <h4>Добавить новую услугу</h4>
-                    <input type="text" id="new-service-name" placeholder="Название услуги">
+                    <input type="text" id="new-service-name" placeholder="Новая услуга">
                     <select id="new-service-category">
                         <option value="1">Женский каталог</option>
                         <option value="2">Мужской каталог</option>
                     </select>
                     <select id="new-service-length">
                         ${data.hairlengths.map(h => `<option value="${h.id_length}">${h.name_length}</option>`).join('')}
-                        <option value="new">Новая длина...</option>
+                        <option value="new">Новый подраздел</option>
                     </select>
-                    <input type="text" id="new-length-name" placeholder="Название новой длины" style="display: none;">
+                    <input type="text" id="new-length-name" placeholder="Название нового подраздела" style="display: none;">
                     <input type="checkbox" id="new-service-ot"> <label for="new-service-ot">Цена "от"</label>
                     <input type="number" id="new-service-price" placeholder="Цена (₽)">
                     <input type="number" id="new-service-duration" placeholder="Длительность (мин)">
@@ -1848,7 +1848,7 @@ async function loadServicesEditList() {
                     <div class="service-edit-item" data-service-id="${service.id_service}">
                         <input type="text" value="${service.name_service}" disabled>
                         <input type="text" value="${service.name_length}" disabled>
-                        <input type="number" value="${service.price}" data-price="${service.id_service}">
+                        <input type="number" value="${service.price}" data-price="${service.id_service}"><label for="new-service-ot">"от"</label>
                         <input type="checkbox" ${service.ot ? 'checked' : ''} data-ot="${service.id_service}">
                         <div class="material-list" id="materials-${service.id_service}">
                             ${service.materials.map(m => `
