@@ -1206,23 +1206,6 @@ option {
     cursor: pointer; /* Курсор при наведении */
 }
 
-.save-material-btn {
-    background-color: #4CAF50; /* Зелёный цвет для "Сохранить" */
-    color: white;
-}
-
-.save-material-btn:hover {
-    background-color: #45a049;
-}
-
-.delete-material-btn {
-    background-color: #f44336; /* Красный цвет для "Удалить" */
-    color: white;
-}
-
-.delete-material-btn:hover {
-    background-color: #da190b;
-}
 
  /* Добавляем стили для нижней панели */
         .bottom-nav {
