@@ -1894,7 +1894,6 @@ async function loadServicesEditList() {
                     const serviceId = button.getAttribute('data-service-id');
                     if (confirm('Удалить услугу и связанные записи?')) {
                         await deleteService(serviceId);
-                    );
                         loadServicesEditList();
                     }
                 });
