@@ -3,7 +3,7 @@ const fetch = require('node-fetch');
 exports.handler = async () => {
     try {
         const response = await fetch(
-            'https://revised-bios-collection-gather.trycloudflare.com/api/update_completed_bookings',
+            'https://biotechnology-les-nu-cleaning.trycloudflare.com/api/update_completed_bookings',
             {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' }
