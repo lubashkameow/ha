@@ -2220,7 +2220,7 @@ async function loadMaterialsEditList() {
 
                     // Управление полем "Название" и "Объём (мл)"
                     if (quantityValue === '') {
-                        nameInput.disabled = true;
+                        nameInput.disabled = false;
                         mlInput.disabled = true;
                         e.target.disabled = true; // Блокируем само поле "Количество"
                     } else {
