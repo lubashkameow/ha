@@ -2149,26 +2149,17 @@ async function loadMaterialsEditList() {
                 </div>
                 <div class="materials-table-container">
                     <table class="materials-table">
-                        <thead>
                             <tr>
-                                <th>Название</th>
-                                <th>Цена (₽)</th>
-                                <th>Объём (мл)</th>
-                                <th>Количество</th>
-                                <th>Действия</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-            `;
-            data.materials.forEach(material => {
-                html += `
-                <tr>
                                 <td>Название</td>
                                 <td>Цена (₽)</td>
                                 <td>Объём (мл)</td>
                                 <td>Количество</td>
                                 <td>Действия</td>
                             </tr>
+            `;
+            data.materials.forEach(material => {
+                html += `
+                
                     <tr class="material-edit-item" data-material-id="${material.id_material}">
                         <td><input type="text" value="${material.name_material}" disabled></td>
                         <td><input type="number" value="${material.price_mat}" data-price="${material.id_material}"></td>
