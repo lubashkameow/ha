@@ -1148,62 +1148,88 @@ option {
     margin-top: 15px;
 }
 
-.add-material-btn {
+.add-material-btn, .add-material-to-service-btn {
     padding: 8px 12px;
     font-size: 14px;
 }
 
+
+
+
+
+/* Стили для кнопки "Добавить материал" */
 .add-material-to-service-btn {
-    padding: 6px 10px; /* Уменьшаем внутренние отступы, чтобы кнопка стала меньше */
-    font-size: 14px; /* Уменьшаем размер шрифта */
-    margin-left: 10px; /* Добавляем отступ слева от кнопки */
-    margin-top: 5px; /* Добавляем небольшой отступ сверху */
-    margin-bottom: 5px; /* Добавляем отступ снизу */
-    border-radius: 4px; /* Скругляем углы для аккуратного вида */
-    color: white; /* Цвет текста */
-    border: none; /* Убираем стандартную рамку */
-    cursor: pointer; /* Курсор при наведении */
+    padding: 6px 10px;
+    font-size: 14px;
+    margin-left: 10px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    border-radius: 4px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+.add-material-to-service-btn:hover {
+    background-color: #45a049;
+}
+.add-material-select {
+    margin-right: 10px;
+    padding: 5px;
+    border-radius: 4px;
+    font-size: 14px;
+}
+.material-list {
+    margin-bottom: 10px;
 }
 
-
-
+/* Стили для таблицы материалов */
 .materials-table-container {
-    width: 100%; /* Контейнер занимает всю ширину родителя */
-    overflow-x: auto; /* Добавляем горизонтальную прокрутку, если таблица выходит за рамки */
-    margin-top: 20px; /* Отступ сверху */
+    width: 100%;
+    overflow-x: auto;
+    margin-top: 20px;
 }
-
 .materials-table {
-    width: 100%; /* Таблица занимает всю ширину контейнера */
-    border-collapse: collapse; /* Убираем двойные границы */
-    font-size: 14px; /* Уменьшаем шрифт для компактности */
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
 }
-
 .materials-table th, .materials-table td {
-    padding: 8px; /* Внутренние отступы в ячейках */
-    text-align: left; /* Выравнивание текста */
-    border-bottom: 1px solid #ddd; /* Разделительная линия между строками */
+    padding: 8px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
 }
-
 .materials-table th {
-    background-color: #f4f4f4; /* Цвет фона для заголовков */
-    font-weight: bold; /* Жирный шрифт для заголовков */
+    background-color: #f4f4f4;
+    font-weight: bold;
 }
-
 .materials-table td input {
-    width: 100%; /* Поля ввода занимают всю ширину ячейки */
-    box-sizing: border-box; /* Учитываем padding и border в ширине */
-    padding: 5px; /* Внутренние отступы для полей */
-    border: 1px solid #ccc; /* Рамка для полей */
-    border-radius: 4px; /* Скругление углов */
+    width: 100%;
+    box-sizing: border-box;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
 }
-
 .materials-table td button {
-    padding: 5px 10px; /* Размер кнопок */
-    margin: 0 5px; /* Отступы между кнопками */
-    border-radius: 4px; /* Скругление углов */
-    border: none; /* Убираем рамку */
-    cursor: pointer; /* Курсор при наведении */
+    padding: 5px 10px;
+    margin: 0 5px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+}
+.save-material-btn {
+    background-color: #4CAF50;
+    color: white;
+}
+.save-material-btn:hover {
+    background-color: #45a049;
+}
+.delete-material-btn {
+    background-color: #f44336;
+    color: white;
+}
+.delete-material-btn:hover {
+    background-color: #da190b;
 }
 
 
