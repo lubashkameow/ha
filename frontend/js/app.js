@@ -2149,19 +2149,24 @@ async function loadMaterialsEditList() {
                 </div>
                 <div class="materials-table-container">
                     <table class="materials-table">
-                               <tr class="material-edit-item">
-                                <td>Название     </td>
-                                <td>Цена (₽)   </td>
-                                <td>Объём (мл)   </td>
-                                <td>Количество   </td>
-                                <td>Действия   </td>
+                        <thead>
+                            <tr>
+                                <th>Название</th>
+                                <th>Цена (₽)</th>
+                                <th>Объём (мл)</th>
+                                <th>Количество</th>
+                                <th>Действия</th>
                             </tr>
+                        </thead>
+                        <tbody>
             `;
             data.materials.forEach(material => {
+                const isQuantityEmpty = !material.quantity || material.quantity === '';
                 html += `
-                
                     <tr class="material-edit-item" data-material-id="${material.id_material}">
-                        <td><input type="text" value="${material.name_material}" disabled></td>
+                        <td>
+                            <input type="text" value="${material.name_material}" data-name="${material.id_material}" ${isQuantityEmpty ? 'disabled' : ''}>
+                        </td>
                         <td><input type="number" value="${material.price_mat}" data-price="${material.id_material}"></td>
                         <td><input type="number" value="${material.ml || ''}" data-ml="${material.id_material}"></td>
                         <td><input type="number" value="${material.quantity || ''}" data-quantity="${material.id_material}"></td>
@@ -2173,6 +2178,7 @@ async function loadMaterialsEditList() {
                 `;
             });
             html += `
+                        </tbody>
                     </table>
                 </div>
             `;
@@ -2193,6 +2199,19 @@ async function loadMaterialsEditList() {
                     if (confirm('Удалить материал и связанные записи?')) {
                         await deleteMaterial(materialId);
                         loadMaterialsEditList();
+                    }
+                });
+            });
+
+            // Добавляем обработчик для поля "Количество"
+            document.querySelectorAll('.materials-table td input[data-quantity]').forEach(quantityInput => {
+                quantityInput.addEventListener('input', (e) => {
+                    const materialId = e.target.getAttribute('data-quantity');
+                    const nameInput = document.querySelector(`input[data-name="${materialId}"]`);
+                    if (e.target.value.trim() === '') {
+                        nameInput.disabled = true;
+                    } else {
+                        nameInput.disabled = false;
                     }
                 });
             });
