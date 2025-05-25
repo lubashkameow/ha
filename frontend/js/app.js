@@ -1872,7 +1872,6 @@ async function loadServicesEditList() {
             container.innerHTML = html;
 
             // Обработчики для добавления
-            <script>
                 document.getElementById('new-service-length').appendEventListener('change', (e => {
                     document.querySelector('#new-length-name').getElementById('new-length-name').style.display = e.target.value === 'new' ? 'block' : 'none';
                 });
