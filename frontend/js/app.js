@@ -1848,62 +1848,100 @@ async function loadServicesEditList() {
                     <div class="service-edit-item" data-service-id="${service.id_service}">
                         <input type="text" value="${service.name_service}" disabled>
                         <input type="text" value="${service.name_length}" disabled>
-                        <input type="number" value="${service.price}" data-price="${service.id_service}"><label for="new-service-ot">"от"</label>
-                        <input type="checkbox" ${service.ot ? 'checked' : ''} data-ot="${service.id_service}">
+                        <input type="number" value="${service.price}" data-price="${service.id_service}">
+                        <label><input type="checkbox" ${service.ot ? 'checked' : ''} data-ot="${service.id_service}"> От</label>
                         <div class="material-list" id="materials-${service.id_service}">
                             ${service.materials.map(m => `
-                                <div class="material-item" data-material-id="${m.id_material}">
+                                <div class="material-item" data-id-material="${m.id_material}">
                                     <span>${m.name_material}</span>
-                                    <input type="number" value="${m.quantity_ml || m.quant || 0}" data-quantity="${m.id_material}">
-                                    <button class="delete-material-btn" data-material-id="${m.id_material}">Удалить</button>
+                                    <input type="number" name="quantity" value="${m.quantity_ml || m.quant || ''}" data-material-id="${m.id_material}">
+                                    <button class="delete-material-btn" data-material-id="${m.id_material}" data-service-id="${service.id_service}" data-id="${service.id_service}">Удалить</button>
                                 </div>
                             `).join('')}
                         </div>
-                        <button class="add-material-to-service-btn" data-service-id="${service.id_service}">Добавить материал</button>
-                        <button class="save-service-btn" data-service-id="${service.id_service}">Сохранить</button>
-                        <button class="delete-service-btn" data-service-id="${service.id_service}">Удалить</button>
+                        <select class="add-material-select" data-service-id="${service.id_service}">
+                            <option value="">Выберите материал</option>
+                            ${data.materials.map(m => `<option value="${m.id_material}">${m.name_material}</option>`).join('')}
+                        </select>
+                        <button class="add-material-to-service-btn" data-service-id="${serviceId}" id_service}">Добавить материал</button>
+                        <button data-class="save-service-btn" data-service-id="${service.id_service}" id_service-btn">Сохранить</button>
+                        <button data-class="delete-service-btn" data-id="${service.id_service}" id_service_btn="Удалить</button>
                     </div>
                 `;
             });
             container.innerHTML = html;
 
-            // Обработчики для добавления новой услуги
-            document.getElementById('new-service-length').addEventListener('change', (e) => {
-                document.getElementById('new-length-name').style.display = e.target.value === 'new' ? 'block' : 'none';
-            });
+            // Обработчики для добавления
+            <script>
+                document.getElementById('new-service-length').appendEventListener('change', (e => {
+                    document.querySelector('#new-length-name').getElementById('new-length-name').style.display = e.target.value === 'new' ? 'block' : 'none';
+                });
 
-            document.getElementById('add-material-btn').addEventListener('click', () => addMaterialField('new-service-materials'));
-            document.getElementById('add-service-btn').addEventListener('click', addNewService);
+            document.getElementById('add-material-btn').appendEventListener('click', () => {
+                    addMaterialField('new-service-materials');
+                });
+            document.getElementById('add-service-btn').appendEventListener('click', addNewService);
 
-            // Обработчики для существующих услуг
+            // Обработчик для существующих услуг
             document.querySelectorAll('.save-service-btn').forEach(btn => {
-                btn.addEventListener('click', async () => {
-                    const serviceId = btn.getAttribute('data-service-id');
+                button.addEventListener('click', async () => {
+                    const serviceId = button.getAttribute('data-service-id');
                     await updateService(serviceId);
                 });
             });
 
             document.querySelectorAll('.delete-service-btn').forEach(btn => {
-                btn.addEventListener('click', async () => {
-                    const serviceId = btn.getAttribute('data-service-id');
+                button.addEventListener('click', async () => {
+                    const serviceId = button.getAttribute('data-service-id');
                     if (confirm('Удалить услугу и связанные записи?')) {
                         await deleteService(serviceId);
+                    );
                         loadServicesEditList();
                     }
                 });
             });
 
+            // Обработчик для добавления материала к существующей услуге
             document.querySelectorAll('.add-material-to-service-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const serviceId = btn.getAttribute('data-service-id');
-                    addMaterialField(`materials-${serviceId}`, serviceId);
+                button.addEventListener('click', () => {
+                    const serviceId = button.getAttribute('data-service-id');
+                    const select = document.querySelector(`select.add-material-select[data-service-id="${serviceId}"]`);
+                    const materialId = select.value;
+                    const materialName = select.selectedOptions[0]?.textContent || '';
+
+                    if (!materialId) {
+                        alert('Выберите материал');
+                        return;
+                    }
+
+                    const materialList = document.querySelectorById(`materials-${serviceId}`);
+                    const materialItem = document.createElement('div');
+                    newMaterialItem.classList.add('material-item');
+                    materialItem.setAttribute('data-id-material-id', materialId);
+                    materialItem.innerHTML = `
+                        <span>${materialName}></span>
+                        <input type="number" data-quantity="${materialId}" value="0">
+                        <button class="delete-material-btn" data-material-id="${materialId}" data-service-id="${serviceId}" data-id="${serviceId}" id="${serviceId}">Удалить</button>
+                    `;
+                    materialList.appendChild(materialItem);
+
+                    // Обработчик для удаления нового материала
+                    materialItem.querySelector(`.delete-material-btn[data-material-id="${serviceId}"]`).appendEventListener('click', async () => {
+                        if (confirm('Удалить материал из услуги?')) {
+                            await deleteMaterialFromService(serviceId, materialId);
+                            loadServicesEditList();
+                        }
+                    });
+
+                    // Сброс выбора
+                    select.value = '';
                 });
             });
 
             document.querySelectorAll('.delete-material-btn').forEach(btn => {
-                btn.addEventListener('click', async () => {
-                    const materialId = btn.getAttribute('data-material-id');
-                    const serviceId = btn.closest('.service-edit-item').getAttribute('data-service-id');
+                button.addEventListener('click', async () => {
+                    const materialId = button.getAttribute('data-material-id');
+                    const serviceId = button.closest('.service-edit-item').getAttribute('data-service-id');
                     if (confirm('Удалить материал из услуги?')) {
                         await deleteMaterialFromService(serviceId, materialId);
                         loadServicesEditList();
@@ -1924,18 +1962,36 @@ async function addMaterialField(containerId, serviceId = null) {
     const container = document.getElementById(containerId);
     const response = await fetch('/.netlify/functions/getmaterials');
     const data = await response.json();
-    const materialId = `material-${Date.now()}`;
-    container.innerHTML += `
-        <div class="material-item" data-material-id="${materialId}">
-            <select data-material-select="${materialId}">
-                ${data.materials.map(m => `<option value="${m.id_material}">${m.name_material}</option>`).join('')}
-            </select>
-            <input type="number" placeholder="Количество/ml" data-quantity="${materialId}">
-            <button class="remove-material-btn" data-material-id="${materialId}">Удалить</button>
-        </div>
+    
+    // Создаем уникальный идентификатор для нового элемента
+    const tempId = `temp-${Date.now()}`;
+    
+    // Создаем HTML для нового материала
+    const materialItem = document.createElement('div');
+    materialItem.className = 'material-item';
+    materialItem.setAttribute('data-temp-id', tempId); // Используем временный ID
+    materialItem.innerHTML = `
+        <select data-material-select="${tempId}">
+            <option value="">Выберите материал</option>
+            ${data.materials.map(m => `<option value="${m.id_material}" data-name="${m.name_material}">${m.name_material}</option>`).join('')}
+        </select>
+        <input type="number" placeholder="Количество/ml" data-quantity="${tempId}" value="0">
+        <button class="remove-material-btn" data-temp-id="${tempId}">Удалить</button>
     `;
-    document.querySelector(`.remove-material-btn[data-material-id="${materialId}"]`).addEventListener('click', () => {
-        document.querySelector(`.material-item[data-material-id="${materialId}"]`).remove();
+    container.appendChild(materialItem);
+    
+    // Обработчик для удаления материала
+    materialItem.querySelector(`.remove-material-btn[data-temp-id="${tempId}"]`).addEventListener('click', () => {
+        materialItem.remove();
+    });
+    
+    // При выборе материала обновляем data-id-material
+    materialItem.querySelector(`select[data-material-select="${tempId}"]`).addEventListener('change', (e) => {
+        const selectedOption = e.target.selectedOptions[0];
+        if (selectedOption.value) {
+            materialItem.setAttribute('data-id-material', selectedOption.value);
+            materialItem.removeAttribute('data-temp-id');
+        }
     });
 }
 
@@ -2003,10 +2059,17 @@ async function addNewService() {
 async function updateService(serviceId) {
     const price = document.querySelector(`input[data-price="${serviceId}"]`).value;
     const ot = document.querySelector(`input[data-ot="${serviceId}"]`).checked;
-    const materials = Array.from(document.querySelectorAll(`#materials-${serviceId} .material-item`)).map(item => ({
-        id_material: item.querySelector('span').textContent, // Используем name_material как идентификатор
-        quantity: item.querySelector('input[data-quantity]').value
-    }));
+    const materials = Array.from(document.querySelectorAll(`#materials-${serviceId} .material-item`)).map(item => {
+        const idMaterial = item.getAttribute('data-id-material') || item.querySelector('select')?.value;
+        const quantityInput = item.querySelector('input[data-quantity]');
+        if (!idMaterial) return null; // Пропускаем, если материал не выбран
+        return {
+            id_material: idMaterial,
+            quantity: quantityInput ? parseFloat(quantityInput.value) || 0 : 0
+        };
+    }).filter(item => item !== null); // Удаляем null элементы
+
+    console.log('Materials to send:', materials); // Для отладки
 
     try {
         const response = await fetch('/.netlify/functions/updateservice', {
@@ -2023,10 +2086,12 @@ async function updateService(serviceId) {
             alert('Услуга обновлена');
             loadServicesEditList();
         } else {
-            throw new Error('Ошибка обновления услуги');
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Ошибка обновления услуги');
         }
     } catch (error) {
         alert('Ошибка: ' + error.message);
+        console.error('Update service error:', error);
     }
 }
 
