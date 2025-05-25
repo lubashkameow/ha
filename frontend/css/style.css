@@ -1148,10 +1148,21 @@ option {
     margin-top: 15px;
 }
 
-.add-material-btn,
-.add-material-to-service-btn {
+.add-material-btn {
     padding: 8px 12px;
     font-size: 14px;
+}
+
+.add-material-to-service-btn {
+    padding: 6px 10px; /* Уменьшаем внутренние отступы, чтобы кнопка стала меньше */
+    font-size: 14px; /* Уменьшаем размер шрифта */
+    margin-left: 10px; /* Добавляем отступ слева от кнопки */
+    margin-top: 5px; /* Добавляем небольшой отступ сверху */
+    margin-bottom: 5px; /* Добавляем отступ снизу */
+    border-radius: 4px; /* Скругляем углы для аккуратного вида */
+    color: white; /* Цвет текста */
+    border: none; /* Убираем стандартную рамку */
+    cursor: pointer; /* Курсор при наведении */
 }
 
  /* Добавляем стили для нижней панели */
