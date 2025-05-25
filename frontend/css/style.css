@@ -1165,6 +1165,65 @@ option {
     cursor: pointer; /* Курсор при наведении */
 }
 
+
+
+.materials-table-container {
+    width: 100%; /* Контейнер занимает всю ширину родителя */
+    overflow-x: auto; /* Добавляем горизонтальную прокрутку, если таблица выходит за рамки */
+    margin-top: 20px; /* Отступ сверху */
+}
+
+.materials-table {
+    width: 100%; /* Таблица занимает всю ширину контейнера */
+    border-collapse: collapse; /* Убираем двойные границы */
+    font-size: 14px; /* Уменьшаем шрифт для компактности */
+}
+
+.materials-table th, .materials-table td {
+    padding: 8px; /* Внутренние отступы в ячейках */
+    text-align: left; /* Выравнивание текста */
+    border-bottom: 1px solid #ddd; /* Разделительная линия между строками */
+}
+
+.materials-table th {
+    background-color: #f4f4f4; /* Цвет фона для заголовков */
+    font-weight: bold; /* Жирный шрифт для заголовков */
+}
+
+.materials-table td input {
+    width: 100%; /* Поля ввода занимают всю ширину ячейки */
+    box-sizing: border-box; /* Учитываем padding и border в ширине */
+    padding: 5px; /* Внутренние отступы для полей */
+    border: 1px solid #ccc; /* Рамка для полей */
+    border-radius: 4px; /* Скругление углов */
+}
+
+.materials-table td button {
+    padding: 5px 10px; /* Размер кнопок */
+    margin: 0 5px; /* Отступы между кнопками */
+    border-radius: 4px; /* Скругление углов */
+    border: none; /* Убираем рамку */
+    cursor: pointer; /* Курсор при наведении */
+}
+
+.save-material-btn {
+    background-color: #4CAF50; /* Зелёный цвет для "Сохранить" */
+    color: white;
+}
+
+.save-material-btn:hover {
+    background-color: #45a049;
+}
+
+.delete-material-btn {
+    background-color: #f44336; /* Красный цвет для "Удалить" */
+    color: white;
+}
+
+.delete-material-btn:hover {
+    background-color: #da190b;
+}
+
  /* Добавляем стили для нижней панели */
         .bottom-nav {
             position: fixed;
