@@ -2162,14 +2162,21 @@ async function loadMaterialsEditList() {
             `;
             data.materials.forEach(material => {
                 const isQuantityEmpty = !material.quantity || material.quantity === '';
+                const isMlEmpty = !material.ml || material.ml === '';
                 html += `
                     <tr class="material-edit-item" data-material-id="${material.id_material}">
                         <td>
                             <input type="text" value="${material.name_material}" data-name="${material.id_material}" ${isQuantityEmpty ? 'disabled' : ''}>
                         </td>
-                        <td><input type="number" value="${material.price_mat}" data-price="${material.id_material}"></td>
-                        <td><input type="number" value="${material.ml || ''}" data-ml="${material.id_material}"></td>
-                        <td><input type="number" value="${material.quantity || ''}" data-quantity="${material.id_material}"></td>
+                        <td>
+                            <input type="number" value="${material.price_mat}" data-price="${material.id_material}">
+                        </td>
+                        <td>
+                            <input type="number" value="${material.ml || ''}" data-ml="${material.id_material}" ${isMlEmpty ? 'disabled' : ''}>
+                        </td>
+                        <td>
+                            <input type="number" value="${material.quantity || ''}" data-quantity="${material.id_material}" ${isQuantityEmpty ? 'disabled' : ''}>
+                        </td>
                         <td>
                             <button class="save-material-btn" data-material-id="${material.id_material}">Сохранить</button>
                             <button class="delete-material-btn" data-material-id="${material.id_material}">Удалить</button>
@@ -2203,15 +2210,35 @@ async function loadMaterialsEditList() {
                 });
             });
 
-            // Добавляем обработчик для поля "Количество"
+            // Динамическое управление блокировкой
             document.querySelectorAll('.materials-table td input[data-quantity]').forEach(quantityInput => {
                 quantityInput.addEventListener('input', (e) => {
                     const materialId = e.target.getAttribute('data-quantity');
                     const nameInput = document.querySelector(`input[data-name="${materialId}"]`);
-                    if (e.target.value.trim() === '') {
+                    const mlInput = document.querySelector(`input[data-ml="${materialId}"]`);
+                    const quantityValue = e.target.value.trim();
+
+                    // Управление полем "Название" и "Объём (мл)"
+                    if (quantityValue === '') {
                         nameInput.disabled = true;
+                        mlInput.disabled = true;
+                        e.target.disabled = true; // Блокируем само поле "Количество"
                     } else {
                         nameInput.disabled = false;
+                        mlInput.disabled = false;
+                        e.target.disabled = false;
+                    }
+                });
+            });
+
+            document.querySelectorAll('.materials-table td input[data-ml]').forEach(mlInput => {
+                mlInput.addEventListener('input', (e) => {
+                    const materialId = e.target.getAttribute('data-ml');
+                    const mlValue = e.target.value.trim();
+                    if (mlValue === '') {
+                        e.target.disabled = true; // Блокируем само поле "Объём (мл)"
+                    } else {
+                        e.target.disabled = false;
                     }
                 });
             });
@@ -2223,7 +2250,6 @@ async function loadMaterialsEditList() {
         console.error('Ошибка загрузки материалов:', error);
     }
 }
-
 // Добавление нового материала
 async function addNewMaterial() {
     const name = document.getElementById('new-material-name')?.value;
