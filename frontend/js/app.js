@@ -2178,7 +2178,7 @@ async function loadMaterialsEditList() {
                             <input type="number" value="${material.quantity || ''}" data-quantity="${material.id_material}" ${isQuantityEmpty ? 'disabled' : ''}>
                         </td>
                         <td>
-                            <button class="save-material-btn" data-material-id="${material.id_material}">Сохранить</button>
+                            <button class="save-material-btn" data-material-id="${material.id_material}">Сохранить</button><br>
                             <button class="delete-material-btn" data-material-id="${material.id_material}">Удалить</button>
                         </td>
                     </tr>
@@ -2220,11 +2220,11 @@ async function loadMaterialsEditList() {
 
                     // Управление полем "Название" и "Объём (мл)"
                     if (quantityValue === '') {
-                        nameInput.disabled = false;
+                        nameInput.disabled = true;
                         mlInput.disabled = true;
                         e.target.disabled = true; // Блокируем само поле "Количество"
                     } else {
-                        nameInput.disabled = false;
+                        nameInput.disabled = true;
                         mlInput.disabled = false;
                         e.target.disabled = false;
                     }
