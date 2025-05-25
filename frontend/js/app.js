@@ -2147,19 +2147,38 @@ async function loadMaterialsEditList() {
                     <input type="number" id="new-material-quantity" placeholder="Количество">
                     <button id="add-material-btn-final" class="form-button">Добавить материал</button>
                 </div>
+                <div class="materials-table-container">
+                    <table class="materials-table">
+                        <thead>
+                            <tr>
+                                <th>Название</th>
+                                <th>Цена (₽)</th>
+                                <th>Объём (мл)</th>
+                                <th>Количество</th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody>
             `;
             data.materials.forEach(material => {
                 html += `
-                    <div class="material-edit-item" data-material-id="${material.id_material}">
-                        <input type="text" value="${material.name_material}" disabled>
-                        <input type="number" value="${material.price_mat}" data-price="${material.id_material}">
-                        <input type="number" value="${material.ml || ''}" data-ml="${material.id_material}">
-                        <input type="number" value="${material.quantity || ''}" data-quantity="${material.id_material}">
-                        <button class="save-material-btn" data-material-id="${material.id_material}">Сохранить</button>
-                        <button class="delete-material-btn" data-material-id="${material.id_material}">Удалить</button>
-                    </div>
+                    <tr class="material-edit-item" data-material-id="${material.id_material}">
+                        <td><input type="text" value="${material.name_material}" disabled></td>
+                        <td><input type="number" value="${material.price_mat}" data-price="${material.id_material}"></td>
+                        <td><input type="number" value="${material.ml || ''}" data-ml="${material.id_material}"></td>
+                        <td><input type="number" value="${material.quantity || ''}" data-quantity="${material.id_material}"></td>
+                        <td>
+                            <button class="save-material-btn" data-material-id="${material.id_material}">Сохранить</button>
+                            <button class="delete-material-btn" data-material-id="${material.id_material}">Удалить</button>
+                        </td>
+                    </tr>
                 `;
             });
+            html += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
             container.innerHTML = html;
 
             document.getElementById('add-material-btn-final').addEventListener('click', addNewMaterial);
