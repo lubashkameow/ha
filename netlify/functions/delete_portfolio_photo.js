@@ -1,7 +1,7 @@
 const fetch = require('node-fetch');
 
 exports.handler = async (event) => {
-  const apiUrl = 'https://revised-bios-collection-gather.trycloudflare.com/api/delete_portfolio_photo';
+  const apiUrl = 'https://biotechnology-les-nu-cleaning.trycloudflare.com/api/delete_portfolio_photo';
 
   try {
     const { user_id, photo_id } = JSON.parse(event.body);
