@@ -1819,7 +1819,7 @@ async function loadServicesEditList() {
     try {
         const response = await fetch('/.netlify/functions/getservicesedit');
         const data = await response.json();
-        console.log('Loaded services data:', data);
+        console.log('Loaded services data:', data); // Отладка
         if (data.services && data.services.length > 0) {
             let html = `
                 <div class="add-service-form">
@@ -1855,7 +1855,7 @@ async function loadServicesEditList() {
                             ${service.materials.map(m => `
                                 <div class="material-item" data-id-material="${m.id_material}">
                                     <span>${m.name_material}</span>
-                                    <input type="number" name="quantity" value="${m.quantity_ml || m.quant || ''}" data-material-id="${m.id_material}">
+                                    <input type="number" name="quantity" value="${m.quantity_ml !== undefined ? m.quantity_ml : (m.quant || '')}" data-material-id="${m.id_material}">
                                     <button class="delete-material-btn" data-material-id="${m.id_material}" data-service-id="${service.id_service}">Удалить</button>
                                 </div>
                             `).join('')}
@@ -1919,7 +1919,7 @@ async function loadServicesEditList() {
                     materialItem.setAttribute('data-id-material', materialId);
                     materialItem.innerHTML = `
                         <span>${materialName}</span>
-                        <input type="number" data-quantity="${materialId}" value="0">
+                        <input type="number" name="quantity" value="0" data-material-id="${materialId}">
                         <button class="delete-material-btn" data-material-id="${materialId}" data-service-id="${serviceId}">Удалить</button>
                     `;
                     materialList.appendChild(materialItem);
@@ -1955,7 +1955,6 @@ async function loadServicesEditList() {
         console.error('Ошибка загрузки услуг:', error);
     }
 }
-
 // Добавление поля для материала
 async function addMaterialField(containerId, serviceId = null) {
     const container = document.getElementById(containerId);
@@ -2058,17 +2057,23 @@ async function addNewService() {
 async function updateService(serviceId) {
     const price = document.querySelector(`input[data-price="${serviceId}"]`).value;
     const ot = document.querySelector(`input[data-ot="${serviceId}"]`).checked;
-    const materials = Array.from(document.querySelectorAll(`#materials-${serviceId} .material-item`)).map(item => {
-        const idMaterial = item.getAttribute('data-id-material') || item.querySelector('select')?.value;
-        const quantityInput = item.querySelector('input[data-quantity]');
-        if (!idMaterial) return null; // Пропускаем, если материал не выбран
-        return {
-            id_material: idMaterial,
-            quantity: quantityInput ? parseFloat(quantityInput.value) || 0 : 0
-        };
-    }).filter(item => item !== null); // Удаляем null элементы
+    const materialItems = document.querySelectorAll(`#materials-${serviceId} .material-item`);
+    const materials = [];
 
-    console.log('Materials to send:', materials); // Для отладки
+    materialItems.forEach(item => {
+        const idMaterial = item.getAttribute('data-id-material');
+        const quantityInput = item.querySelector('input[name="quantity"]');
+        const quantity = quantityInput ? (quantityInput.value.trim() === '' ? 0 : parseFloat(quantityInput.value)) : 0;
+        console.log(`Material ID: ${idMaterial}, Quantity: ${quantity}`); // Отладка
+        if (idMaterial) {
+            materials.push({
+                id_material: idMaterial,
+                quantity: quantity
+            });
+        }
+    });
+
+    console.log('Materials to send:', materials); // Отладка перед отправкой
 
     try {
         const response = await fetch('/.netlify/functions/updateservice', {
@@ -2093,7 +2098,6 @@ async function updateService(serviceId) {
         console.error('Update service error:', error);
     }
 }
-
 // Удаление услуги
 async function deleteService(serviceId) {
     try {
