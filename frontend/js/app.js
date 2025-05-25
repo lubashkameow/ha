@@ -2137,6 +2137,7 @@ async function loadMaterialsEditList() {
     try {
         const response = await fetch('/.netlify/functions/getmaterials');
         const data = await response.json();
+        console.log('Materials data:', data); // Для отладки
         if (data.materials && data.materials.length > 0) {
             let html = `
                 <div class="add-material-form">
@@ -2161,12 +2162,12 @@ async function loadMaterialsEditList() {
                         <tbody>
             `;
             data.materials.forEach(material => {
-                const isQuantityEmpty = !material.quantity || material.quantity === '';
                 const isMlEmpty = !material.ml || material.ml === '';
+                const isQuantityEmpty = !material.quantity || material.quantity === '';
                 html += `
                     <tr class="material-edit-item" data-material-id="${material.id_material}">
                         <td>
-                            <input type="text" value="${material.name_material}" data-name="${material.id_material}" ${isQuantityEmpty ? 'disabled' : ''}>
+                            <input type="text" value="${material.name_material}" disabled>
                         </td>
                         <td>
                             <input type="number" value="${material.price_mat}" data-price="${material.id_material}">
@@ -2178,7 +2179,7 @@ async function loadMaterialsEditList() {
                             <input type="number" value="${material.quantity || ''}" data-quantity="${material.id_material}" ${isQuantityEmpty ? 'disabled' : ''}>
                         </td>
                         <td>
-                            <button class="save-material-btn" data-material-id="${material.id_material}">Сохранить</button><br>
+                            <button class="save-material-btn" data-material-id="${material.id_material}">Сохранить</button>
                             <button class="delete-material-btn" data-material-id="${material.id_material}">Удалить</button>
                         </td>
                     </tr>
@@ -2210,33 +2211,26 @@ async function loadMaterialsEditList() {
                 });
             });
 
-            // Динамическое управление блокировкой
-            document.querySelectorAll('.materials-table td input[data-quantity]').forEach(quantityInput => {
-                quantityInput.addEventListener('input', (e) => {
-                    const materialId = e.target.getAttribute('data-quantity');
-                    const nameInput = document.querySelector(`input[data-name="${materialId}"]`);
-                    const mlInput = document.querySelector(`input[data-ml="${materialId}"]`);
-                    const quantityValue = e.target.value.trim();
-
-                    // Управление полем "Название" и "Объём (мл)"
-                    if (quantityValue === '') {
-                        nameInput.disabled = true;
-                        mlInput.disabled = true;
-                        e.target.disabled = true; // Блокируем само поле "Количество"
-                    } else {
-                        nameInput.disabled = true;
-                        mlInput.disabled = false;
-                        e.target.disabled = false;
-                    }
-                });
-            });
-
+            // Оставляем только обработчик для "Объём (мл)"
             document.querySelectorAll('.materials-table td input[data-ml]').forEach(mlInput => {
                 mlInput.addEventListener('input', (e) => {
                     const materialId = e.target.getAttribute('data-ml');
                     const mlValue = e.target.value.trim();
                     if (mlValue === '') {
-                        e.target.disabled = true; // Блокируем само поле "Объём (мл)"
+                        e.target.disabled = true;
+                    } else {
+                        e.target.disabled = false;
+                    }
+                });
+            });
+
+            // Оставляем обработчик для "Количество"
+            document.querySelectorAll('.materials-table td input[data-quantity]').forEach(quantityInput => {
+                quantityInput.addEventListener('input', (e) => {
+                    const materialId = e.target.getAttribute('data-quantity');
+                    const quantityValue = e.target.value.trim();
+                    if (quantityValue === '') {
+                        e.target.disabled = true;
                     } else {
                         e.target.disabled = false;
                     }
@@ -2250,6 +2244,8 @@ async function loadMaterialsEditList() {
         console.error('Ошибка загрузки материалов:', error);
     }
 }
+
+
 // Добавление нового материала
 async function addNewMaterial() {
     const name = document.getElementById('new-material-name')?.value;
