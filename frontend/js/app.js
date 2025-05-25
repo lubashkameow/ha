@@ -2150,11 +2150,11 @@ async function loadMaterialsEditList() {
                 <div class="materials-table-container">
                     <table class="materials-table">
                                <tr class="material-edit-item">
-                                <td>Название</td>
-                                <td>Цена (₽)</td>
-                                <td>Объём (мл)</td>
-                                <td>Количество</td>
-                                <td>Действия</td>
+                                <td>Название     </td>
+                                <td>Цена (₽)   </td>
+                                <td>Объём (мл)   </td>
+                                <td>Количество   </td>
+                                <td>Действия   </td>
                             </tr>
             `;
             data.materials.forEach(material => {
