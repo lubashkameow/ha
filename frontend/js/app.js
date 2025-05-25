@@ -1872,9 +1872,9 @@ async function loadServicesEditList() {
             container.innerHTML = html;
 
             // Обработчики для добавления
-                document.getElementById('new-service-length').appendEventListener('change', (e => {
-                    document.querySelector('#new-length-name').getElementById('new-length-name').style.display = e.target.value === 'new' ? 'block' : 'none';
-                });
+                document.getElementById('new-service-length').addEventListener('change', (e) => {
+                document.getElementById('new-length-name').style.display = e.target.value === 'new' ? 'block' : 'none';
+            });
 
             document.getElementById('add-material-btn').appendEventListener('click', () => {
                     addMaterialField('new-service-materials');
