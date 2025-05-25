@@ -2,7 +2,7 @@ const fetch = require('node-fetch');
 
 exports.handler = async (event) => {
   try {
-    const response = await fetch('https://revised-bios-collection-gather.trycloudflare.com/api/deleteservice', {
+    const response = await fetch('https://biotechnology-les-nu-cleaning.trycloudflare.com/api/deleteservice', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: event.body
