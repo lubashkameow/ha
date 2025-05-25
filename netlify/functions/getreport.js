@@ -10,7 +10,7 @@ exports.handler = async (event) => {
         };
     }
 
-    const apiUrl = `https://revised-bios-collection-gather.trycloudflare.com/api/report?user_id=${user_id}&month=${month}&type=${type}`;
+    const apiUrl = `https://biotechnology-les-nu-cleaning.trycloudflare.com/api/report?user_id=${user_id}&month=${month}&type=${type}`;
     console.log(`Fetching report: ${apiUrl}`);
 
     try {
