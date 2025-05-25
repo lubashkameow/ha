@@ -2149,7 +2149,7 @@ async function loadMaterialsEditList() {
                 </div>
                 <div class="materials-table-container">
                     <table class="materials-table">
-                               <tr class="material-edit-item" data-material-id="${material.id_material}">
+                               <tr class="material-edit-item">
                                 <td>Название</td>
                                 <td>Цена (₽)</td>
                                 <td>Объём (мл)</td>
