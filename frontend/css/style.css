@@ -1109,23 +1109,32 @@ option {
 }
 
 /* Стили для списка материалов */
+/* Стили для списка материалов */
 .materials-table-container {
     width: 100%;
     overflow-x: auto;
     margin-top: 20px;
+    border: 1px solid #ddd; /* Добавим рамку для наглядности */
 }
 
 .materials-table {
     width: 100%;
     border-collapse: collapse;
     font-size: 14px;
+    table-layout: fixed; /* Фиксируем ширину столбцов */
 }
 
 .materials-table th, .materials-table td {
     padding: 10px;
     text-align: left;
     border-bottom: 1px solid #ddd;
-    min-width: 100px;
+    border-right: 1px solid #ddd; /* Разделяем столбцы */
+    width: 20%; /* Равномерное распределение ширины */
+    box-sizing: border-box;
+}
+
+.materials-table th:last-child, .materials-table td:last-child {
+    border-right: none; /* Убираем правую границу у последнего столбца */
 }
 
 .materials-table th {
@@ -1172,7 +1181,16 @@ option {
 }
 
 .material-edit-item {
-    display: table-row;
+    display: table-row !important; /* Принудительно используем табличную разметку */
+}
+
+/* Убедимся, что родительский контейнер не сжимает таблицу */
+#materials-tab-content {
+    width: 100%;
+    overflow: visible;
+    min-height: 200px;
+    padding: 10px;
+    box-sizing: border-box;
 }
 
 /* Стили для списка материалов */
