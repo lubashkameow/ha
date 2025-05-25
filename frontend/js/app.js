@@ -1819,6 +1819,7 @@ async function loadServicesEditList() {
     try {
         const response = await fetch('/.netlify/functions/getservicesedit');
         const data = await response.json();
+        console.log('Loaded services data:', data);
         if (data.services && data.services.length > 0) {
             let html = `
                 <div class="add-service-form">
