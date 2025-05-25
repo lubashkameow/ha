@@ -1,7 +1,7 @@
 const fetch = require('node-fetch');
 
 exports.handler = async (event) => {
-    const apiUrl = `https://revised-bios-collection-gather.trycloudflare.com/api/toggleworkday`;
+    const apiUrl = `https://biotechnology-les-nu-cleaning.trycloudflare.com/api/toggleworkday`;
 
     try {
         const response = await fetch(apiUrl, {
