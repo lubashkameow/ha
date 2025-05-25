@@ -10,7 +10,7 @@ exports.handler = async (event) => {
         };
     }
     
-    const url = `https://revised-bios-collection-gather.trycloudflare.com/api/timeslots?date=${date}&master_id=${master_id}&service_id=${service_id}`;
+    const url = `https://biotechnology-les-nu-cleaning.trycloudflare.com/api/timeslots?date=${date}&master_id=${master_id}&service_id=${service_id}`;
     
     try {
         const response = await fetch(url);
