@@ -2149,7 +2149,7 @@ async function loadMaterialsEditList() {
                 </div>
                 <div class="materials-table-container">
                     <table class="materials-table">
-                            <tr>
+                               <tr class="material-edit-item" data-material-id="${material.id_material}">
                                 <td>Название</td>
                                 <td>Цена (₽)</td>
                                 <td>Объём (мл)</td>
@@ -2173,7 +2173,6 @@ async function loadMaterialsEditList() {
                 `;
             });
             html += `
-                        </tbody>
                     </table>
                 </div>
             `;
