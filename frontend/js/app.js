@@ -1855,7 +1855,7 @@ async function loadServicesEditList() {
                                 <div class="material-item" data-id-material="${m.id_material}">
                                     <span>${m.name_material}</span>
                                     <input type="number" name="quantity" value="${m.quantity_ml || m.quant || ''}" data-material-id="${m.id_material}">
-                                    <button class="delete-material-btn" data-material-id="${m.id_material}" data-service-id="${service.id_service}" data-id="${service.id_service}">Удалить</button>
+                                    <button class="delete-material-btn" data-material-id="${m.id_material}" data-service-id="${service.id_service}">Удалить</button>
                                 </div>
                             `).join('')}
                         </div>
@@ -1863,35 +1863,35 @@ async function loadServicesEditList() {
                             <option value="">Выберите материал</option>
                             ${data.materials.map(m => `<option value="${m.id_material}">${m.name_material}</option>`).join('')}
                         </select>
-                        <button class="add-material-to-service-btn" data-service-id="${serviceId}" id_service}">Добавить материал</button>
-                        <button data-class="save-service-btn" data-service-id="${service.id_service}" id_service-btn">Сохранить</button>
-                        <button data-class="delete-service-btn" data-id="${service.id_service}" id_service_btn="Удалить</button>
+                        <button class="add-material-to-service-btn" data-service-id="${service.id_service}">Добавить материал</button>
+                        <button class="save-service-btn" data-service-id="${service.id_service}">Сохранить</button>
+                        <button class="delete-service-btn" data-service-id="${service.id_service}">Удалить</button>
                     </div>
                 `;
             });
             container.innerHTML = html;
 
-            // Обработчики для добавления
-                document.getElementById('new-service-length').addEventListener('change', (e) => {
+            // Обработчики для добавления новой услуги
+            document.getElementById('new-service-length').addEventListener('change', (e) => {
                 document.getElementById('new-length-name').style.display = e.target.value === 'new' ? 'block' : 'none';
             });
 
-            document.getElementById('add-material-btn').appendEventListener('click', () => {
-                    addMaterialField('new-service-materials');
-                });
-            document.getElementById('add-service-btn').appendEventListener('click', addNewService);
+            document.getElementById('add-material-btn').addEventListener('click', () => {
+                addMaterialField('new-service-materials');
+            });
+            document.getElementById('add-service-btn').addEventListener('click', addNewService);
 
-            // Обработчик для существующих услуг
+            // Обработчики для существующих услуг
             document.querySelectorAll('.save-service-btn').forEach(btn => {
-                button.addEventListener('click', async () => {
-                    const serviceId = button.getAttribute('data-service-id');
+                btn.addEventListener('click', async () => {
+                    const serviceId = btn.getAttribute('data-service-id');
                     await updateService(serviceId);
                 });
             });
 
             document.querySelectorAll('.delete-service-btn').forEach(btn => {
-                button.addEventListener('click', async () => {
-                    const serviceId = button.getAttribute('data-service-id');
+                btn.addEventListener('click', async () => {
+                    const serviceId = btn.getAttribute('data-service-id');
                     if (confirm('Удалить услугу и связанные записи?')) {
                         await deleteService(serviceId);
                         loadServicesEditList();
@@ -1901,30 +1901,30 @@ async function loadServicesEditList() {
 
             // Обработчик для добавления материала к существующей услуге
             document.querySelectorAll('.add-material-to-service-btn').forEach(btn => {
-                button.addEventListener('click', () => {
-                    const serviceId = button.getAttribute('data-service-id');
+                btn.addEventListener('click', () => {
+                    const serviceId = btn.getAttribute('data-service-id');
                     const select = document.querySelector(`select.add-material-select[data-service-id="${serviceId}"]`);
                     const materialId = select.value;
-                    const materialName = select.selectedOptions[0]?.textContent || '';
+                    const materialName = select.selectedOptions[0]?.text || '';
 
                     if (!materialId) {
                         alert('Выберите материал');
                         return;
                     }
 
-                    const materialList = document.querySelectorById(`materials-${serviceId}`);
+                    const materialList = document.getElementById(`materials-${serviceId}`);
                     const materialItem = document.createElement('div');
-                    newMaterialItem.classList.add('material-item');
-                    materialItem.setAttribute('data-id-material-id', materialId);
+                    materialItem.className = 'material-item';
+                    materialItem.setAttribute('data-id-material', materialId);
                     materialItem.innerHTML = `
-                        <span>${materialName}></span>
+                        <span>${materialName}</span>
                         <input type="number" data-quantity="${materialId}" value="0">
-                        <button class="delete-material-btn" data-material-id="${materialId}" data-service-id="${serviceId}" data-id="${serviceId}" id="${serviceId}">Удалить</button>
+                        <button class="delete-material-btn" data-material-id="${materialId}" data-service-id="${serviceId}">Удалить</button>
                     `;
                     materialList.appendChild(materialItem);
 
                     // Обработчик для удаления нового материала
-                    materialItem.querySelector(`.delete-material-btn[data-material-id="${serviceId}"]`).appendEventListener('click', async () => {
+                    materialItem.querySelector(`.delete-material-btn[data-material-id="${materialId}"]`).addEventListener('click', async () => {
                         if (confirm('Удалить материал из услуги?')) {
                             await deleteMaterialFromService(serviceId, materialId);
                             loadServicesEditList();
@@ -1937,9 +1937,9 @@ async function loadServicesEditList() {
             });
 
             document.querySelectorAll('.delete-material-btn').forEach(btn => {
-                button.addEventListener('click', async () => {
-                    const materialId = button.getAttribute('data-material-id');
-                    const serviceId = button.closest('.service-edit-item').getAttribute('data-service-id');
+                btn.addEventListener('click', async () => {
+                    const materialId = btn.getAttribute('data-material-id');
+                    const serviceId = btn.getAttribute('data-service-id');
                     if (confirm('Удалить материал из услуги?')) {
                         await deleteMaterialFromService(serviceId, materialId);
                         loadServicesEditList();
