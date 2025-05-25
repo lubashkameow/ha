@@ -2,7 +2,7 @@ const fetch = require('node-fetch');
 
 exports.handler = async (event) => {
     const body = JSON.parse(event.body);
-    const url = `https://revised-bios-collection-gather.trycloudflare.com/api/bookings`;
+    const url = `https://biotechnology-les-nu-cleaning.trycloudflare.com/api/bookings`;
     
     try {
         const response = await fetch(url, {
