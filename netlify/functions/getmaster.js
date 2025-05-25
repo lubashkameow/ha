@@ -10,7 +10,7 @@ exports.handler = async (event) => {
         };
     }
     
-    const url = `https://revised-bios-collection-gather.trycloudflare.com/api/master?date=${date}`;
+    const url = `https://biotechnology-les-nu-cleaning.trycloudflare.com/api/master?date=${date}`;
     
     try {
         const response = await fetch(url);
