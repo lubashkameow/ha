@@ -1129,7 +1129,7 @@ option {
     text-align: left;
     border-bottom: 1px solid #ddd;
     border-right: 1px solid #ddd; /* Разделяем столбцы */
-    width: 20%; /* Равномерное распределение ширины */
+    /* width: 20%;  Равномерное распределение ширины */
     box-sizing: border-box;
 }
 
@@ -1162,36 +1162,12 @@ option {
     cursor: pointer;
 }
 
-.save-material-btn {
-    background-color: #4CAF50;
-    color: white;
-}
-
-.save-material-btn:hover {
-    background-color: #45a049;
-}
-
-.delete-material-btn {
-    background-color: #f44336;
-    color: white;
-}
-
-.delete-material-btn:hover {
-    background-color: #da190b;
-}
 
 .material-edit-item {
     display: table-row !important; /* Принудительно используем табличную разметку */
 }
 
-/* Убедимся, что родительский контейнер не сжимает таблицу */
-#materials-tab-content {
-    width: 100%;
-    overflow: visible;
-    min-height: 200px;
-    padding: 10px;
-    box-sizing: border-box;
-}
+
 
 /* Стили для списка материалов */
 .material-edit-item {
