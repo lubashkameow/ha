@@ -1121,7 +1121,6 @@ option {
     width: 100%;
     border-collapse: collapse;
     font-size: 14px;
-    table-layout: fixed; /* Фиксируем ширину столбцов */
 }
 
 .materials-table th, .materials-table td {
@@ -1130,6 +1129,7 @@ option {
     border-bottom: 1px solid #ddd;
     border-right: 1px solid #ddd; /* Разделяем столбцы */
     /* width: 20%;  Равномерное распределение ширины */
+  overflow: visible;
     box-sizing: border-box;
 }
 
