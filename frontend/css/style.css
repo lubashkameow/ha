@@ -1232,7 +1232,13 @@ option {
     background-color: #da190b;
 }
 
-
+.material-list,
+.materials-table-container,
+.materials-table {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
  /* Добавляем стили для нижней панели */
         .bottom-nav {
             position: fixed;
