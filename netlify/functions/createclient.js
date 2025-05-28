@@ -17,7 +17,7 @@ exports.handler = async (event) => {
         };
     }
 
-    const apiUrl = 'https://biotechnology-les-nu-cleaning.trycloudflare.com/api/createclient'; 
+    const apiUrl = 'https://leon-dec-becomes-result.trycloudflare.com/api/createclient'; 
 
     try {
         const response = await fetch(apiUrl, {
