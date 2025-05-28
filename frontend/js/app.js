@@ -24,13 +24,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     checkIfUserIsMaster();
 
-// В app.js, внутри DOMContentLoaded
-document.addEventListener('DOMContentLoaded', () => {
+
+  // Принудительная прокрутка для main-content
   const mainContent = document.querySelector('.main-content');
-  mainContent.addEventListener('touchmove', (e) => {
-    e.stopPropagation(); // Предотвращаем блокировку прокрутки
-  }, { passive: true });
-});
+  if (mainContent) {
+    mainContent.style.overflowY = 'auto';
+    mainContent.style.webkitOverflowScrolling = 'touch';
+
+    // Обработчик для Android
+    mainContent.addEventListener('touchstart', () => {
+      mainContent.style.overflowY = 'auto'; // Восстанавливаем прокрутку
+    }, { passive: true });
+
+    mainContent.addEventListener('touchmove', (e) => {
+      e.stopPropagation(); // Предотвращаем блокировку прокрутки
+    }, { passive: true });
+  }
+
 
 });
 
