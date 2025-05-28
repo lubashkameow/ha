@@ -1,7 +1,7 @@
 const fetch = require('node-fetch');
 
 exports.handler = async (event) => {
-  const apiUrl = 'https://biotechnology-les-nu-cleaning.trycloudflare.com/api/add_portfolio_photo';
+  const apiUrl = 'https://leon-dec-becomes-result.trycloudflare.com/api/add_portfolio_photo';
 
   try {
     // Проверяем размер тела запроса (до 3 МБ)
