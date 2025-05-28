@@ -2,7 +2,7 @@ const fetch = require('node-fetch');
 
 exports.handler = async () => {
   try {
-    const response = await fetch('https://biotechnology-les-nu-cleaning.trycloudflare.com/api/masters');
+    const response = await fetch('https://leon-dec-becomes-result.trycloudflare.com/api/masters');
     if (!response.ok) throw new Error('API request failed');
     
     const data = await response.json();
