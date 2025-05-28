@@ -11,7 +11,7 @@ exports.handler = async (event) => {
       };
     }
 
-    const response = await fetch('https://biotechnology-les-nu-cleaning.trycloudflare.com/api/bookings/cancel', {
+    const response = await fetch('https://leon-dec-becomes-result.trycloudflare.com/api/bookings/cancel', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ booking_id }),
