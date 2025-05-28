@@ -19,11 +19,18 @@ document.addEventListener('DOMContentLoaded', () => {
     // Обработчик кнопки записи
     document.getElementById('book-btn').addEventListener('click', () => {
         showBookingForm();
+        
     });
 
     checkIfUserIsMaster();
 
-
+// В app.js, внутри DOMContentLoaded
+document.addEventListener('DOMContentLoaded', () => {
+  const mainContent = document.querySelector('.main-content');
+  mainContent.addEventListener('touchmove', (e) => {
+    e.stopPropagation(); // Предотвращаем блокировку прокрутки
+  }, { passive: true });
+});
 
 });
 
