@@ -8,24 +8,25 @@
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  background-color: var(--bg-color);F
+  background-color: var(--bg-color);
   color: var(--text-color);
   margin: 0;
   padding: 0;
   min-height: 100vh;
-  touch-action: pan-y;
 }
 
 h1, h2 {
-  font-family: cursive, serif;
+  font-family: 'Dancing Script', cursive, serif;
   font-weight: normal;
   margin: 5px 0;
+  font-style: italic;
         }
 
 .welcome-text {
-  font-family: cursive, serif;
+  font-family: 'Dancing Script', cursive, serif;
   margin: 5px 0 15px;
   font-size: 1.1em;
+  font-style: italic;
         }
 
 .container {
@@ -35,6 +36,7 @@ h1, h2 {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  overflow-y: auto;
 }
 
 header {
@@ -55,6 +57,8 @@ header {
   flex: 1;
   padding: 20px 0;
   overflow-y: auto;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .info-card {
@@ -1249,7 +1253,7 @@ option {
         }
         
         .page-container {
-            padding-bottom: 60px; /* Чтобы контент не перекрывался панелью */
+            padding-bottom: 80px; /* Чтобы контент не перекрывался панелью */
         }
 
 input[type="text"],
