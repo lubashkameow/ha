@@ -77,18 +77,20 @@
         </main>
     </div>
     
-    <script>
-  // Предотвращаем масштабирование, но сохраняем прокрутку
+<script>
   document.addEventListener('touchstart', function(e) {
     if (e.touches.length > 1) {
-      e.preventDefault(); // Блокируем pinch-zoom
+      e.preventDefault();
     }
   }, { passive: false });
 
-  document.addEventListener('gesturestart', function(e) {
-    e.preventDefault(); // Блокируем жесты масштабирования
-  });
+  document.addEventListener('touchmove', function(e) {
+    if (e.touches.length === 1) {
+      e.stopPropagation();
+    }
+  }, { passive: true });
 </script>
+
 
     <!-- Контейнер для страницы записи (изначально скрыт) -->
     <div class="container" id="booking-page" style="display:none;">
