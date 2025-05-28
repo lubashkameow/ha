@@ -6,6 +6,7 @@
     <title>Salon Booking</title>
     <link href="css/style.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="js/app.js" defer></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
@@ -77,11 +78,17 @@
     </div>
     
     <script>
-        // Дополнительная защита от масштабирования
-        document.addEventListener('gesturestart', function(e) {
-            e.preventDefault();
-        });
-    </script>
+  // Предотвращаем масштабирование, но сохраняем прокрутку
+  document.addEventListener('touchstart', function(e) {
+    if (e.touches.length > 1) {
+      e.preventDefault(); // Блокируем pinch-zoom
+    }
+  }, { passive: false });
+
+  document.addEventListener('gesturestart', function(e) {
+    e.preventDefault(); // Блокируем жесты масштабирования
+  });
+</script>
 
     <!-- Контейнер для страницы записи (изначально скрыт) -->
     <div class="container" id="booking-page" style="display:none;">
