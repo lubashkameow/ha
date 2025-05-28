@@ -1,7 +1,7 @@
 const fetch = require('node-fetch');
 
 exports.handler = async (event) => {
-  const apiUrl = 'https://biotechnology-les-nu-cleaning.trycloudflare.com/api/update_portfolio_description';
+  const apiUrl = 'https://leon-dec-becomes-result.trycloudflare.com/api/update_portfolio_description';
 
   try {
     const { user_id, photo_id, description } = JSON.parse(event.body);
