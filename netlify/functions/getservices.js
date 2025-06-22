@@ -2,7 +2,7 @@ const fetch = require('node-fetch');
 
 exports.handler = async () => {
   try {
-    const response = await fetch('https://friday-newton-emerging-dh.trycloudflare.com/api/services');
+    const response = await fetch('https://cad-specifies-slovakia-proof.trycloudflare.com/api/services');
     
     if (!response.ok) throw new Error('API request failed');
     
