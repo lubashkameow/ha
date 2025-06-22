@@ -2,7 +2,7 @@ const fetch = require('node-fetch');
 
 exports.handler = async (event) => {
   try {
-    const response = await fetch('https://leon-dec-becomes-result.trycloudflare.com/api/updatematerial', {
+    const response = await fetch('https://cad-specifies-slovakia-proof.trycloudflare.com/api/updatematerial', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: event.body
